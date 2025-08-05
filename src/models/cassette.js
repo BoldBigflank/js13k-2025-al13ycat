@@ -1,129 +1,18 @@
-export const cassette = () => {
-let geometry;
-let material;
-let mesh;
-let pivot;
-let parent = new THREE.Group();
-geometry = new THREE.BoxGeometry(1, 8, 2);
-geometry.translate(0, 0, 0);
-geometry.rotateX(THREE.MathUtils.degToRad(0));
-geometry.rotateY(THREE.MathUtils.degToRad(0));
-geometry.rotateZ(THREE.MathUtils.degToRad(0));
-material = new THREE.MeshBasicMaterial({color: 0x0000ff});
-mesh = new THREE.Mesh(geometry, material);
-mesh.name = 'case1';
-mesh.position.set(7.5, 4, 0);
-mesh.position.set(7.5, 4, 0);
-parent.add(mesh);
-geometry = new THREE.BoxGeometry(3, 9, 2);
-geometry.translate(0, 0, 0);
-geometry.rotateX(THREE.MathUtils.degToRad(0));
-geometry.rotateY(THREE.MathUtils.degToRad(0));
-geometry.rotateZ(THREE.MathUtils.degToRad(0));
-material = new THREE.MeshBasicMaterial({color: 0x0000ff});
-mesh = new THREE.Mesh(geometry, material);
-mesh.name = 'case2';
-mesh.position.set(5.5, 4.5, 0);
-mesh.position.set(5.5, 4.5, 0);
-parent.add(mesh);
-geometry = new THREE.BoxGeometry(8, 1, 2);
-geometry.translate(0, 0, 0);
-geometry.rotateX(THREE.MathUtils.degToRad(0));
-geometry.rotateY(THREE.MathUtils.degToRad(0));
-geometry.rotateZ(THREE.MathUtils.degToRad(0));
-material = new THREE.MeshBasicMaterial({color: 0x0000ff});
-mesh = new THREE.Mesh(geometry, material);
-mesh.name = 'case3';
-mesh.position.set(0, 8.5, 0);
-mesh.position.set(0, 8.5, 0);
-parent.add(mesh);
-geometry = new THREE.BoxGeometry(8, 1, 2);
-geometry.translate(0, 0, 0);
-geometry.rotateX(THREE.MathUtils.degToRad(0));
-geometry.rotateY(THREE.MathUtils.degToRad(0));
-geometry.rotateZ(THREE.MathUtils.degToRad(0));
-material = new THREE.MeshBasicMaterial({color: 0x0000ff});
-mesh = new THREE.Mesh(geometry, material);
-mesh.name = 'case4';
-mesh.position.set(0, 2.5, 0);
-mesh.position.set(0, 2.5, 0);
-parent.add(mesh);
-geometry = new THREE.BoxGeometry(3, 9, 2);
-geometry.translate(0, 0, 0);
-geometry.rotateX(THREE.MathUtils.degToRad(0));
-geometry.rotateY(THREE.MathUtils.degToRad(0));
-geometry.rotateZ(THREE.MathUtils.degToRad(0));
-material = new THREE.MeshBasicMaterial({color: 0x0000ff});
-mesh = new THREE.Mesh(geometry, material);
-mesh.name = 'case5';
-mesh.position.set(-5.5, 4.5, 0);
-mesh.position.set(-5.5, 4.5, 0);
-parent.add(mesh);
-geometry = new THREE.BoxGeometry(1, 8, 2);
-geometry.translate(0, 0, 0);
-geometry.rotateX(THREE.MathUtils.degToRad(0));
-geometry.rotateY(THREE.MathUtils.degToRad(0));
-geometry.rotateZ(THREE.MathUtils.degToRad(0));
-material = new THREE.MeshBasicMaterial({color: 0x0000ff});
-mesh = new THREE.Mesh(geometry, material);
-mesh.name = 'case6';
-mesh.position.set(-7.5, 4, 0);
-mesh.position.set(-7.5, 4, 0);
-parent.add(mesh);
-geometry = new THREE.BoxGeometry(14, 3, 2.01);
-geometry.translate(0, 0, 0);
-geometry.rotateX(THREE.MathUtils.degToRad(0));
-geometry.rotateY(THREE.MathUtils.degToRad(0));
-geometry.rotateZ(THREE.MathUtils.degToRad(0));
-material = new THREE.MeshBasicMaterial({color: 0xd3d3d3});
-mesh = new THREE.Mesh(geometry, material);
-mesh.name = 'label';
-mesh.position.set(0, 6.5, 0);
-mesh.position.set(0, 6.5, 0);
-parent.add(mesh);
-geometry = new THREE.BoxGeometry(12, 2.1, 2.4);
-geometry.translate(0, 0.95, 0);
-geometry.rotateX(THREE.MathUtils.degToRad(0));
-geometry.rotateY(THREE.MathUtils.degToRad(0));
-geometry.rotateZ(THREE.MathUtils.degToRad(0));
-material = new THREE.MeshBasicMaterial({color: 0xff0000});
-mesh = new THREE.Mesh(geometry, material);
-mesh.name = 'base';
-mesh.position.set(0, 0.95, 0);
-mesh.position.set(0, 0, 0);
-parent.add(mesh);
-geometry = new THREE.BoxGeometry(1.9999999999999998, 1.9999999999999987, 1);
-geometry.translate(-0.0046951672795056965, 0, 0);
-geometry.rotateX(THREE.MathUtils.degToRad(0));
-geometry.rotateY(THREE.MathUtils.degToRad(0));
-geometry.rotateZ(THREE.MathUtils.degToRad(-45));
-material = new THREE.MeshBasicMaterial({color: 0xff7300});
-mesh = new THREE.Mesh(geometry, material);
-mesh.name = 'rightReel';
-mesh.position.set(2.7199999999999998, 3.893933982822019, 0);
-mesh.position.set(2.7246951672795054, 3.893933982822019, 0);
-parent.add(mesh);
-geometry = new THREE.BoxGeometry(4.000000000000001, 3.999999999999999, 0.19999999999999996);
-geometry.translate(4.440892098500626e-16, 0, 1.1102230246251565e-16);
-geometry.rotateX(THREE.MathUtils.degToRad(0));
-geometry.rotateY(THREE.MathUtils.degToRad(0));
-geometry.rotateZ(THREE.MathUtils.degToRad(-45));
-material = new THREE.MeshBasicMaterial({color: 0xc300ff});
-mesh = new THREE.Mesh(geometry, material);
-mesh.name = 'rightTape';
-mesh.position.set(2.8071067811865467, 3.907106781186547, -0.09999999999999998);
-mesh.position.set(2.807106781186546, 3.907106781186547, -0.10000000000000009);
-parent.add(mesh);
-geometry = new THREE.BoxGeometry(2.000000000000001, 1.9999999999999991, 1);
-geometry.translate(0.05710678118654755, -0.09289321881345236, 0);
-geometry.rotateX(THREE.MathUtils.degToRad(0));
-geometry.rotateY(THREE.MathUtils.degToRad(0));
-geometry.rotateZ(THREE.MathUtils.degToRad(-45));
-material = new THREE.MeshBasicMaterial({color: 0xff7300});
-mesh = new THREE.Mesh(geometry, material);
-mesh.name = 'leftReel';
-mesh.position.set(-2.6928932188134524, 3.9071067811865476, 0);
-mesh.position.set(-2.75, 4, 0);
-parent.add(mesh);
-return parent;
-}
+export const cassetteModel = () => 
+[
+  [
+    "cube_case1_1_8_2_7.5_4_0_0_0_0_7.5_4_0_#0000ff",
+    "cube_case2_3_9_2_5.5_4.5_0_0_0_0_5.5_4.5_0_#0000ff",
+    "cube_case3_8_4_2_0_7_0_0_0_0_0_8.5_0_#0000ff",
+    "cube_case4_8_1_2_0_2.5_0_0_0_0_0_2.5_0_#0000ff",
+    "cube_case5_3_9_2_-5.5_4.5_0_0_0_0_-5.5_4.5_0_#0000ff",
+    "cube_case6_1_8_2_-7.5_4_0_0_0_0_-7.5_4_0_#0000ff"
+  ],
+  "cube_base_12_2.1_2.4_0_0.95_0_0_0_0_0_0_0_#ff0000",
+  "cube_rightReel_2_2_1_2.72_3.89_0_0_0_-45_2.72_3.89_0_#ff7300",
+  "cube_rightTape_4_4_0.2_2.81_3.91_-0.1_0_0_-45_2.81_3.91_-0.1_#c300ff",
+  "cube_leftReel_2_2_1_-2.69_3.91_0_0_0_-45_-2.75_4_0_#ff7300",
+  "sphere_dot_1_1_1_0_4_0_0_0_0_0_4_0_#9999ff",
+  "plane_label_12_3_0_0_7_1.01_90_0_0_0_7_1.01_#d3d3d3",
+  "cylinder_base_16_8_16_0_-8_0_0_0_0_0_-8_0_#00ff00"
+]
