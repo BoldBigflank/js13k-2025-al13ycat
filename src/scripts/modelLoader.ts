@@ -1,5 +1,5 @@
 import { cassetteModel } from "../models/cassette";
-import * as THREE from "three";
+import * as THREE from "https://js13kgames.com/2025/webxr/three.module.js";
 
 import { BasicShader } from "../shaders/BasicShader";
 
@@ -122,6 +122,22 @@ const createModel = (modelArray: Model): THREE.Group => {
     });
     return parent;
 };
+
+export const createCube = (options) => {
+    const { width, height, depth, color } = options
+    const geometry = new THREE.BoxGeometry( width, height, depth );
+    const material = new THREE.MeshBasicMaterial( { color } );
+
+    const cubeA = new THREE.Mesh( geometry, material );
+    return cubeA
+}
+
+export const createCylinder = (options) => {
+    const { radius, depth, color } = options
+    const geometry = new THREE.CylinderGeometry(radius, radius, depth, 32);
+    const material = new THREE.MeshBasicMaterial( { color } );
+    return new THREE.Mesh(geometry, material)
+}
 
 export const loadModelByName = (name: string) => {
     if (name === "cassette") {

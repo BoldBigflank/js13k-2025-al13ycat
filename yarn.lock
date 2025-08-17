@@ -818,8 +818,7 @@ __metadata:
   dependencies:
     kontra: "npm:^10.0.2"
     prettier: "npm:^3.6.2"
-    three: "npm:^0.178.0"
-    vite: "npm:^7.0.4"
+    vite: "npm:^7.0.6"
   languageName: unknown
   linkType: soft
 
@@ -1319,13 +1318,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"three@npm:^0.178.0":
-  version: 0.178.0
-  resolution: "three@npm:0.178.0"
-  checksum: 10c0/00bffd075f2e0fac396c2be121ae0b376508c2f91b97eba19606ace34c53f51b8287047841ef22a3762f6525a83e7b9143728b17639e6d8477e1207d9e9d1866
-  languageName: node
-  linkType: hard
-
 "tinyglobby@npm:^0.2.12, tinyglobby@npm:^0.2.14":
   version: 0.2.14
   resolution: "tinyglobby@npm:0.2.14"
@@ -1354,7 +1346,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^7.0.4":
+"vite@npm:^7.0.6":
   version: 7.0.6
   resolution: "vite@npm:7.0.6"
   dependencies:

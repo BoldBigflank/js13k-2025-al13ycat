@@ -1,4 +1,4 @@
-import { Vector2, Vector3, Color } from "three";
+import * as THREE from "https://js13kgames.com/2025/webxr/three.module.js";
 
 /**
  * @module BasicShader
@@ -15,13 +15,13 @@ const BasicShader = {
 
 	uniforms: {
 
-		'uDirLightPos':	{ value: new Vector3() },
-		'uDirLightColor': { value: new Color( 0xeeeeee ) },
+		'uDirLightPos':	{ value: new THREE.Vector3() },
+		'uDirLightColor': { value: new THREE.Color( 0xeeeeee ) },
 
-		'uAmbientLightColor': { value: new Color( 0x050505 ) },
+		'uAmbientLightColor': { value: new THREE.Color( 0x050505 ) },
 
-		'uBaseColor': { value: new Color( 0xffffff ) },
-		'uLineColor1': { value: new Color( 0x000000 ) }
+		'uBaseColor': { value: new THREE.Color( 0xffffff ) },
+		'uLineColor1': { value: new THREE.Color( 0x000000 ) }
 
 	},
 
