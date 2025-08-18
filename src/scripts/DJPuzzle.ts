@@ -1,28 +1,31 @@
+import { BLUE, GREEN, ORANGE, RED, VIOLET, YELLOW } from "./Colors"
+
 const SEQUENCE_COLOR = [
-    'red',
-    'orange',
-    'yellow',
-    'green',
-    'blue',
-    'violet'
+    RED,
+    ORANGE,
+    YELLOW,
+    GREEN,
+    BLUE,
+    VIOLET
 ]
 
 const SEQUENCE_TITLE = [
-    '1 2',
-    '2 3',
-    '3 4',
-    '4 5',
-    '5 6',
-    '6 1'
+    'OFFSIDE', // -> sideshow ->
+    'SHOWCASE', // -> caseload ->
+    'LOADOUT', // -> outback ->
+    'BACKHAND', // -> handbook ->
+    'BOOKMARKS', // -> marksman ->
+    'MANPOWER' // -> power off ->
 ]
-
+// work space suit case load out back hand shake down town home
+// off side  show  case load out back hand book marks man power
 const SEQUENCE_ARTIST = [
-    'A B',
-    'B C',
-    'C D',
-    'D E',
-    'E F',
-    'F A'
+    'Shiny Toy Guns',
+    'B.B. King',
+    'Jack White',
+    'Black Sabbath',
+    'Faith Hill',
+    'Cliff Sheen',
 ]
 
 const RECORD_INDEXES = [ // Manual shuffling :/
