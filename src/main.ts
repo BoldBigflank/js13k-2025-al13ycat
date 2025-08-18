@@ -5,6 +5,7 @@ import * as THREE from "https://js13kgames.com/2025/webxr/three.module.js";
 import { VRButton } from "./libraries/VRButton";
 import { cassetteModel } from "./models/cassette";
 import { InteractiveObject3D } from "./types";
+import { Vinyl } from "./models/vinyl";
 // import { XRControllerModelFactory } from "./libraries/XRControllerModelFactory";
 const clock = new THREE.Clock()
 
@@ -38,7 +39,7 @@ const initGame = async () => {
         0.1,
         1000,
     );
-    camera.position.set(0, 8, 20)
+    camera.position.set(0, 1, 0)
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
@@ -48,6 +49,7 @@ const initGame = async () => {
     directionalLight.target.position.set(0, 0, 0);
     scene.add(directionalLight);
     scene.add(directionalLight.target);
+    
     cassetteMesh = loadModelByName("cassette") as InteractiveObject3D;
     cassetteMesh.position.set(0, 0, -20)
     cassetteMesh.userData.isPickable = true
@@ -58,6 +60,16 @@ const initGame = async () => {
         console.log("MOVE")
     }
     scene.add(cassetteMesh);
+
+    djPuzzle.records.forEach((record, i) => {
+        const mesh = Vinyl(record)
+        mesh.position.set(i * 1 - 3, 1, -1)
+        mesh.userData.isPickable = true
+        mesh.onPointerPick = () => {
+            console.log('picked', mesh)
+        }
+        scene.add(mesh)
+    })
 
     // Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true });        
