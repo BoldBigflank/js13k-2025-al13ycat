@@ -16,3 +16,4 @@ dist.zip
 dist
 .DS_Store
 node_modules
+extra/words/*.txt
