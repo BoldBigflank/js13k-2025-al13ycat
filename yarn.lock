@@ -645,6 +645,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"esm@npm:^3.2.25":
+  version: 3.2.25
+  resolution: "esm@npm:3.2.25"
+  checksum: 10c0/8e60e8075506a7ce28681c30c8f54623fe18a251c364cd481d86719fc77f58aa055b293d80632d9686d5408aaf865ffa434897dc9fd9153c8b3f469fad23f094
+  languageName: node
+  linkType: hard
+
 "exponential-backoff@npm:^3.1.1":
   version: 3.1.2
   resolution: "exponential-backoff@npm:3.1.2"
@@ -818,6 +825,7 @@ __metadata:
   dependencies:
     kontra: "npm:^10.0.2"
     prettier: "npm:^3.6.2"
+    roadroller: "npm:^2.1.0"
     vite: "npm:^7.0.6"
   languageName: unknown
   linkType: soft
@@ -1096,6 +1104,17 @@ __metadata:
   version: 0.12.0
   resolution: "retry@npm:0.12.0"
   checksum: 10c0/59933e8501727ba13ad73ef4a04d5280b3717fd650408460c987392efe9d7be2040778ed8ebe933c5cbd63da3dcc37919c141ef8af0a54a6e4fca5a2af177bfe
+  languageName: node
+  linkType: hard
+
+"roadroller@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "roadroller@npm:2.1.0"
+  dependencies:
+    esm: "npm:^3.2.25"
+  bin:
+    roadroller: cli.mjs
+  checksum: 10c0/442aa16e1a1d5c727af711d6f34cb0c1e6183722942212fc8b50362daf9022878d647660b9810fa8bc03aeed833210bad56c6fe5428f8732b50964896a6d0604
   languageName: node
   linkType: hard
 
