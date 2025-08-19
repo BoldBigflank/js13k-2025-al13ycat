@@ -1,6 +1,6 @@
 import "./style.css";
 import { loadModelByName, createCube, createCylinder } from "./scripts/modelLoader";
-import DJPuzzle from "./scripts/djPuzzle";
+import DJPuzzle from "./scripts/DJPuzzle";
 import * as THREE from "https://js13kgames.com/2025/webxr/three.module.js";
 import { VRButton } from "./libraries/VRButton";
 import { cassetteModel } from "./models/cassette";

@@ -14,6 +14,9 @@
 package.json
 dist.zip
 dist
+dist-tsc
 .DS_Store
 node_modules
 extra/words/*.txt
+test-zip
+test-zip-clean
