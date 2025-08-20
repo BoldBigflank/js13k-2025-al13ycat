@@ -12,20 +12,17 @@ import * as THREE from "https://js13kgames.com/2025/webxr/three.module.js";
  * @type {ShaderMaterial~Shader}
  */
 const BasicShader = {
+    uniforms: {
+        uDirLightPos: { value: new THREE.Vector3() },
+        uDirLightColor: { value: new THREE.Color(0xeeeeee) },
 
-	uniforms: {
+        uAmbientLightColor: { value: new THREE.Color(0x050505) },
 
-		'uDirLightPos':	{ value: new THREE.Vector3() },
-		'uDirLightColor': { value: new THREE.Color( 0xeeeeee ) },
+        uBaseColor: { value: new THREE.Color(0xffffff) },
+        uLineColor1: { value: new THREE.Color(0x000000) },
+    },
 
-		'uAmbientLightColor': { value: new THREE.Color( 0x050505 ) },
-
-		'uBaseColor': { value: new THREE.Color( 0xffffff ) },
-		'uLineColor1': { value: new THREE.Color( 0x000000 ) }
-
-	},
-
-	vertexShader: /* glsl */`
+    vertexShader: /* glsl */ `
 
 		varying vec3 vNormal;
 
@@ -36,7 +33,7 @@ const BasicShader = {
 
 		}`,
 
-	fragmentShader: /* glsl */`
+    fragmentShader: /* glsl */ `
 
 		uniform vec3 uBaseColor;
 		uniform vec3 uLineColor1;
@@ -80,8 +77,7 @@ const BasicShader = {
 
 			#include <colorspace_fragment>
 
-		}`
-
+		}`,
 };
 
 export { BasicShader };

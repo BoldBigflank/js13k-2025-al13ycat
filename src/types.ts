@@ -8,7 +8,7 @@ export type GameManager = {
     loop: GameLoop;
 };
 
-export interface InteractiveObject3D extends THREE.Object3d {
-    onPointerPick?: () => void
-    onPointerMove?: () => void
+export interface InteractiveObject3D extends THREE.Object3D {
+    onPointerPick?: (selectedController?: THREE.Group) => void;
+    onPointerMove?: (selectedController?: THREE.Group) => void;
 }
