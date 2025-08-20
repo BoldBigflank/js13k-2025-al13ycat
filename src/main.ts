@@ -20,6 +20,7 @@ let cassetteMesh;
 const intersected = [];
 
 let controls, baseReferenceSpace;
+const START_POSITION = new THREE.Vector3(0, 0, 0.3)
 
 const initGame = async () => {
     // Clean up intro and start canvas
@@ -86,19 +87,33 @@ const initGame = async () => {
 
     djPuzzle.vinyls.forEach((record, i) => {
         const mesh = Vinyl(record);
-        mesh.position.set(0.7, 1.25, -0.2 - 0.125 * i);
+        mesh.name = `vinyl-${i}-${record.color}`
+        const originalPosition = new THREE.Vector3(0.7, 1.25, -0.2 - 0.125 * i);
+        mesh.position.copy(originalPosition)
+        mesh.userData.originalPosition = originalPosition
         mesh.userData.isPickable = true;
         mesh.userData.recordIndex = i
         // Select a record
         mesh.onPointerPick = (controller) => {
+            if (controller.userData.selected) return // Don't let it grab twice
             console.log("picked", mesh, controller);
             djPuzzle.selected[controller.id] = i
             const target = controller.getObjectByName('target')
             if (target) {
                 target.add(mesh)
                 mesh.position.set(0, 0, 0)
+                controller.userData.selected = mesh
             }
         };
+        mesh.onPointerDrop = (controller) => {
+            // If it's near an open table mesh
+            
+            // Else move back to its original position
+            scene.add(mesh)
+            mesh.position.copy(originalPosition)
+            mesh.setRotationFromQuaternion(new THREE.Quaternion())
+            controller.userData.selected = undefined
+        }
         scene.add(mesh);
     });
 
@@ -120,10 +135,7 @@ const initGame = async () => {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor("#000000");
-    renderer.xr.addEventListener(
-        "sessionstart",
-        () => (baseReferenceSpace = renderer.xr.getReferenceSpace()),
-    );
+    renderer.xr.addEventListener("sessionstart", onXRSessionStart);
     renderer.xr.enabled = true;
     renderer.setAnimationLoop(animate);
     document.body.appendChild(VRButton.createButton(renderer));
@@ -134,11 +146,15 @@ const initGame = async () => {
     controller1 = renderer.xr.getController(0);
     controller1.addEventListener("selectstart", onSelectStart);
     controller1.addEventListener("selectend", onSelectEnd);
+    controller1.addEventListener("squeezestart", onSelectStart);
+    controller1.addEventListener("squeezeend", onSelectEnd);
     scene.add(controller1);
 
     controller2 = renderer.xr.getController(1);
     controller2.addEventListener("selectstart", onSelectStart);
     controller2.addEventListener("selectend", onSelectEnd);
+    controller2.addEventListener("squeezestart", onSelectStart);
+    controller2.addEventListener("squeezeend", onSelectEnd);
     scene.add(controller2);
 
     // const controllerModelFactory = new XRControllerModelFactory();
@@ -195,6 +211,17 @@ const initGame = async () => {
     window.addEventListener("resize", onWindowResize, false);
 };
 
+function onXRSessionStart() {
+    baseReferenceSpace = renderer.xr.getReferenceSpace()
+    // Move to the dj station
+    console.log(baseReferenceSpace)
+    const offsetPosition = { x: -1 * START_POSITION.x, y: -1 * START_POSITION.y, z: -1 * START_POSITION.z, w: 1}
+    const offsetRotation = new THREE.Quaternion()
+    const transform = new XRRigidTransform(offsetPosition, offsetRotation)
+    const teleportSpaceOffset = baseReferenceSpace.getOffsetReferenceSpace(transform)
+    renderer.xr.setReferenceSpace( teleportSpaceOffset );
+}
+
 // Starts pulling trigger
 function onSelectStart(event) {
     console.log("onSelectStart");
@@ -222,9 +249,9 @@ function onSelectStart(event) {
 function onSelectEnd(event) {
     console.log("onSelectEnd");
     selectedController = event.target;
-    if (selectedController.userData.selected !== undefined) {
-        const object = selectedController.userData.selected;
-        selectedController.userData.selected = undefined;
+    const focusedObject = selectedController.userData.selected;
+    if (focusedObject?.onPointerDrop) {
+        focusedObject.onPointerDrop(selectedController)
     }
 }
 
