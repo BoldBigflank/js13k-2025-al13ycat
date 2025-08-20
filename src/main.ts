@@ -91,8 +91,13 @@ const initGame = async () => {
         mesh.userData.recordIndex = i
         // Select a record
         mesh.onPointerPick = (controller) => {
-            console.log("picked", mesh);
+            console.log("picked", mesh, controller);
             djPuzzle.selected[controller.id] = i
+            const target = controller.getObjectByName('target')
+            if (target) {
+                target.add(mesh)
+                mesh.position.set(0, 0, 0)
+            }
         };
         scene.add(mesh);
     });
@@ -139,6 +144,8 @@ const initGame = async () => {
     // const controllerModelFactory = new XRControllerModelFactory();
 
     controllerGrip1 = renderer.xr.getControllerGrip(0);
+    
+    // Visual representation of the controller
     const controllerMesh1 = createCylinder({
         radius: 0.01,
         depth: 0.2,
@@ -147,9 +154,9 @@ const initGame = async () => {
     controllerMesh1.name = "controllerMesh1";
     controllerMesh1.rotateX(Math.PI / 4);
     controllerGrip1.add(controllerMesh1);
-    // controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
     scene.add(controllerGrip1);
 
+    // Visual representation of the controller
     controllerGrip2 = renderer.xr.getControllerGrip(1);
     const controllerMesh2 = createCylinder({
         radius: 0.01,
@@ -158,10 +165,7 @@ const initGame = async () => {
     });
     controllerMesh2.rotateX(Math.PI / 4);
     controllerGrip2.add(controllerMesh2);
-    // controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
     scene.add(controllerGrip2);
-
-    //
 
     const geometry = new THREE.BufferGeometry().setFromPoints([
         new THREE.Vector3(0, 0, 0),
@@ -174,6 +178,16 @@ const initGame = async () => {
 
     controller1.add(line.clone());
     controller2.add(line.clone());
+
+    // Target for selected records to go
+    const target = new THREE.Object3D();
+    target.rotation.set(-1 * Math.PI / 2, 0, 0)
+    target.position.set(0, -0.05, -.12)
+    target.name = "target";
+
+    controller1.add(target.clone());
+    controller2.add(target.clone());
+
 
     raycaster = new THREE.Raycaster();
 
