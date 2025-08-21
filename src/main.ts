@@ -78,8 +78,7 @@ const initGame = async () => {
             djPuzzle.selected[controller.id] = i;
             const target = controller.getObjectByName("target");
             if (target) {
-                moveParent(mesh, target);
-                // mesh.position.set(0, 0, 0);
+                target.attach(mesh);
                 AnimationFactory.Instance.animateTransform({
                     mesh,
                     end: {
@@ -100,22 +99,28 @@ const initGame = async () => {
                 djPuzzle.addVinylByIndex(mesh.userData.recordIndex);
                 delete djPuzzle.selected[controller.id];
                 controller.userData.selected = undefined;
-                mesh.removeFromParent();
-                scene.add(mesh);
-                const tableAPos = tableA.getWorldPosition(new THREE.Vector3());
-                const vinylPosition = new THREE.Vector3(
-                    tableAPos.x,
-                    tableAPos.y + 0.1,
-                    tableAPos.z,
-                );
-                mesh.position.copy(vinylPosition);
-                mesh.rotation.set((-1 * Math.PI) / 2, 0, 0);
+                tableA.attach(mesh);
+                AnimationFactory.Instance.animateTransform({
+                    mesh,
+                    end: {
+                        position: new THREE.Vector3(0, 0.1, 0),
+                        rotation: new THREE.Euler((-1 * Math.PI) / 2, 0, 0),
+                    },
+                    duration: 60,
+                });
                 return;
             } else {
                 // Else move back to its original position
-                scene.add(mesh);
-                mesh.position.copy(originalPosition);
-                mesh.setRotationFromQuaternion(new THREE.Quaternion());
+                scene.attach(mesh);
+                AnimationFactory.Instance.animateTransform({
+                    mesh,
+                    end: {
+                        position: originalPosition,
+                        rotation: new THREE.Euler(),
+                    },
+                    duration: 60,
+                });
+                
                 controller.userData.selected = undefined;
             }
         };
@@ -188,7 +193,7 @@ const initGame = async () => {
     controller2.add(line.clone());
 
     // Target for selected records to go
-    const target = new THREE.Object3D();
+    const target = new THREE.Group();
     target.rotation.set((-1 * Math.PI) / 2, 0, 0);
     target.position.set(0, -0.05, -0.12);
     target.name = "target";
