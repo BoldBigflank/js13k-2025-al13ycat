@@ -13,6 +13,7 @@ export interface AnimateTransformOpts {
     ease?: (t: number) => number;
     duration: number;
     delay?: number;
+    loop?: boolean;
 }
 
 type Animating = {
@@ -22,6 +23,9 @@ type Animating = {
     easeFunc: (t: number) => number;
     startTime: number;
     endTime: number;
+    loop: boolean;
+    resolve?: () => void;
+    reject?: (reason?: any) => void;
 };
 
 // Default easing function (quadratic ease)
@@ -61,12 +65,36 @@ export class AnimationFactory {
 
             // It's over
             if (now >= animation.endTime) {
+                if (animation.loop) {
+                    animation.startTime = now;
+                    animation.endTime = now + duration;
+                    if (animation.end.position) {
+                        animation.mesh.position.copy(animation.start.position);
+                    }
+                    if (animation.end.rotation) {
+                        animation.mesh.rotation.copy(animation.start.rotation);
+                    }
+                    if (animation.end.scaling) {
+                        animation.mesh.scale.copy(animation.start.scaling);
+                    }
+                    return true;
+                }
+
                 if (animation.end.position)
                     animation.mesh.position.copy(animation.end.position);
                 if (animation.end.rotation)
                     animation.mesh.rotation.copy(animation.end.rotation);
                 if (animation.end.scaling)
                     animation.mesh.scale.copy(animation.end.scaling);
+                
+                // Resolve the promise if it exists and this is not a looped animation
+                if (animation.resolve) {
+                    animation.resolve();
+                    // Clean up the promise references
+                    animation.resolve = undefined;
+                    animation.reject = undefined;
+                }
+                
                 return false;
             }
 
@@ -77,20 +105,17 @@ export class AnimationFactory {
                     animation.easeFunc(lerpAmount),
                 );
             if (animation.end.rotation) {
-                // Convert Euler rotations to quaternions for smooth interpolation
-                const startQuat = new THREE.Quaternion().setFromEuler(
-                    animation.start.rotation!,
-                );
-                const endQuat = new THREE.Quaternion().setFromEuler(
-                    animation.end.rotation,
-                );
-                const currentQuat = new THREE.Quaternion();
-                currentQuat.slerpQuaternions(
-                    startQuat,
-                    endQuat,
-                    animation.easeFunc(lerpAmount),
-                );
-                animation.mesh.rotation.setFromQuaternion(currentQuat);
+                // Lerp individual Euler angles directly
+                const startEuler = animation.start.rotation!;
+                const endEuler = animation.end.rotation;
+                const currentEuler = new THREE.Euler();
+                
+                // Interpolate each axis independently
+                currentEuler.x = startEuler.x + (endEuler.x - startEuler.x) * animation.easeFunc(lerpAmount);
+                currentEuler.y = startEuler.y + (endEuler.y - startEuler.y) * animation.easeFunc(lerpAmount);
+                currentEuler.z = startEuler.z + (endEuler.z - startEuler.z) * animation.easeFunc(lerpAmount);
+                
+                animation.mesh.rotation.copy(currentEuler);
             }
             if (animation.end.scaling)
                 animation.mesh.scale.lerpVectors(
@@ -102,13 +127,22 @@ export class AnimationFactory {
         });
     }
 
-    public animateTransform(opts: AnimateTransformOpts) {
+    public animateTransform(opts: AnimateTransformOpts): Promise<void> {
         const { mesh, end } = opts;
         const duration = opts.duration || 1000;
         const delay = opts.delay || 0;
         const ease = opts.ease || defaultEase;
         const now = this.clock.getElapsedTime() * 1000;
-
+        
+        // Create a promise that resolves when the animation completes
+        let resolve: (() => void) | undefined;
+        let reject: ((reason?: any) => void) | undefined;
+        
+        const promise = new Promise<void>((res, rej) => {
+            resolve = res;
+            reject = rej;
+        });
+        
         this.animations.push({
             mesh,
             start: {
@@ -120,6 +154,40 @@ export class AnimationFactory {
             easeFunc: ease,
             startTime: now + delay,
             endTime: now + delay + duration,
+            loop: opts.loop || false,
+            resolve,
+            reject,
         });
+        
+        return promise;
+    }
+
+    public cancelAnimation(mesh: THREE.Object3D, jumpToEnd: boolean = false) {
+        const animations = this.animations.filter((animation) => animation.mesh === mesh);
+        if (!animations.length) return;
+        
+        animations.forEach((animation) => {
+            if (jumpToEnd) {
+                if (animation.end.position) {
+                    mesh.position.copy(animation.end.position);
+                }
+                if (animation.end.rotation) {
+                    mesh.rotation.copy(animation.end.rotation);
+                }
+                if (animation.end.scaling) {
+                    mesh.scale.copy(animation.end.scaling);
+                }
+            }
+            
+            // Resolve the promise if it exists (animation was cancelled)
+            if (animation.reject) {
+                animation.reject();
+                // Clean up the promise references
+                animation.resolve = undefined;
+                animation.reject = undefined;
+            }
+        });
+        
+        this.animations = this.animations.filter((animation) => animation.mesh !== mesh);
     }
 }

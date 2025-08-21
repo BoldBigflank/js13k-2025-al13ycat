@@ -58,6 +58,15 @@ const initGame = async () => {
     cassetteMesh.position.set(0, 0, -20);
     cassetteMesh.userData.isPickable = true;
     scene.add(cassetteMesh);
+    AnimationFactory.Instance.animateTransform({
+        mesh: cassetteMesh,
+        end: {
+            rotation: new THREE.Euler(0, 2*Math.PI - 0.01, 0)
+        },
+        duration: 3000,
+        ease: (t) => t,
+        loop: true
+    })
 
     const arenaMesh = loadModelByName("arena") as InteractiveObject3D;
     const tableA = arenaMesh.getObjectByName("tableA") as InteractiveObject3D;
@@ -78,6 +87,7 @@ const initGame = async () => {
             djPuzzle.selected[controller.id] = i;
             const target = controller.getObjectByName("target");
             if (target) {
+                AnimationFactory.Instance.cancelAnimation(mesh)
                 target.attach(mesh);
                 AnimationFactory.Instance.animateTransform({
                     mesh,
@@ -92,6 +102,7 @@ const initGame = async () => {
         };
         mesh.onPointerDrop = (controller) => {
             // If it's near an open table mesh
+            AnimationFactory.Instance.cancelAnimation(mesh, true)
             const tableDistance = mesh
                 .getWorldPosition(new THREE.Vector3())
                 .distanceTo(tableA.getWorldPosition(new THREE.Vector3()));
@@ -103,10 +114,21 @@ const initGame = async () => {
                 AnimationFactory.Instance.animateTransform({
                     mesh,
                     end: {
-                        position: new THREE.Vector3(0, 0.1, 0),
+                        position: new THREE.Vector3(0, 0.07, 0),
                         rotation: new THREE.Euler((-1 * Math.PI) / 2, 0, 0),
                     },
                     duration: 60,
+                }).then((cancelled) => {
+                    if (cancelled) return
+                    AnimationFactory.Instance.animateTransform({
+                        mesh,
+                        end: {
+                            rotation: new THREE.Euler((-1 * Math.PI) / 2, 0, -2 * Math.PI),
+                        },
+                        ease: t => t,
+                        duration: 1800,
+                        loop:true
+                    })
                 });
                 return;
             } else {
@@ -297,7 +319,6 @@ function cleanIntersected() {
 
 function animate() {
     AnimationFactory.Instance.update();
-    cassetteMesh.rotation.y += 0.005;
     cleanIntersected();
 
     intersectObjects(controller1);
