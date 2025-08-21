@@ -53,43 +53,53 @@ type DJPuzzleState = {
 };
 
 export class DJPuzzle {
-    queue: number[]
-    rack: number[]
-    selected: Record<string,number>;
+    queue: number[];
+    rack: number[];
+    selected: Record<string, number>;
     vinyls: Vinyl[];
     comboCount: {
-        color: number,
-        artist: number,
-        title: number
+        color: number;
+        artist: number;
+        title: number;
     };
     solvedCombo: {
-        color: boolean,
-        artist: boolean,
-        title: boolean
-    }
-    
+        color: boolean;
+        artist: boolean;
+        title: boolean;
+    };
+
     constructor() {
         this.reset();
     }
 
     addVinylByIndex(index: number) {
-        this.queue.unshift(index)
-        this.updateComboCount()
+        this.queue.unshift(index);
+        this.updateComboCount();
     }
 
     updateComboCount() {
         // Looking backwards at the queue, see how much the queue follows the VINYL_INDICES
-        const [COLOR_COMBO, ARTIST_COMBO, TITLE_COMBO] = VINYL_INDEXES
+        const [COLOR_COMBO, ARTIST_COMBO, TITLE_COMBO] = VINYL_INDEXES;
         this.comboCount = {
-            color: comboCorrectCount(this.queue, [...COLOR_COMBO].reverse(), true),
+            color: comboCorrectCount(
+                this.queue,
+                [...COLOR_COMBO].reverse(),
+                true,
+            ),
             artist: comboCorrectCount(this.queue, [...ARTIST_COMBO].reverse()),
             title: comboCorrectCount(this.queue, [...TITLE_COMBO].reverse()),
-        }
+        };
         this.solvedCombo = {
-            color: this.solvedCombo.color || this.comboCount.color === COLOR_COMBO.length,
-            artist: this.solvedCombo.artist || this.comboCount.artist === ARTIST_COMBO.length,
-            title: this.solvedCombo.title || this.comboCount.title === TITLE_COMBO.length,
-        }
+            color:
+                this.solvedCombo.color ||
+                this.comboCount.color === COLOR_COMBO.length,
+            artist:
+                this.solvedCombo.artist ||
+                this.comboCount.artist === ARTIST_COMBO.length,
+            title:
+                this.solvedCombo.title ||
+                this.comboCount.title === TITLE_COMBO.length,
+        };
     }
 
     isSolved(comboType: "color" | "artist" | "title") {
@@ -97,12 +107,12 @@ export class DJPuzzle {
     }
 
     reset() {
-        this.queue = []
-        this.rack = []
-        this.selected = {}
+        this.queue = [];
+        this.rack = [];
+        this.selected = {};
         const [colorIndex, titleIndex, artistIndex] = VINYL_INDEXES;
         this.vinyls = SEQUENCE_COLOR.map((_color, index) => {
-            this.rack.push(index)
+            this.rack.push(index);
             return {
                 index,
                 color: SEQUENCE_COLOR[colorIndex[index]],
@@ -114,13 +124,12 @@ export class DJPuzzle {
             color: 0,
             artist: 0,
             title: 0,
-        }
+        };
         this.solvedCombo = {
             color: false,
             artist: false,
             title: false,
-        }
-
+        };
     }
 }
 

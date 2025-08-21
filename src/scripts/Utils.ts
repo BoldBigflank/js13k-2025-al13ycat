@@ -1,3 +1,5 @@
+import * as THREE from "https://js13kgames.com/2025/webxr/three.module.js";
+
 export const Clamp = (value: number, min: number, max: number) => {
     return Math.min(Math.max(value, min), max);
 };
@@ -13,9 +15,13 @@ export const initCanvas = (
     return [canvas, ctx];
 };
 
-export const comboCorrectCount = (array1: number[], array2: number[], startAtZero: boolean = false): number => {
+export const comboCorrectCount = (
+    array1: number[],
+    array2: number[],
+    startAtZero: boolean = false,
+): number => {
     let count = 0;
-    let array2StartIndex = array2.findIndex(value => value === array1[0]);
+    let array2StartIndex = array2.findIndex((value) => value === array1[0]);
     for (let i = 0; i < array1.length && i < array2.length; i++) {
         if (array1[i] === array2[(array2StartIndex + i) % array2.length]) {
             count++;
@@ -24,4 +30,13 @@ export const comboCorrectCount = (array1: number[], array2: number[], startAtZer
         }
     }
     return count;
+};
+
+export const moveParent = (mesh: THREE.Object3D, parent: THREE.Object3D) => {
+    let meshPosition = new THREE.Vector3();
+    mesh.removeFromParent();
+    parent.add(mesh);
+    mesh.updateMatrixWorld(true);
+    mesh.worldToLocal(meshPosition);
+    mesh.position.set(meshPosition.x, meshPosition.y, meshPosition.z);
 };

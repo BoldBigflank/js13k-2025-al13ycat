@@ -6,6 +6,8 @@ import { VRButton } from "./libraries/VRButton";
 
 import { InteractiveObject3D } from "./types";
 import { Vinyl } from "./models/vinyl";
+import { AnimationFactory } from "./scripts/AnimationFactory";
+import { moveParent } from "./scripts/Utils";
 // import { XRControllerModelFactory } from "./libraries/XRControllerModelFactory";
 const clock = new THREE.Clock();
 
@@ -41,6 +43,7 @@ const initGame = async () => {
     );
     camera.position.set(0, 2, 1);
     camera.rotation.set((-1 * Math.PI) / 12, 0, 0);
+    AnimationFactory.Instance.initScene(scene);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
@@ -75,8 +78,16 @@ const initGame = async () => {
             djPuzzle.selected[controller.id] = i;
             const target = controller.getObjectByName("target");
             if (target) {
-                target.add(mesh);
-                mesh.position.set(0, 0, 0);
+                moveParent(mesh, target);
+                // mesh.position.set(0, 0, 0);
+                AnimationFactory.Instance.animateTransform({
+                    mesh,
+                    end: {
+                        position: new THREE.Vector3(0, 0, 0),
+                        rotation: new THREE.Euler(0, 0, 0),
+                    },
+                    duration: 60,
+                });
                 controller.userData.selected = mesh;
             }
         };
@@ -280,6 +291,7 @@ function cleanIntersected() {
 }
 
 function animate() {
+    AnimationFactory.Instance.update();
     cassetteMesh.rotation.y += 0.005;
     cleanIntersected();
 
