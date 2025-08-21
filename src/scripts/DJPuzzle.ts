@@ -12,7 +12,9 @@ const SEQUENCE_TITLE = [
     "MANPOWER", // -> power off ->
 ];
 // work space suit case load out back hand shake down town home
+// NOTE: This one has the incorrect "download"
 // off side  show  case load out back hand book marks man power
+// NOTE: This one has the incorrect "outman"
 const SEQUENCE_ARTIST = [
     "Shiny Toy Guns",
     "B.B. King",

@@ -1,8 +1,5 @@
 import "./style.css";
-import {
-    loadModelByName,
-    createCylinder,
-} from "./scripts/modelLoader";
+import { loadModelByName, createCylinder } from "./scripts/modelLoader";
 import DJPuzzle from "./scripts/DJPuzzle";
 import * as THREE from "https://js13kgames.com/2025/webxr/three.module.js";
 import { VRButton } from "./libraries/VRButton";
@@ -20,7 +17,7 @@ let cassetteMesh;
 const intersected = [];
 
 let controls, baseReferenceSpace;
-const START_POSITION = new THREE.Vector3(0, 0, 0.3)
+const START_POSITION = new THREE.Vector3(0, 0, 0.3);
 
 const initGame = async () => {
     // Clean up intro and start canvas
@@ -43,7 +40,7 @@ const initGame = async () => {
         1000,
     );
     camera.position.set(0, 2, 1);
-    camera.rotation.set(-1 * Math.PI / 12, 0, 0);
+    camera.rotation.set((-1 * Math.PI) / 12, 0, 0);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
@@ -57,78 +54,62 @@ const initGame = async () => {
     cassetteMesh = loadModelByName("cassette") as InteractiveObject3D;
     cassetteMesh.position.set(0, 0, -20);
     cassetteMesh.userData.isPickable = true;
-    cassetteMesh.onPointerPick = () => {
-        console.log("PICK");
-    };
-    cassetteMesh.onPointerMove = () => {
-        console.log("MOVE");
-    };
     scene.add(cassetteMesh);
 
     const arenaMesh = loadModelByName("arena") as InteractiveObject3D;
-    const tableA = arenaMesh.getObjectByName('tableA') as InteractiveObject3D;
-    const tableB = arenaMesh.getObjectByName('tableB') as InteractiveObject3D;
-    [tableA, tableB].forEach((tableMesh) => {
-        // Drop a record
-        tableMesh.onPointerPick = (controller) => {
-            // Update the puzzle
-            const selectedVinyl = djPuzzle.selected[controller.id]
-            if (selectedVinyl) {
-                djPuzzle.addVinylByIndex(selectedVinyl)
-                delete djPuzzle.selected[controller.id]
-            }
-            
-            // Update the meshes
-            tableMesh.userData.loaded = true
-        }
-    })
+    const tableA = arenaMesh.getObjectByName("tableA") as InteractiveObject3D;
 
     scene.add(arenaMesh);
 
     djPuzzle.vinyls.forEach((record, i) => {
         const mesh = Vinyl(record);
-        mesh.name = `vinyl-${i}-${record.color}`
+        mesh.name = `vinyl-${i}`;
         const originalPosition = new THREE.Vector3(0.7, 1.25, -0.2 - 0.125 * i);
-        mesh.position.copy(originalPosition)
-        mesh.userData.originalPosition = originalPosition
+        mesh.position.copy(originalPosition);
+        mesh.userData.originalPosition = originalPosition;
         mesh.userData.isPickable = true;
-        mesh.userData.recordIndex = i
+        mesh.userData.recordIndex = i;
         // Select a record
         mesh.onPointerPick = (controller) => {
-            if (controller.userData.selected) return // Don't let it grab twice
-            console.log("picked", mesh, controller);
-            djPuzzle.selected[controller.id] = i
-            const target = controller.getObjectByName('target')
+            if (controller.userData.selected) return; // Don't let it grab twice
+            djPuzzle.selected[controller.id] = i;
+            const target = controller.getObjectByName("target");
             if (target) {
-                target.add(mesh)
-                mesh.position.set(0, 0, 0)
-                controller.userData.selected = mesh
+                target.add(mesh);
+                mesh.position.set(0, 0, 0);
+                controller.userData.selected = mesh;
             }
         };
         mesh.onPointerDrop = (controller) => {
             // If it's near an open table mesh
-            
-            // Else move back to its original position
-            scene.add(mesh)
-            mesh.position.copy(originalPosition)
-            mesh.setRotationFromQuaternion(new THREE.Quaternion())
-            controller.userData.selected = undefined
-        }
+            const tableDistance = mesh
+                .getWorldPosition(new THREE.Vector3())
+                .distanceTo(tableA.getWorldPosition(new THREE.Vector3()));
+            if (tableDistance < 0.3) {
+                djPuzzle.addVinylByIndex(mesh.userData.recordIndex);
+                delete djPuzzle.selected[controller.id];
+                controller.userData.selected = undefined;
+                mesh.removeFromParent();
+                scene.add(mesh);
+                const tableAPos = tableA.getWorldPosition(new THREE.Vector3());
+                const vinylPosition = new THREE.Vector3(
+                    tableAPos.x,
+                    tableAPos.y + 0.1,
+                    tableAPos.z,
+                );
+                mesh.position.copy(vinylPosition);
+                mesh.rotation.set((-1 * Math.PI) / 2, 0, 0);
+                return;
+            } else {
+                // Else move back to its original position
+                scene.add(mesh);
+                mesh.position.copy(originalPosition);
+                mesh.setRotationFromQuaternion(new THREE.Quaternion());
+                controller.userData.selected = undefined;
+            }
+        };
         scene.add(mesh);
     });
-
-    djPuzzle.addVinylByIndex(2)
-    console.log(djPuzzle.comboCount)
-    djPuzzle.addVinylByIndex(4)
-    console.log(djPuzzle.comboCount)
-    djPuzzle.addVinylByIndex(1)
-    console.log(djPuzzle.comboCount)
-    djPuzzle.addVinylByIndex(3)
-    console.log(djPuzzle.comboCount)
-    djPuzzle.addVinylByIndex(0)
-    console.log(djPuzzle.comboCount)
-    
-    
 
     // Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -160,7 +141,7 @@ const initGame = async () => {
     // const controllerModelFactory = new XRControllerModelFactory();
 
     controllerGrip1 = renderer.xr.getControllerGrip(0);
-    
+
     // Visual representation of the controller
     const controllerMesh1 = createCylinder({
         radius: 0.01,
@@ -197,13 +178,12 @@ const initGame = async () => {
 
     // Target for selected records to go
     const target = new THREE.Object3D();
-    target.rotation.set(-1 * Math.PI / 2, 0, 0)
-    target.position.set(0, -0.05, -.12)
+    target.rotation.set((-1 * Math.PI) / 2, 0, 0);
+    target.position.set(0, -0.05, -0.12);
     target.name = "target";
 
     controller1.add(target.clone());
     controller2.add(target.clone());
-
 
     raycaster = new THREE.Raycaster();
 
@@ -212,19 +192,23 @@ const initGame = async () => {
 };
 
 function onXRSessionStart() {
-    baseReferenceSpace = renderer.xr.getReferenceSpace()
+    baseReferenceSpace = renderer.xr.getReferenceSpace();
     // Move to the dj station
-    console.log(baseReferenceSpace)
-    const offsetPosition = { x: -1 * START_POSITION.x, y: -1 * START_POSITION.y, z: -1 * START_POSITION.z, w: 1}
-    const offsetRotation = new THREE.Quaternion()
-    const transform = new XRRigidTransform(offsetPosition, offsetRotation)
-    const teleportSpaceOffset = baseReferenceSpace.getOffsetReferenceSpace(transform)
-    renderer.xr.setReferenceSpace( teleportSpaceOffset );
+    const offsetPosition = {
+        x: -1 * START_POSITION.x,
+        y: -1 * START_POSITION.y,
+        z: -1 * START_POSITION.z,
+        w: 1,
+    };
+    const offsetRotation = new THREE.Quaternion();
+    const transform = new XRRigidTransform(offsetPosition, offsetRotation);
+    const teleportSpaceOffset =
+        baseReferenceSpace.getOffsetReferenceSpace(transform);
+    renderer.xr.setReferenceSpace(teleportSpaceOffset);
 }
 
 // Starts pulling trigger
 function onSelectStart(event) {
-    console.log("onSelectStart");
     selectedController = event.target;
     const intersections = getIntersections(selectedController);
     if (intersections.length > 0) {
@@ -247,11 +231,10 @@ function onSelectStart(event) {
 
 // Releases the trigger
 function onSelectEnd(event) {
-    console.log("onSelectEnd");
     selectedController = event.target;
     const focusedObject = selectedController.userData.selected;
     if (focusedObject?.onPointerDrop) {
-        focusedObject.onPointerDrop(selectedController)
+        focusedObject.onPointerDrop(selectedController);
     }
 }
 

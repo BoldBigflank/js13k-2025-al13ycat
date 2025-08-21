@@ -17,6 +17,7 @@ dist
 dist-tsc
 .DS_Store
 node_modules
+node_modules/.vite/deps/_metadata.json
 extra/words/*.txt
 test-zip
 test-zip-clean
