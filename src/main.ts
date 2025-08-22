@@ -3,7 +3,7 @@ import * as THREE from "https://js13kgames.com/2025/webxr/three.module.js";
 import { loadModelByName, createCylinder } from "./scripts/modelLoader";
 import DJPuzzle from "./scripts/DJPuzzle";
 import { VRButton } from "./libraries/VRButton";
-
+import { Witch } from "./models/witch"
 import { InteractiveObject3D } from "./types";
 import { Vinyl } from "./models/vinyl";
 import { AnimationFactory } from "./scripts/AnimationFactory";
@@ -12,6 +12,8 @@ import { Events } from "./libraries/Events";
 import { BLUE, GREEN, RED } from "./scripts/Colors";
 import { TestMusic } from "./audio/music";
 // import { XRControllerModelFactory } from "./libraries/XRControllerModelFactory";
+
+const DEBUG = false
 
 const COMBO_COLORS = {
     color: RED,
@@ -31,7 +33,7 @@ let controls, baseReferenceSpace;
 const START_POSITION = new THREE.Vector3(0, 0, 0.3);
 
 const initGame = async () => {
-    TestMusic()
+    if (DEBUG) TestMusic()
     // Clean up intro and start canvas
     document.getElementById("intro")!.style.display = "none";
     const canvasElement = document.getElementById("c");
@@ -39,6 +41,17 @@ const initGame = async () => {
         canvasElement as unknown as HTMLCanvasElement;
     if (!canvas) return;
     canvas.style.display = "block";
+
+    // Renderer
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor("#000000");
+    renderer.xr.addEventListener("sessionstart", onXRSessionStart);
+    renderer.xr.enabled = true;
+    renderer.setAnimationLoop(animate);
+    document.body.appendChild(VRButton.createButton(renderer));
+    document.body.appendChild(renderer.domElement);
 
     // Init Puzzle
     const djPuzzle = new DJPuzzle();
@@ -53,6 +66,8 @@ const initGame = async () => {
     );
     camera.position.set(0, 2, 1);
     camera.rotation.set((-1 * Math.PI) / 12, 0, 0);
+    camera.name = "camera"
+    scene.add(camera)
     AnimationFactory.Instance.initScene(scene);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
@@ -96,6 +111,10 @@ const initGame = async () => {
     catMesh2.position.set(3, 1, -1)
     catMesh2.rotation.set(0, Math.PI / 2, 0)
     scene.add(catMesh2)
+
+
+    const witch = Witch(scene, renderer)
+    witch.position.set(0, 1.5, -1)
 
 
     djPuzzle.vinyls.forEach((record, i) => {
@@ -174,17 +193,6 @@ const initGame = async () => {
         };
         scene.add(mesh);
     });
-
-    // Renderer
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor("#000000");
-    renderer.xr.addEventListener("sessionstart", onXRSessionStart);
-    renderer.xr.enabled = true;
-    renderer.setAnimationLoop(animate);
-    document.body.appendChild(VRButton.createButton(renderer));
-    document.body.appendChild(renderer.domElement);
 
     // Controllers
 
@@ -376,6 +384,7 @@ function cleanIntersected() {
 
 function animate() {
     AnimationFactory.Instance.update();
+    Events.Instance.emit('tick')
     cleanIntersected();
 
     intersectObjects(controller1);
