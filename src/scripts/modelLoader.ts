@@ -1,5 +1,6 @@
 import { cassetteModel } from "../models/cassette";
 import { arenaModel } from "../models/arena";
+import { catModel } from '../models/cat'
 import * as THREE from "https://js13kgames.com/2025/webxr/three.module.js";
 
 import { BasicShader } from "../shaders/BasicShader";
@@ -11,6 +12,34 @@ const createModel = (modelArray: Model): THREE.Group => {
     parent.position.set(0, 0, 0);
     parent.rotation.set(0, 0, 0);
     parent.scale.set(1, 1, 1);
+
+    const parsePyramidGeometry = (item: string) => {
+        const [
+            shape,
+            name,
+            width,
+            height,
+            depth,
+            x,
+            y,
+            z,
+            rX,
+            rY,
+            rZ,
+            oX,
+            oY,
+            oZ,
+            color,
+        ] = item.split("_");
+        const radius = width / 2
+        const geometry = new THREE.CylinderGeometry(0, radius, height, 4);
+        geometry.scale(1, 1, depth / width)
+        geometry.translate(x - oX, y - oY, z - oZ);
+        geometry.rotateX(THREE.MathUtils.degToRad(rX));
+        geometry.rotateY(THREE.MathUtils.degToRad(rY));
+        geometry.rotateZ(THREE.MathUtils.degToRad(rZ));
+        return geometry;
+    }
 
     const parseCubeGeometry = (item: string) => {
         const [
@@ -124,6 +153,10 @@ const createModel = (modelArray: Model): THREE.Group => {
     };
 
     modelArray.forEach((item) => {
+        if (item === null) {
+            console.error("ITEM IS NULL")
+            return
+        }
         if (Array.isArray(item)) {
             parent.add(createModel(item));
         } else {
@@ -158,6 +191,9 @@ const createModel = (modelArray: Model): THREE.Group => {
                     break;
                 case "cylinder":
                     geometry = parseCylinderGeometry(item);
+                    break;
+                case "pyramid":
+                    geometry = parsePyramidGeometry(item);
                     break;
                 default:
                     throw new Error(`Unknown shape: ${shape}`);
@@ -215,6 +251,10 @@ export const loadModelByName = (name: string) => {
         const model = createModel(arenaModel());
         model.name = "arena";
         return model;
+    } else if (name === 'cat') {
+        const model = createModel(catModel());
+        model.name = "cat"
+        return model
     }
     return null;
 };

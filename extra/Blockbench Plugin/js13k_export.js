@@ -8,7 +8,13 @@ Plugin.register("js13k_export", {
     version: "0.0.2",
     variant: "both",
     onload() {
-        const roundHundredth = (num) => Math.round(num * 100) / 100;
+        // round to two decimal places and return as a string
+        const roundHundredth = (num) => {
+            const roundedFloat = Math.round(num * 100) / 100;
+            const roundedString = roundedFloat.toFixed(2);
+            // Remove trailing zeroes and decimal point if there are no decimal places
+            return Number(roundedString);
+        }
         const roundWhole = (num) => Math.round(num);
         const codec = new Codec("js13k_export", {
             name: "JS13k Mesh",
@@ -29,16 +35,30 @@ Plugin.register("js13k_export", {
                     "#d3d3d3", //silver
                 ];
 
+
+                const convertPyramid = (pyramid) => {
+                    console.log('pyramid', pyramid);
+                    const name = pyramid.name.replace("pyramid_", "") || "pyramid";
+                    const width = roundHundredth(pyramid.mesh.geometry.boundingBox.max.x - pyramid.mesh.geometry.boundingBox.min.x);
+                    const height = roundHundredth(pyramid.mesh.geometry.boundingBox.max.y - pyramid.mesh.geometry.boundingBox.min.y);
+                    const depth = roundHundredth(pyramid.mesh.geometry.boundingBox.max.z - pyramid.mesh.geometry.boundingBox.min.z);
+                    const [x, y, z] = pyramid.position;
+                    const [rX, rY, rZ] = pyramid.rotation;
+                    const [oX, oY, oZ] = pyramid.origin;
+                    const color = CUBE_COLORS[pyramid.color];
+                    return `pyramid_${name}_${roundHundredth(width)}_${roundHundredth(height)}_${roundHundredth(depth)}_${roundHundredth(x)}_${roundHundredth(y)}_${roundHundredth(z)}_${roundWhole(rX)}_${roundWhole(rY)}_${roundWhole(rZ)}_${roundHundredth(oX)}_${roundHundredth(oY)}_${roundHundredth(oZ)}_${color}`;
+                }
                 const convertCylinder = (cylinder) => {
+                    console.log('cylinder', cylinder);
                     const name = cylinder.name.replace("cylinder_", "") || "cylinder";
-                    const width = cylinder.mesh.geometry.boundingBox.max.x - cylinder.mesh.geometry.boundingBox.min.x;
-                    const height = cylinder.mesh.geometry.boundingBox.max.y - cylinder.mesh.geometry.boundingBox.min.y;
-                    const depth = cylinder.mesh.geometry.boundingBox.max.z - cylinder.mesh.geometry.boundingBox.min.z;
+                    const width = roundHundredth(cylinder.mesh.geometry.boundingBox.max.x - cylinder.mesh.geometry.boundingBox.min.x);
+                    const height = roundHundredth(cylinder.mesh.geometry.boundingBox.max.y - cylinder.mesh.geometry.boundingBox.min.y);
+                    const depth = roundHundredth(cylinder.mesh.geometry.boundingBox.max.z - cylinder.mesh.geometry.boundingBox.min.z);
                     const [x, y, z] = cylinder.position;
                     const [rX, rY, rZ] = cylinder.rotation;
                     const [oX, oY, oZ] = cylinder.origin;
                     const color = CUBE_COLORS[cylinder.color];
-                    return `cylinder_${name}_${width}_${height}_${depth}_${x}_${y}_${z}_${rX}_${rY}_${rZ}_${oX}_${oY}_${oZ}_${color}`;
+                    return `cylinder_${name}_${width}_${height}_${depth}_${roundHundredth(x)}_${roundHundredth(y)}_${roundHundredth(z)}_${roundWhole(rX)}_${roundWhole(rY)}_${roundWhole(rZ)}_${roundHundredth(oX)}_${roundHundredth(oY)}_${roundHundredth(oZ)}_${color}`;
                 }
                 const convertPlane = (plane) => {
                     const name = plane.name.replace("plane_", "") || "plane";
@@ -50,7 +70,7 @@ Plugin.register("js13k_export", {
                     const [rX, rY, rZ] = plane.rotation;
                     const [oX, oY, oZ] = plane.origin;
                     const color = CUBE_COLORS[plane.color];
-                    return `plane_${name}_${width}_${height}_${depth}_${x}_${y}_${z}_${rX}_${rY}_${rZ}_${oX}_${oY}_${oZ}_${color}`;
+                    return `plane_${name}_${width}_${height}_${depth}_${roundHundredth(x)}_${roundHundredth(y)}_${roundHundredth(z)}_${roundHundredth(rX)}_${roundHundredth(rY)}_${roundHundredth(rZ)}_${roundHundredth(oX)}_${roundHundredth(oY)}_${roundHundredth(oZ)}_${color}`;
                 };
 
                 const convertSphere = (sphere) => {
@@ -69,9 +89,9 @@ Plugin.register("js13k_export", {
                     } = sphere.mesh.geometry.boundingBox.max;
 
                     // size
-                    const width = x1 - x0;
-                    const height = y1 - y0;
-                    const depth = z1 - z0;
+                    const width = roundHundredth(x1 - x0);
+                    const height = roundHundredth(y1 - y0);
+                    const depth = roundHundredth(z1 - z0);
 
                     // rotation
                     const rX = roundWhole(sphere.rotation[0]);
@@ -85,7 +105,7 @@ Plugin.register("js13k_export", {
 
                     const color = CUBE_COLORS[sphere.color];
 
-                    return `sphere_${name}_${width}_${height}_${depth}_${x}_${y}_${z}_${rX}_${rY}_${rZ}_${oX}_${oY}_${oZ}_${color}`;
+                    return `sphere_${name}_${width}_${height}_${depth}_${roundHundredth(x)}_${roundHundredth(y)}_${roundHundredth(z)}_${roundWhole(rX)}_${roundWhole(rY)}_${roundWhole(rZ)}_${roundHundredth(oX)}_${roundHundredth(oY)}_${roundHundredth(oZ)}_${color}`;
                 };
 
                 const convertCube = (cube) => {
@@ -124,6 +144,8 @@ Plugin.register("js13k_export", {
                             return convertPlane(obj);
                         } else if (obj.name.startsWith("cylinder")) {
                             return convertCylinder(obj);
+                        } else if (obj.name.startsWith("pyramid")) {
+                            return convertPyramid(obj);
                         } else {
                             Blockbench.showQuickMessage(`Unknown mesh type: ${obj.name}`);
                             return null;

@@ -1,15 +1,24 @@
 import "./style.css";
+import * as THREE from "https://js13kgames.com/2025/webxr/three.module.js";
 import { loadModelByName, createCylinder } from "./scripts/modelLoader";
 import DJPuzzle from "./scripts/DJPuzzle";
-import * as THREE from "https://js13kgames.com/2025/webxr/three.module.js";
 import { VRButton } from "./libraries/VRButton";
 
 import { InteractiveObject3D } from "./types";
 import { Vinyl } from "./models/vinyl";
 import { AnimationFactory } from "./scripts/AnimationFactory";
-import { moveParent } from "./scripts/Utils";
+import { DebugScreen } from "./models/DebugScreen";
+import { Events } from "./libraries/Events";
+import { BLUE, GREEN, RED } from "./scripts/Colors";
+import { TestMusic } from "./audio/music";
 // import { XRControllerModelFactory } from "./libraries/XRControllerModelFactory";
-const clock = new THREE.Clock();
+
+const COMBO_COLORS = {
+    color: RED,
+    artist: GREEN,
+    title: BLUE,
+}
+
 
 let camera, scene, raycaster, renderer;
 let selectedController;
@@ -22,6 +31,7 @@ let controls, baseReferenceSpace;
 const START_POSITION = new THREE.Vector3(0, 0, 0.3);
 
 const initGame = async () => {
+    TestMusic()
     // Clean up intro and start canvas
     document.getElementById("intro")!.style.display = "none";
     const canvasElement = document.getElementById("c");
@@ -54,6 +64,11 @@ const initGame = async () => {
     scene.add(directionalLight);
     scene.add(directionalLight.target);
 
+    const debugScreen = DebugScreen();
+    debugScreen.position.set(0, 1, -5);
+    Events.Instance.emit("debug", "Hello🔒, world!");
+    scene.add(debugScreen);
+
     cassetteMesh = loadModelByName("cassette") as InteractiveObject3D;
     cassetteMesh.position.set(0, 0, -20);
     cassetteMesh.userData.isPickable = true;
@@ -70,8 +85,18 @@ const initGame = async () => {
 
     const arenaMesh = loadModelByName("arena") as InteractiveObject3D;
     const tableA = arenaMesh.getObjectByName("tableA") as InteractiveObject3D;
-
     scene.add(arenaMesh);
+
+    const catMesh = loadModelByName("cat");
+    catMesh.position.set(-3, 1, 0)
+    catMesh.scale.set(0.1, 0.1, 0.1)
+    scene.add(catMesh)
+    const catMesh2 = catMesh.clone(true)
+    catMesh2.name = "catMesh2"
+    catMesh2.position.set(3, 1, -1)
+    catMesh2.rotation.set(0, Math.PI / 2, 0)
+    scene.add(catMesh2)
+
 
     djPuzzle.vinyls.forEach((record, i) => {
         const mesh = Vinyl(record);
@@ -110,11 +135,12 @@ const initGame = async () => {
                 djPuzzle.addVinylByIndex(mesh.userData.recordIndex);
                 delete djPuzzle.selected[controller.id];
                 controller.userData.selected = undefined;
+                // Move the selected vinyl to the table
                 tableA.attach(mesh);
                 AnimationFactory.Instance.animateTransform({
                     mesh,
                     end: {
-                        position: new THREE.Vector3(0, 0.07, 0),
+                        position: new THREE.Vector3(0, 0.01, 0),
                         rotation: new THREE.Euler((-1 * Math.PI) / 2, 0, 0),
                     },
                     duration: 60,
@@ -227,6 +253,32 @@ const initGame = async () => {
 
     // Event listeners
     window.addEventListener("resize", onWindowResize, false);
+
+    Events.Instance.on("combo", () => {
+        console.log("Combo:", djPuzzle.comboCount);
+        let bestCombo = "color";
+        if (djPuzzle.comboCount.artist > djPuzzle.comboCount[bestCombo]) {
+            bestCombo = "artist";
+        }
+        if (djPuzzle.comboCount.title > djPuzzle.comboCount[bestCombo]) {
+            bestCombo = "title";
+        }
+        
+        console.log("Best combo:", bestCombo);
+        for (let i = 0; i < 6; i++) {
+            const progressMesh = arenaMesh.getObjectByName(`progress-${i}`);
+            const color = i < djPuzzle.comboCount[bestCombo] ? COMBO_COLORS[bestCombo] : 0x000000;
+            if (progressMesh) {
+                progressMesh.visible = true;
+                progressMesh.material.color.set(color);
+                progressMesh.material.emissive.set(color);
+                progressMesh.material.needsUpdate = true;
+            }
+        }
+    });
+    Events.Instance.on("solved", () => {
+        console.log("Solved:", djPuzzle.solvedCombo);
+    });
 };
 
 function onXRSessionStart() {
@@ -258,6 +310,9 @@ function onSelectStart(event) {
                 if (focusedObject.onPointerPick) {
                     focusedObject.onPointerPick(selectedController);
                     collided = true;
+                    // hide the line
+                    const line = selectedController.getObjectByName("line");
+                    line.visible = false;
                     break;
                 }
                 focusedObject = focusedObject.parent;
@@ -274,6 +329,8 @@ function onSelectEnd(event) {
     if (focusedObject?.onPointerDrop) {
         focusedObject.onPointerDrop(selectedController);
     }
+    const line = selectedController.getObjectByName("line");
+    line.visible = true;
 }
 
 function getIntersections(controller) {

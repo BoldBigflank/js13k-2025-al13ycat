@@ -31,12 +31,3 @@ export const comboCorrectCount = (
     }
     return count;
 };
-
-export const moveParent = (mesh: THREE.Object3D, parent: THREE.Object3D) => {
-    let meshPosition = new THREE.Vector3();
-    mesh.removeFromParent();
-    parent.add(mesh);
-    mesh.updateMatrixWorld(true);
-    mesh.worldToLocal(meshPosition);
-    mesh.position.set(meshPosition.x, meshPosition.y, meshPosition.z);
-};

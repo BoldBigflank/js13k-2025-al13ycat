@@ -1,3 +1,4 @@
+import { Events } from "../libraries/Events";
 import { BLUE, GREEN, ORANGE, RED, VIOLET, YELLOW } from "./Colors";
 import { comboCorrectCount } from "./Utils";
 
@@ -73,6 +74,7 @@ export class DJPuzzle {
     }
 
     addVinylByIndex(index: number) {
+        Events.Instance.emit("debug", `Adding vinyl by index: ${index}`);
         this.queue.unshift(index);
         this.updateComboCount();
     }
@@ -100,6 +102,10 @@ export class DJPuzzle {
                 this.solvedCombo.title ||
                 this.comboCount.title === TITLE_COMBO.length,
         };
+        Events.Instance.emit("debug", `Combo: ${JSON.stringify(this.comboCount)}`);
+        Events.Instance.emit("debug", `Solved: ${JSON.stringify(this.solvedCombo)}`);
+        Events.Instance.emit("combo", this.comboCount);
+        Events.Instance.emit("solved", this.solvedCombo);
     }
 
     isSolved(comboType: "color" | "artist" | "title") {

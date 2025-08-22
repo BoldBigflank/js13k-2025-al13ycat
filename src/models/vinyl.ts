@@ -60,9 +60,13 @@ export const Vinyl = ({ color, title, artist }: VinylProps): THREE.Object3D => {
         INCHES_TO_METERS_SCALE,
         INCHES_TO_METERS_SCALE,
     );
-    const material = new THREE.MeshStandardMaterial({
+    const material = new THREE.MeshPhongMaterial({
         color: color,
         side: THREE.DoubleSide,
+        emissive: 0x000000,
+        specular: 0x111111,
+        shininess: 50,
+        
     });
     result.add(new THREE.Mesh(geometry, material)); // Remember to scene.add later
 
