@@ -1,38 +1,38 @@
-export const RED = "#e81416";
-export const ORANGE = "#ffa500";
-export const YELLOW = "#faeb36";
-export const GREEN = "#79c314";
-export const BLUE = "#487de7";
-export const VIOLET = "#70369d";
+export const RED = '#e81416'
+export const ORANGE = '#ffa500'
+export const YELLOW = '#faeb36'
+export const GREEN = '#79c314'
+export const BLUE = '#487de7'
+export const VIOLET = '#70369d'
 
-export const LIGHT_GREEN = "#1aff1a";
-export const DARK_GREEN = "#0a650a";
-export const WHITE = "#ffffff";
-export const MID_GREY = "#666666";
-export const BROWN = "#994f00";
-export const BLACK = "#000000";
-export const MAGENTA = "#ff00ff";
+export const LIGHT_GREEN = '#1aff1a'
+export const DARK_GREEN = '#0a650a'
+export const WHITE = '#ffffff'
+export const MID_GREY = '#666666'
+export const BROWN = '#994f00'
+export const BLACK = '#000000'
+export const MAGENTA = '#ff00ff'
 
-export const BRICK1 = "#dd7d7d";
-export const BRICK2 = "#cb6b6b";
-export const BRICK3 = "#b65454";
-export const BRICK4 = "#9e3333";
-export const BRICK5 = "#842020";
+export const BRICK1 = '#dd7d7d'
+export const BRICK2 = '#cb6b6b'
+export const BRICK3 = '#b65454'
+export const BRICK4 = '#9e3333'
+export const BRICK5 = '#842020'
 
-export const GRASS1 = "#abb348";
-export const GRASS2 = "#7ca244";
-export const GRASS3 = "#426d38";
-export const GRASS4 = "#799c45";
-export const GRASS5 = "#a7af48";
+export const GRASS1 = '#abb348'
+export const GRASS2 = '#7ca244'
+export const GRASS3 = '#426d38'
+export const GRASS4 = '#799c45'
+export const GRASS5 = '#a7af48'
 
-export const DIRT1 = "#6d4d41";
-export const DIRT2 = "#49332b";
+export const DIRT1 = '#6d4d41'
+export const DIRT2 = '#49332b'
 
-export const GRAVEL0 = "#30312D";
-export const GRAVEL1 = "#4A4B46";
-export const GRAVEL2 = "#484848";
-export const GRAVEL3 = "#4E523F";
-export const GRAVEL4 = "#63645F";
-export const GRAVEL5 = "#64655f";
+export const GRAVEL0 = '#30312D'
+export const GRAVEL1 = '#4A4B46'
+export const GRAVEL2 = '#484848'
+export const GRAVEL3 = '#4E523F'
+export const GRAVEL4 = '#63645F'
+export const GRAVEL5 = '#64655f'
 
-export const SPANISH_BLUE = "#0065BF";
+export const SPANISH_BLUE = '#0065BF'

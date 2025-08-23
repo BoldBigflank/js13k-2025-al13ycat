@@ -1,9 +1,9 @@
-import * as THREE from "https://js13kgames.com/2025/webxr/three.module.js";
+import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 
 import type { InteractiveObject3D } from '../types'
-import { PickupSFX } from "../audio/music";
-import { Events } from "../libraries/Events";
-import { loadModelByName } from "../scripts/modelLoader";
+import { PickupSFX } from '../audio/music'
+import { Events } from '../libraries/Events'
+import { loadModelByName } from '../scripts/modelLoader'
 
 let pc = 0
 
@@ -28,7 +28,7 @@ export const Witch = (scene: THREE.Scene, renderer: THREE.WebGLRenderer): Intera
             const camera = renderer.xr?.getCamera()
             // Get the camera's orientation, turn it 180 degrees around the Y axis, then push it to lookAtPos
             lookAtPos.push(camera.quaternion.clone())
-            
+
             if (lookAtPos.length > 60) {
                 let q = lookAtPos.shift()
                 const yAxisRot = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI, 0))
@@ -40,13 +40,13 @@ export const Witch = (scene: THREE.Scene, renderer: THREE.WebGLRenderer): Intera
         }
     }
     Events.Instance.on('tick', animate)
-    
+
     // Add interaction
     parent.userData.isPickable = true
     parent.onPointerPick = () => {
         PickupSFX()
     }
-    
+
     scene.add(parent)
     return parent
 }

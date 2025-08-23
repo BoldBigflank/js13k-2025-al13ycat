@@ -16,7 +16,7 @@
  * @type {ShaderMaterial~Shader}
  */
 const RGBShiftShader = {
-    name: "RGBShiftShader",
+    name: 'RGBShiftShader',
 
     uniforms: {
         tDiffuse: { value: null },
@@ -52,6 +52,6 @@ const RGBShiftShader = {
 			gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);
 
 		}`,
-};
+}
 
-export { RGBShiftShader };
+export { RGBShiftShader }

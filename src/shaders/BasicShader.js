@@ -1,4 +1,4 @@
-import * as THREE from "https://js13kgames.com/2025/webxr/three.module.js";
+import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 
 /**
  * @module BasicShader
@@ -78,6 +78,6 @@ const BasicShader = {
 			#include <colorspace_fragment>
 
 		}`,
-};
+}
 
-export { BasicShader };
+export { BasicShader }

@@ -12,7 +12,7 @@
  * @type {ShaderMaterial~Shader}
  */
 const TechnicolorShader = {
-    name: "TechnicolorShader",
+    name: 'TechnicolorShader',
 
     uniforms: {
         tDiffuse: { value: null },
@@ -42,6 +42,6 @@ const TechnicolorShader = {
 			gl_FragColor = newTex;
 
 		}`,
-};
+}
 
-export { TechnicolorShader };
+export { TechnicolorShader }

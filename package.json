@@ -1,24 +1,23 @@
 {
-  "name": "js13k-2025",
-  "packageManager": "yarn@4.6.0",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "prepare": "husky"
-  },
-  "devDependencies": {
-    "husky": "^9.1.7",
-    "pinst": "^3.0.0",
-    "prettier": "^3.6.2",
-    "roadroller": "^2.1.0",
-    "vite": "^7.0.6"
-  },
-  "dependencies": {
-    "kontra": "^10.0.2"
-  },
-  "lint-staged": {
-    "*.js": "prettier --write",
-    "*.ts": "prettier --write"
-  }
+    "name": "js13k-2025",
+    "packageManager": "yarn@4.6.0",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
+        "prepare": "husky"
+    },
+    "devDependencies": {
+        "husky": "^9.1.7",
+        "pinst": "^3.0.0",
+        "prettier": "3.6.2",
+        "roadroller": "^2.1.0",
+        "vite": "^7.0.6"
+    },
+    "dependencies": {
+        "kontra": "^10.0.2"
+    },
+    "lint-staged": {
+        "**/*": "prettier --write --ignore-unknown"
+    }
 }

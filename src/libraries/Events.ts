@@ -24,63 +24,63 @@
  */
 
 export class Events {
-    private static _instance: Events;
-    private callbacks: { [key: string]: Function[] };
+  private static _instance: Events;
+  private callbacks: { [key: string]: Function[] };
 
-    private constructor() {
-        this.callbacks = {};
-    }
+  private constructor() {
+    this.callbacks = {};
+  }
 
-    public static get Instance(): Events {
-        if (!Events._instance) {
-            Events._instance = new Events();
-        }
-        return Events._instance;
+  public static get Instance(): Events {
+    if (!Events._instance) {
+      Events._instance = new Events();
     }
+    return Events._instance;
+  }
 
-    /**
-     * Register a callback for an event to be called whenever the event is emitted. The callback will be passed all arguments used in the `emit` call.
-     * @param event - Name of the event.
-     * @param callback - Function that will be called when the event is emitted.
-     */
-    public on(event: string, callback: Function): void {
-        this.callbacks[event] = this.callbacks[event] || [];
-        this.callbacks[event].push(callback);
-    }
+  /**
+   * Register a callback for an event to be called whenever the event is emitted. The callback will be passed all arguments used in the `emit` call.
+   * @param event - Name of the event.
+   * @param callback - Function that will be called when the event is emitted.
+   */
+  public on(event: string, callback: Function): void {
+    this.callbacks[event] = this.callbacks[event] || [];
+    this.callbacks[event].push(callback);
+  }
 
-    /**
-     * Remove a callback for an event.
-     * @param event - Name of the event.
-     * @param callback - The function that was passed during registration.
-     */
-    public off(event: string, callback: Function): void {
-        this.callbacks[event] = (this.callbacks[event] || []).filter(
-            fn => fn !== callback
-        );
-    }
+  /**
+   * Remove a callback for an event.
+   * @param event - Name of the event.
+   * @param callback - The function that was passed during registration.
+   */
+  public off(event: string, callback: Function): void {
+    this.callbacks[event] = (this.callbacks[event] || []).filter(
+      (fn) => fn !== callback,
+    );
+  }
 
-    /**
-     * Call all callback functions for the event. All arguments will be passed to the callback functions.
-     * @param event - Name of the event.
-     * @param args - Comma separated list of arguments passed to all callbacks.
-     */
-    public emit(event: string, ...args: any[]): void {
-        (this.callbacks[event] || []).forEach(fn => fn(...args));
-    }
+  /**
+   * Call all callback functions for the event. All arguments will be passed to the callback functions.
+   * @param event - Name of the event.
+   * @param args - Comma separated list of arguments passed to all callbacks.
+   */
+  public emit(event: string, ...args: any[]): void {
+    (this.callbacks[event] || []).forEach((fn) => fn(...args));
+  }
 
-    /**
-     * Reset all callbacks (expose for testing)
-     */
-    public _reset(): void {
-        Object.keys(this.callbacks).forEach(key => {
-            delete this.callbacks[key];
-        });
-    }
+  /**
+   * Reset all callbacks (expose for testing)
+   */
+  public _reset(): void {
+    Object.keys(this.callbacks).forEach((key) => {
+      delete this.callbacks[key];
+    });
+  }
 
-    /**
-     * Get all callbacks (expose for testing)
-     */
-    public getCallbacks(): { [key: string]: Function[] } {
-        return this.callbacks;
-    }
+  /**
+   * Get all callbacks (expose for testing)
+   */
+  public getCallbacks(): { [key: string]: Function[] } {
+    return this.callbacks;
+  }
 }
