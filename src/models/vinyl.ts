@@ -1,6 +1,6 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { initCanvas } from '../scripts/Utils'
-import { BLACK, MAGENTA } from '../scripts/Colors'
+import { BLACK, BLUE, GREEN, MAGENTA } from '../scripts/Colors'
 
 const INCHES_TO_METERS_SCALE = 0.0254
 
@@ -17,20 +17,7 @@ const LabelMaterial = (artist, title) => {
     // ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = BLACK
 
-    ctx.textAlign = 'center'
-
-    if (artist) {
-        ctx.font = `64px monospace`
-        ctx.textBaseline = 'middle'
-        ctx.fillText(artist, 0.5 * RES, 0.42 * RES)
-    }
-
-    if (title) {
-        ctx.font = `96px monospace`
-        ctx.textBaseline = 'bottom'
-        ctx.fillText(title, 0.5 * RES, 0.68 * RES)
-    }
-
+    // Outlines
     ctx.strokeStyle = BLACK
     ctx.lineWidth = 8
     ctx.beginPath()
@@ -39,6 +26,26 @@ const LabelMaterial = (artist, title) => {
     ctx.beginPath()
     ctx.arc(RES / 2, RES / 2, 288, 0, 2 * Math.PI)
     ctx.stroke()
+
+    // Artist is green, title is blue
+    ctx.textAlign = 'center'
+    if (artist) {
+        ctx.font = `64px monospace`
+        ctx.textBaseline = 'middle'
+        ctx.strokeStyle = BLACK
+        ctx.lineWidth = 8
+        ctx.strokeText(artist, 0.5 * RES, 0.42 * RES)
+        ctx.fillStyle = GREEN
+        ctx.fillText(artist, 0.5 * RES, 0.42 * RES)
+    }
+
+    if (title) {
+        ctx.font = `96px monospace`
+        ctx.textBaseline = 'bottom'
+        ctx.fillStyle = BLUE
+        ctx.strokeText(title, 0.5 * RES, 0.68 * RES)
+        ctx.fillText(title, 0.5 * RES, 0.68 * RES)
+    }
 
     const texture = new THREE.CanvasTexture(canvas)
     texture.encoding = THREE.LinearSRGBColorSpace
@@ -49,7 +56,7 @@ const LabelMaterial = (artist, title) => {
     return material
 }
 
-export const Vinyl = ({ color, title, artist }: VinylProps): THREE.Object3D => {
+export const Vinyl = ({ color, artist, title }: VinylProps): THREE.Object3D => {
     const result = new THREE.Group()
     // Outer ring
 

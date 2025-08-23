@@ -112,6 +112,7 @@ Plugin.register('js13k_export', {
                 }
 
                 const convertCube = (cube) => {
+                    const name = cube.name.replace('cube_', '') || 'cube'
                     // size
                     const width = roundHundredth(cube.to[0] - cube.from[0])
                     const height = roundHundredth(cube.to[1] - cube.from[1])
@@ -133,7 +134,7 @@ Plugin.register('js13k_export', {
                     const oZ = roundHundredth(cube.origin[2])
                     const color = CUBE_COLORS[cube.color]
 
-                    return `cube_${cube.name}_${width}_${height}_${depth}_${x}_${y}_${z}_${rX}_${rY}_${rZ}_${oX}_${oY}_${oZ}_${color}`
+                    return `cube_${name}_${width}_${height}_${depth}_${x}_${y}_${z}_${rX}_${rY}_${rZ}_${oX}_${oY}_${oZ}_${color}`
                 }
 
                 const handleObject = (obj) => {

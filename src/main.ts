@@ -1,12 +1,14 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { loadModelByName, createCylinder } from './scripts/modelLoader'
 import DJPuzzle from './scripts/DJPuzzle'
+import { SequenceType } from './scripts/DJPuzzle'
 import { VRButton } from './libraries/VRButton'
 import { Witch } from './models/witch'
 import { InteractiveObject3D } from './types'
 import { Vinyl } from './models/vinyl'
 import { AnimationFactory } from './scripts/AnimationFactory'
 import { DebugScreen } from './models/DebugScreen'
+import { GameOverDialog } from './models/GameOverDialog'
 import { Events } from './libraries/Events'
 import { BLUE, GREEN, RED } from './scripts/Colors'
 import { TestMusic } from './audio/music'
@@ -79,6 +81,10 @@ const initGame = async () => {
     Events.Instance.emit('debug', 'Hello🔒, world!')
     scene.add(debugScreen)
 
+    const gameOverDialog = GameOverDialog()
+    gameOverDialog.position.set(0, 1.5, -1)
+    scene.add(gameOverDialog)
+
     cassetteMesh = loadModelByName('cassette') as InteractiveObject3D
     cassetteMesh.position.set(0, 0, -20)
     cassetteMesh.userData.isPickable = true
@@ -109,15 +115,28 @@ const initGame = async () => {
 
     const witch = Witch(scene, renderer)
     witch.position.set(0, 1.5, -1)
+    witch.rotation.set(0, Math.PI, 0)
 
     djPuzzle.vinyls.forEach((record, i) => {
         const mesh = Vinyl(record)
         mesh.name = `vinyl-${i}`
-        const originalPosition = new THREE.Vector3(0.7, 1.25, -0.2 - 0.125 * i)
+        const originalPosition = new THREE.Vector3(0.7, 1.15, -0.2 - 0.125 * i)
         mesh.position.copy(originalPosition)
         mesh.userData.originalPosition = originalPosition
         mesh.userData.isPickable = true
         mesh.userData.recordIndex = i
+        mesh.userData.returnToOriginalPosition = () => {
+            scene.attach(mesh)
+            AnimationFactory.Instance.cancelAnimation(mesh)
+            AnimationFactory.Instance.animateTransform({
+                mesh,
+                end: {
+                    position: mesh.userData.originalPosition,
+                    rotation: new THREE.Euler(0, 0, 0),
+                },
+                duration: 100,
+            })
+        }
         // Select a record
         mesh.onPointerPick = (controller: THREE.Group) => {
             if (controller.userData.selected) return // Don't let it grab twice
@@ -144,10 +163,16 @@ const initGame = async () => {
                 .getWorldPosition(new THREE.Vector3())
                 .distanceTo(tableA.getWorldPosition(new THREE.Vector3()))
             if (tableDistance < 0.3) {
+                // Move the selected vinyl to the table
                 djPuzzle.addVinylByIndex(mesh.userData.recordIndex)
                 delete djPuzzle.selected[controller.id]
                 controller.userData.selected = undefined
-                // Move the selected vinyl to the table
+                tableA.children.forEach((child: THREE.Object3D) => {
+                    if (child.userData.returnToOriginalPosition) {
+                        child.userData.returnToOriginalPosition()
+                    }
+                })
+                // Move any other meshes
                 tableA.attach(mesh)
                 AnimationFactory.Instance.animateTransform({
                     mesh,
@@ -170,16 +195,7 @@ const initGame = async () => {
                 return
             } else {
                 // Else move back to its original position
-                scene.attach(mesh)
-                AnimationFactory.Instance.animateTransform({
-                    mesh,
-                    end: {
-                        position: originalPosition,
-                        rotation: new THREE.Euler(),
-                    },
-                    duration: 60,
-                })
-
+                mesh.userData.returnToOriginalPosition()
                 controller.userData.selected = undefined
             }
         }
@@ -252,16 +268,14 @@ const initGame = async () => {
     window.addEventListener('resize', onWindowResize, false)
 
     Events.Instance.on('combo', () => {
-        console.log('Combo:', djPuzzle.comboCount)
         let bestCombo = 'color'
-        if (djPuzzle.comboCount.artist > djPuzzle.comboCount[bestCombo]) {
+        if (djPuzzle.comboCount.artist >= djPuzzle.comboCount[bestCombo]) {
             bestCombo = 'artist'
         }
-        if (djPuzzle.comboCount.title > djPuzzle.comboCount[bestCombo]) {
+        if (djPuzzle.comboCount.title >= djPuzzle.comboCount[bestCombo]) {
             bestCombo = 'title'
         }
 
-        console.log('Best combo:', bestCombo)
         for (let i = 0; i < 6; i++) {
             const progressMesh = arenaMesh.getObjectByName(`progress-${i}`)
             const color = i < djPuzzle.comboCount[bestCombo] ? COMBO_COLORS[bestCombo] : 0x000000
@@ -274,8 +288,25 @@ const initGame = async () => {
         }
     })
     Events.Instance.on('solved', () => {
-        console.log('Solved:', djPuzzle.solvedCombo)
+        const puzzleKeys = Object.keys(djPuzzle.solvedCombo) as SequenceType[]
+        for (let i = 0; i < puzzleKeys.length; i++) {
+            const puzzleKey = puzzleKeys[i]
+            const completeMesh = arenaMesh.getObjectByName(`complete-${i}`)
+            const color = djPuzzle.solvedCombo[puzzleKey] ? COMBO_COLORS[puzzleKey] : 0x000000
+            if (completeMesh) {
+                completeMesh.visible = true
+                completeMesh.material.color.set(color)
+                completeMesh.material.emissive.set(color)
+                completeMesh.material.needsUpdate = true
+            }
+        }
     })
+    djPuzzle.reset()
+    djPuzzle.addVinylByIndex(2)
+    djPuzzle.addVinylByIndex(4)
+    djPuzzle.addVinylByIndex(1)
+    djPuzzle.addVinylByIndex(5)
+    djPuzzle.addVinylByIndex(2)
 }
 
 function onXRSessionStart() {

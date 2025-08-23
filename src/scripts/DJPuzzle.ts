@@ -4,6 +4,8 @@ import { comboCorrectCount } from './Utils'
 
 const SEQUENCE_COLOR = [RED, ORANGE, YELLOW, GREEN, BLUE, VIOLET]
 
+const SEQUENCE_ARTIST = ['Shiny Toy Guns', 'B.B. King', 'Jack White', 'Black Sabbath', 'Faith Hill', 'Cliff Sheen']
+
 const SEQUENCE_TITLE = [
     'OFFSIDE', // -> sideshow ->
     'SHOWCASE', // -> caseload ->
@@ -15,8 +17,7 @@ const SEQUENCE_TITLE = [
 // work space suit case load out back hand shake down town home
 // NOTE: This one has the incorrect "download"
 // off side  show  case load out back hand book marks man power
-// NOTE: This one has the incorrect "outman"
-const SEQUENCE_ARTIST = ['Shiny Toy Guns', 'B.B. King', 'Jack White', 'Black Sabbath', 'Faith Hill', 'Cliff Sheen']
+// NOTE: This one has the incorrect "outback/outman", "handbook/handoff"
 
 const VINYL_INDEXES = [
     // Manual shuffling :/
@@ -25,30 +26,17 @@ const VINYL_INDEXES = [
     [0, 3, 5, 1, 4, 2],
 ]
 
-const SEQUENCES = {
-    color: SEQUENCE_COLOR,
-    title: SEQUENCE_TITLE,
-    artist: SEQUENCE_ARTIST,
-}
-
-type SequenceType = 'color' | 'title' | 'artist'
+export type SequenceType = 'color' | 'artist' | 'title'
 
 type Vinyl = {
     index: number
     color: string
-    title: string
     artist: string
-}
-
-type DJPuzzleState = {
-    currentVynil: Vinyl | null
-    comboType: 'color' | 'title' | 'artist' | null
-    comboCount: number
+    title: string
 }
 
 export class DJPuzzle {
     queue: number[]
-    rack: number[]
     selected: Record<string, number>
     vinyls: Vinyl[]
     comboCount: {
@@ -67,7 +55,6 @@ export class DJPuzzle {
     }
 
     addVinylByIndex(index: number) {
-        Events.Instance.emit('debug', `Adding vinyl by index: ${index}`)
         this.queue.unshift(index)
         this.updateComboCount()
     }
@@ -75,6 +62,10 @@ export class DJPuzzle {
     updateComboCount() {
         // Looking backwards at the queue, see how much the queue follows the VINYL_INDICES
         const [COLOR_COMBO, ARTIST_COMBO, TITLE_COMBO] = VINYL_INDEXES
+        Events.Instance.emit('debug', `Queue is ${this.queue}`)
+        Events.Instance.emit('debug', `Comparing to ${[...ARTIST_COMBO].reverse()}`)
+
+        // TODO: This isn't the right array to compare
         this.comboCount = {
             color: comboCorrectCount(this.queue, [...COLOR_COMBO].reverse(), true),
             artist: comboCorrectCount(this.queue, [...ARTIST_COMBO].reverse()),
@@ -85,6 +76,11 @@ export class DJPuzzle {
             artist: this.solvedCombo.artist || this.comboCount.artist === ARTIST_COMBO.length,
             title: this.solvedCombo.title || this.comboCount.title === TITLE_COMBO.length,
         }
+
+        if (this.solvedCombo.color) this.comboCount.color = 0
+        if (this.solvedCombo.artist) this.comboCount.artist = 0
+        if (this.solvedCombo.title) this.comboCount.title = 0
+
         Events.Instance.emit('debug', `Combo: ${JSON.stringify(this.comboCount)}`)
         Events.Instance.emit('debug', `Solved: ${JSON.stringify(this.solvedCombo)}`)
         Events.Instance.emit('combo', this.comboCount)
@@ -97,16 +93,14 @@ export class DJPuzzle {
 
     reset() {
         this.queue = []
-        this.rack = []
         this.selected = {}
-        const [colorIndex, titleIndex, artistIndex] = VINYL_INDEXES
+        const [COLOR_COMBO, ARTIST_COMBO, TITLE_COMBO] = VINYL_INDEXES
         this.vinyls = SEQUENCE_COLOR.map((_color, index) => {
-            this.rack.push(index)
             return {
                 index,
-                color: SEQUENCE_COLOR[colorIndex[index]],
-                title: SEQUENCE_TITLE[titleIndex[index]],
-                artist: SEQUENCE_ARTIST[artistIndex[index]],
+                color: SEQUENCE_COLOR[COLOR_COMBO[index]],
+                artist: SEQUENCE_ARTIST[ARTIST_COMBO[index]],
+                title: SEQUENCE_TITLE[TITLE_COMBO[index]],
             }
         })
         this.comboCount = {
@@ -119,6 +113,8 @@ export class DJPuzzle {
             artist: false,
             title: false,
         }
+        Events.Instance.emit('combo', this.comboCount)
+        Events.Instance.emit('solved', this.solvedCombo)
     }
 }
 
