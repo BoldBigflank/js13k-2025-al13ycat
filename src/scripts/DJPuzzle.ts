@@ -1,8 +1,7 @@
 import { Events } from '../libraries/Events'
 import { BLUE, GREEN, ORANGE, RED, VIOLET, YELLOW } from './Colors'
-import { comboCorrectCount } from './Utils'
 
-const SOLUTION_COLOR = [RED, ORANGE, YELLOW, GREEN, BLUE, VIOLET]
+export const SOLUTION_COLOR = [RED, ORANGE, YELLOW, GREEN, BLUE, VIOLET]
 
 const SOLUTION_ARTIST = ['Shiny Toy Guns', 'B.B. King', 'Jack White', 'Black Sabbath', 'Faith Hill', 'Cliff Sheen']
 
@@ -21,6 +20,7 @@ const SOLUTION_TITLE = [
 
 const SOLUTION_INDEXES = [
     // Manual shuffling :/
+    // Each column is a vinyl
     [0, 1, 2, 3, 4, 5],
     [0, 2, 4, 1, 5, 3],
     [0, 3, 5, 1, 4, 2],
@@ -35,6 +35,12 @@ type Vinyl = {
     title: string
 }
 
+export type GameProgress = {
+    color: Progress
+    artist: Progress
+    title: Progress
+}
+
 export type Progress = {
     currentIndex: number
     correctCount: number
@@ -45,32 +51,34 @@ export class DJPuzzle {
     queue: number[]
     selected: Record<string, number>
     vinyls: Vinyl[]
-    progress: {
-        color: Progress
-        artist: Progress
-        title: Progress
-    }
+    progress: GameProgress
 
     constructor() {
+        this.queue = []
+        this.selected = {}
+        this.vinyls = []
         this.reset()
     }
 
     addVinylByIndex(index: number) {
         const { color, artist, title } = this.vinyls[index]
+        const [COLOR_SOLUTION, ARTIST_SOLUTION, TITLE_SOLUTION] = SOLUTION_INDEXES
         const colorIndex = SOLUTION_COLOR.indexOf(color)
         const artistIndex = SOLUTION_ARTIST.indexOf(artist)
         const titleIndex = SOLUTION_TITLE.indexOf(title)
-        // Color also needs to start at 0
-        if (colorIndex === (this.progress.color.currentIndex + 1) % SOLUTION_COLOR.length) {
+        // TODO: Color also needs to start at 0
+        if (colorIndex === this.progress.color.currentIndex + 1) {
             this.progress.color.correctCount++
             if (this.progress.color.correctCount === SOLUTION_COLOR.length) this.progress.color.solved = true
         } else {
-            this.progress.color.correctCount = 1
+            this.progress.color.currentIndex = -1 // Force them to put 0 first
+            this.progress.color.correctCount = 0
         }
         this.progress.color.currentIndex = colorIndex
 
         if (artistIndex === (this.progress.artist.currentIndex + 1) % SOLUTION_ARTIST.length) {
             this.progress.artist.correctCount++
+            if (this.progress.artist.correctCount === SOLUTION_ARTIST.length) this.progress.artist.solved = true
         } else {
             this.progress.artist.correctCount = 1
         }
@@ -78,12 +86,14 @@ export class DJPuzzle {
 
         if (titleIndex === (this.progress.title.currentIndex + 1) % SOLUTION_TITLE.length) {
             this.progress.title.correctCount++
+            if (this.progress.title.correctCount === SOLUTION_TITLE.length) this.progress.title.solved = true
         } else {
             this.progress.title.correctCount = 1
         }
         this.progress.title.currentIndex = titleIndex
 
         Events.Instance.emit('progress', this.progress)
+        Events.Instance.emit('debug', JSON.stringify(this.progress))
     }
 
     isSolved(comboType: 'color' | 'artist' | 'title') {
@@ -114,11 +124,24 @@ export class DJPuzzle {
         this.vinyls = SOLUTION_COLOR.map((_color, index) => {
             return {
                 index,
-                color: SOLUTION_COLOR[COLOR_SOLUTION[index]],
+                color: SOLUTION_COLOR[COLOR_SOLUTION[index]], // This is wrong
                 artist: SOLUTION_ARTIST[ARTIST_SOLUTION[index]],
                 title: SOLUTION_TITLE[TITLE_SOLUTION[index]],
             }
         })
+
+        COLOR_SOLUTION.forEach((correctPosition, index) => {
+            this.vinyls[correctPosition].color = SOLUTION_COLOR[index]
+        })
+
+        ARTIST_SOLUTION.forEach((correctPosition, index) => {
+            this.vinyls[correctPosition].artist = SOLUTION_ARTIST[index]
+        })
+
+        TITLE_SOLUTION.forEach((correctPosition, index) => {
+            this.vinyls[correctPosition].title = SOLUTION_TITLE[index]
+        })
+
         Events.Instance.emit('progress', this.progress)
     }
 }

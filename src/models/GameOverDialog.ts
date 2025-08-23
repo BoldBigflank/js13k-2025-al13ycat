@@ -1,6 +1,7 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { Events } from '../libraries/Events'
 import { initCanvas } from '../scripts/Utils'
+import { GameProgress, Progress } from '../scripts/DJPuzzle'
 
 export const GameOverDialog = (): THREE.Object3D => {
     const result = new THREE.Group()
@@ -37,8 +38,8 @@ export const GameOverDialog = (): THREE.Object3D => {
         })
         texture.needsUpdate = true
     }
-    Events.Instance.on('solved', (solvedCombo: Record<string, boolean>) => {
-        if (solvedCombo.color && solvedCombo.artist && solvedCombo.title) {
+    Events.Instance.on('progress', (progress: GameProgress) => {
+        if (progress.color.solved && progress.artist.solved && progress.title.solved) {
             mesh.userData.solved = true
         }
         update()

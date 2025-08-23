@@ -1,6 +1,6 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { loadModelByName, createCylinder } from './scripts/modelLoader'
-import DJPuzzle, { Progress } from './scripts/DJPuzzle'
+import DJPuzzle, { GameProgress, Progress, SOLUTION_COLOR } from './scripts/DJPuzzle'
 import { SequenceType } from './scripts/DJPuzzle'
 import { VRButton } from './libraries/VRButton'
 import { Witch } from './models/witch'
@@ -76,10 +76,12 @@ const initGame = async () => {
     scene.add(directionalLight)
     scene.add(directionalLight.target)
 
-    const debugScreen = DebugScreen()
-    debugScreen.position.set(0, 1, -5)
-    Events.Instance.emit('debug', 'Hello🔒, world!')
-    scene.add(debugScreen)
+    if (DEBUG) {
+        const debugScreen = DebugScreen()
+        debugScreen.position.set(0, 1, -5)
+        Events.Instance.emit('debug', 'Hello🔒, world!')
+        scene.add(debugScreen)
+    }
 
     const gameOverDialog = GameOverDialog()
     gameOverDialog.position.set(0, 1.5, -1)
@@ -267,19 +269,20 @@ const initGame = async () => {
     // Event listeners
     window.addEventListener('resize', onWindowResize, false)
 
-    Events.Instance.on('progress', (progress: { color: Progress; artist: Progress; title: Progress }) => {
+    Events.Instance.on('progress', (progress: GameProgress) => {
         // Update combo
-        let bestCombo = 'color'
-        if (progress.artist.correctCount >= progress.title.correctCount) {
+        let bestCombo: SequenceType = 'color'
+        if (progress.artist.correctCount >= progress[bestCombo].correctCount) {
             bestCombo = 'artist'
         }
-        if (progress.title.correctCount >= progress.artist.correctCount) {
+        if (progress.title.correctCount >= progress[bestCombo].correctCount) {
             bestCombo = 'title'
         }
 
         for (let i = 0; i < 6; i++) {
             const progressMesh = arenaMesh.getObjectByName(`progress-${i}`)
-            const color = i < progress[bestCombo].correctCount ? COMBO_COLORS[bestCombo] : 0x000000
+            let color = i < progress[bestCombo].correctCount ? COMBO_COLORS[bestCombo] : 0x000000
+            if (i < progress[bestCombo].correctCount && bestCombo === 'color') color = SOLUTION_COLOR[i]
             if (progressMesh) {
                 progressMesh.visible = true
                 progressMesh.material.color.set(color)
@@ -303,11 +306,29 @@ const initGame = async () => {
     })
 
     djPuzzle.reset()
-    djPuzzle.addVinylByIndex(2)
-    djPuzzle.addVinylByIndex(4)
-    djPuzzle.addVinylByIndex(1)
-    djPuzzle.addVinylByIndex(5)
-    djPuzzle.addVinylByIndex(2)
+    // Color
+    // djPuzzle.addVinylByIndex(0)
+    // djPuzzle.addVinylByIndex(1)
+    // djPuzzle.addVinylByIndex(2)
+    // djPuzzle.addVinylByIndex(3)
+    // djPuzzle.addVinylByIndex(4)
+    // djPuzzle.addVinylByIndex(5)
+
+    // Artist
+    // djPuzzle.addVinylByIndex(0)
+    // djPuzzle.addVinylByIndex(2)
+    // djPuzzle.addVinylByIndex(4)
+    // djPuzzle.addVinylByIndex(1)
+    // djPuzzle.addVinylByIndex(5)
+    // djPuzzle.addVinylByIndex(3)
+
+    // Title
+    // djPuzzle.addVinylByIndex(0)
+    // djPuzzle.addVinylByIndex(3)
+    // djPuzzle.addVinylByIndex(5)
+    // djPuzzle.addVinylByIndex(1)
+    // djPuzzle.addVinylByIndex(4)
+    // djPuzzle.addVinylByIndex(2)
 }
 
 function onXRSessionStart() {
