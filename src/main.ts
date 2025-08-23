@@ -119,7 +119,7 @@ const initGame = async () => {
         mesh.userData.isPickable = true
         mesh.userData.recordIndex = i
         // Select a record
-        mesh.onPointerPick = (controller) => {
+        mesh.onPointerPick = (controller: THREE.Group) => {
             if (controller.userData.selected) return // Don't let it grab twice
             djPuzzle.selected[controller.id] = i
             const target = controller.getObjectByName('target')
@@ -137,7 +137,7 @@ const initGame = async () => {
                 controller.userData.selected = mesh
             }
         }
-        mesh.onPointerDrop = (controller) => {
+        mesh.onPointerDrop = (controller: THREE.Group) => {
             // If it's near an open table mesh
             AnimationFactory.Instance.cancelAnimation(mesh, true)
             const tableDistance = mesh
@@ -156,8 +156,7 @@ const initGame = async () => {
                         rotation: new THREE.Euler((-1 * Math.PI) / 2, 0, 0),
                     },
                     duration: 60,
-                }).then((cancelled) => {
-                    if (cancelled) return
+                }).then(() => {
                     AnimationFactory.Instance.animateTransform({
                         mesh,
                         end: {

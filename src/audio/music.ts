@@ -1,4 +1,4 @@
-import { zzfxM, zzfxP } from '../libraries/zzfx'
+import { zzfx, zzfxM, zzfxP } from '../libraries/zzfx'
 
 export const TestMusic = () => {
     // Fix the parameter order: instruments, patterns, sequence, BPM
@@ -3442,7 +3442,7 @@ export const TestMusic = () => {
         [0, 1, 2, 3, 4, 5, 4, 5, 6, 7, 6, 7, 8, 9, 8, 9, 6, 7, 6, 7, 0, 8, 9, 8, 9, 6, 7, 6, 7],
         187.5,
     )
-    const node = zzfxP(...buffer)
+    zzfxP(...buffer)
 }
 
 export const BlipSFX = () => zzfx(...[, , 76, 0.02, 0.02, 0.01, 1, 0.44, , , , , , 0.5, , , , , 0.01, 0.57]) // Blip 60
