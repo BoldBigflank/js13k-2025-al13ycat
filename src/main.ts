@@ -1,6 +1,6 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { loadModelByName, createCylinder } from './scripts/modelLoader'
-import DJPuzzle from './scripts/DJPuzzle'
+import DJPuzzle, { Progress } from './scripts/DJPuzzle'
 import { SequenceType } from './scripts/DJPuzzle'
 import { VRButton } from './libraries/VRButton'
 import { Witch } from './models/witch'
@@ -267,18 +267,19 @@ const initGame = async () => {
     // Event listeners
     window.addEventListener('resize', onWindowResize, false)
 
-    Events.Instance.on('combo', () => {
+    Events.Instance.on('progress', (progress: { color: Progress; artist: Progress; title: Progress }) => {
+        // Update combo
         let bestCombo = 'color'
-        if (djPuzzle.comboCount.artist >= djPuzzle.comboCount[bestCombo]) {
+        if (progress.artist.correctCount >= progress.title.correctCount) {
             bestCombo = 'artist'
         }
-        if (djPuzzle.comboCount.title >= djPuzzle.comboCount[bestCombo]) {
+        if (progress.title.correctCount >= progress.artist.correctCount) {
             bestCombo = 'title'
         }
 
         for (let i = 0; i < 6; i++) {
             const progressMesh = arenaMesh.getObjectByName(`progress-${i}`)
-            const color = i < djPuzzle.comboCount[bestCombo] ? COMBO_COLORS[bestCombo] : 0x000000
+            const color = i < progress[bestCombo].correctCount ? COMBO_COLORS[bestCombo] : 0x000000
             if (progressMesh) {
                 progressMesh.visible = true
                 progressMesh.material.color.set(color)
@@ -286,13 +287,12 @@ const initGame = async () => {
                 progressMesh.material.needsUpdate = true
             }
         }
-    })
-    Events.Instance.on('solved', () => {
-        const puzzleKeys = Object.keys(djPuzzle.solvedCombo) as SequenceType[]
+        // Update solved
+        const puzzleKeys = Object.keys(progress) as SequenceType[]
         for (let i = 0; i < puzzleKeys.length; i++) {
             const puzzleKey = puzzleKeys[i]
             const completeMesh = arenaMesh.getObjectByName(`complete-${i}`)
-            const color = djPuzzle.solvedCombo[puzzleKey] ? COMBO_COLORS[puzzleKey] : 0x000000
+            const color = progress[puzzleKey].solved ? COMBO_COLORS[puzzleKey] : 0x000000
             if (completeMesh) {
                 completeMesh.visible = true
                 completeMesh.material.color.set(color)
@@ -301,6 +301,7 @@ const initGame = async () => {
             }
         }
     })
+
     djPuzzle.reset()
     djPuzzle.addVinylByIndex(2)
     djPuzzle.addVinylByIndex(4)
