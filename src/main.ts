@@ -1,4 +1,3 @@
-import './style.css'
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { loadModelByName, createCylinder } from './scripts/modelLoader'
 import DJPuzzle from './scripts/DJPuzzle'
@@ -21,12 +20,15 @@ const COMBO_COLORS = {
     title: BLUE,
 }
 
-let camera, scene, raycaster, renderer
-let selectedController
-let controller1, controller2
+let camera: THREE.Camera | undefined,
+    scene: THREE.Scene | undefined,
+    raycaster: THREE.Raycaster | undefined,
+    renderer: THREE.Renderer | undefined
+let selectedController: THREE.Group | undefined
+let controller1: THREE.Group | undefined, controller2: THREE.Group | undefined
 let controllerGrip1, controllerGrip2
 let cassetteMesh
-const intersected = []
+const intersected: THREE.Object3D[] = []
 
 let controls, baseReferenceSpace
 const START_POSITION = new THREE.Vector3(0, 0, 0.3)

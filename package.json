@@ -5,13 +5,15 @@
         "dev": "vite",
         "build": "vite build",
         "preview": "vite preview",
-        "prepare": "husky"
+        "prepare": "husky",
+        "tsc": "tsc"
     },
     "devDependencies": {
         "husky": "^9.1.7",
         "pinst": "^3.0.0",
         "prettier": "3.6.2",
         "roadroller": "^2.1.0",
+        "typescript": "^5.9.2",
         "vite": "^7.0.6"
     },
     "dependencies": {
