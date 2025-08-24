@@ -3,7 +3,7 @@
     "packageManager": "yarn@4.6.0",
     "scripts": {
         "dev": "l13 build --watch && vite",
-        "build": "l13 build --minify",
+        "build": "l13 build",
         "preview": "vite preview",
         "prepare": "husky",
         "tsc": "tsc"
