@@ -36,7 +36,6 @@ Plugin.register('js13k_export', {
                 ]
 
                 const convertPyramid = (pyramid) => {
-                    console.log('pyramid', pyramid)
                     const name = pyramid.name.replace('pyramid_', '') || 'pyramid'
                     const width = roundHundredth(
                         pyramid.mesh.geometry.boundingBox.max.x - pyramid.mesh.geometry.boundingBox.min.x,
@@ -54,7 +53,6 @@ Plugin.register('js13k_export', {
                     return `pyramid_${name}_${roundHundredth(width)}_${roundHundredth(height)}_${roundHundredth(depth)}_${roundHundredth(x)}_${roundHundredth(y)}_${roundHundredth(z)}_${roundWhole(rX)}_${roundWhole(rY)}_${roundWhole(rZ)}_${roundHundredth(oX)}_${roundHundredth(oY)}_${roundHundredth(oZ)}_${color}`
                 }
                 const convertCylinder = (cylinder) => {
-                    console.log('cylinder', cylinder)
                     const name = cylinder.name.replace('cylinder_', '') || 'cylinder'
                     const width = roundHundredth(
                         cylinder.mesh.geometry.boundingBox.max.x - cylinder.mesh.geometry.boundingBox.min.x,
@@ -157,6 +155,7 @@ Plugin.register('js13k_export', {
                     } else if (obj instanceof Group) {
                         const arr = []
                         obj.children.forEach((child) => {
+                            if (!child.visibility) return
                             arr.push(handleObject(child))
                         })
                         return arr
@@ -166,6 +165,7 @@ Plugin.register('js13k_export', {
                 let model = `export const ${Project.name}Model = () => \n`
                 const meshes = []
                 Outliner.root.forEach((obj) => {
+                    if (!obj.visibility) return
                     meshes.push(handleObject(obj))
                 })
                 model += JSON.stringify(meshes, null, 2)

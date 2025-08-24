@@ -62,13 +62,30 @@ const createModel = (modelArray: Model): THREE.Group => {
 
     const parseCylinderGeometry = (item: string) => {
         const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = item.split('_')
+        console.log('cylinder', {
+            name,
+            width,
+            height,
+            depth,
+            x,
+            y,
+            z,
+            rX,
+            rY,
+            rZ,
+            oX,
+            oY,
+            oZ,
+        })
         const radius = width / 2
         const geometry = new THREE.CylinderGeometry(radius, radius, height, 32)
-        geometry.scale(1, 1, depth / width)
         geometry.translate(x - oX, y - oY, z - oZ)
-        geometry.rotateX(THREE.MathUtils.degToRad(rX))
-        geometry.rotateY(THREE.MathUtils.degToRad(rY))
-        geometry.rotateZ(THREE.MathUtils.degToRad(rZ))
+        geometry.scale(1, 1, depth / width)
+        const qX = THREE.MathUtils.degToRad(rX)
+        const qY = THREE.MathUtils.degToRad(rY)
+        const qZ = THREE.MathUtils.degToRad(rZ)
+        const rotEuler = new THREE.Euler(qX, qY, qZ)
+        geometry.applyQuaternion(new THREE.Quaternion().setFromEuler(rotEuler))
         return geometry
     }
 
