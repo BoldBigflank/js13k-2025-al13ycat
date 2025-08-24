@@ -62,21 +62,6 @@ const createModel = (modelArray: Model): THREE.Group => {
 
     const parseCylinderGeometry = (item: string) => {
         const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = item.split('_')
-        console.log('cylinder', {
-            name,
-            width,
-            height,
-            depth,
-            x,
-            y,
-            z,
-            rX,
-            rY,
-            rZ,
-            oX,
-            oY,
-            oZ,
-        })
         const radius = width / 2
         const geometry = new THREE.CylinderGeometry(radius, radius, height, 32)
         geometry.translate(x - oX, y - oY, z - oZ)

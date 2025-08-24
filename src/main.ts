@@ -1,6 +1,6 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
-import { loadModelByName, createCylinder } from './scripts/modelLoader'
-import DJPuzzle, { GameProgress, Progress, SOLUTION_COLOR } from './scripts/DJPuzzle'
+import { loadModelByName } from './scripts/modelLoader'
+import DJPuzzle, { GameProgress, SOLUTION_COLOR } from './scripts/DJPuzzle'
 import { SequenceType } from './scripts/DJPuzzle'
 import { VRButton } from './libraries/VRButton'
 import { Witch } from './models/witch'
@@ -12,7 +12,6 @@ import { GameOverDialog } from './models/GameOverDialog'
 import { Events } from './libraries/Events'
 import { BLUE, GREEN, RED } from './scripts/Colors'
 import { TestMusic } from './audio/music'
-// import { XRControllerModelFactory } from "./libraries/XRControllerModelFactory";
 
 const DEBUG = false
 
@@ -28,7 +27,6 @@ let camera: THREE.Camera | undefined,
     renderer: THREE.Renderer | undefined
 let selectedController: THREE.Group | undefined
 let controller1: THREE.Group | undefined, controller2: THREE.Group | undefined
-let controllerGrip1, controllerGrip2
 let cassetteMesh
 const intersected: THREE.Object3D[] = []
 
@@ -151,7 +149,7 @@ const initGame = async () => {
                     mesh,
                     end: {
                         position: new THREE.Vector3(0, 0, 0),
-                        rotation: new THREE.Euler(0, 0, 0),
+                        rotation: new THREE.Euler(0, Math.PI / 2, 0),
                     },
                     duration: 60,
                 })
@@ -207,6 +205,7 @@ const initGame = async () => {
     // Controllers
 
     controller1 = renderer.xr.getController(0)
+    controller1.addEventListener('connected', onControllerConnected)
     controller1.addEventListener('selectstart', onSelectStart)
     controller1.addEventListener('selectend', onSelectEnd)
     controller1.addEventListener('squeezestart', onSelectStart)
@@ -214,55 +213,12 @@ const initGame = async () => {
     scene.add(controller1)
 
     controller2 = renderer.xr.getController(1)
+    controller2.addEventListener('connected', onControllerConnected)
     controller2.addEventListener('selectstart', onSelectStart)
     controller2.addEventListener('selectend', onSelectEnd)
     controller2.addEventListener('squeezestart', onSelectStart)
     controller2.addEventListener('squeezeend', onSelectEnd)
     scene.add(controller2)
-
-    // const controllerModelFactory = new XRControllerModelFactory();
-
-    controllerGrip1 = renderer.xr.getControllerGrip(0)
-
-    // Visual representation of the controller
-    const controllerMesh1 = createCylinder({
-        radius: 0.01,
-        depth: 0.2,
-        color: 0xff00ff,
-    })
-    controllerMesh1.name = 'controllerMesh1'
-    controllerMesh1.rotateX(Math.PI / 4)
-    controllerGrip1.add(controllerMesh1)
-    scene.add(controllerGrip1)
-
-    // Visual representation of the controller
-    controllerGrip2 = renderer.xr.getControllerGrip(1)
-    const controllerMesh2 = createCylinder({
-        radius: 0.01,
-        depth: 0.2,
-        color: 0x00ff00,
-    })
-    controllerMesh2.rotateX(Math.PI / 4)
-    controllerGrip2.add(controllerMesh2)
-    scene.add(controllerGrip2)
-
-    const geometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -1)])
-
-    const line = new THREE.Line(geometry)
-    line.name = 'line'
-    line.scale.z = 5
-
-    controller1.add(line.clone())
-    controller2.add(line.clone())
-
-    // Target for selected records to go
-    const target = new THREE.Group()
-    target.rotation.set((-1 * Math.PI) / 2, 0, 0)
-    target.position.set(0, -0.05, -0.12)
-    target.name = 'target'
-
-    controller1.add(target.clone())
-    controller2.add(target.clone())
 
     raycaster = new THREE.Raycaster()
 
@@ -346,6 +302,47 @@ function onXRSessionStart() {
     renderer.xr.setReferenceSpace(teleportSpaceOffset)
 }
 
+function onControllerConnected(event) {
+    console.log('controller connected', event)
+    const controller = event.target
+    const handedness = event.data.handedness === 'left' ? -1 : 1
+    const controllerRotation = event.data.hand ? 0 : (handedness * Math.PI) / 2
+    Events.Instance.emit('debug', `Hand: ${event.data.hand}`)
+
+    // TODO: Move target to the controller's grip space
+    const targetMesh = controller.getObjectByName('target')
+    if (!targetMesh) {
+        const target = new THREE.Group()
+        target.name = 'target'
+        target.rotation.set(0, 0, 0)
+        target.position.set(-1 * handedness * 0.035, 0.05, -0.12)
+        controller.add(target)
+    }
+
+    let pawMesh = controller.getObjectByName('paw')
+    if (!pawMesh) {
+        pawMesh = loadModelByName('paw')
+        pawMesh.position.set(0, 0, 0.15)
+        pawMesh.rotation.set((3 * Math.PI) / 2, controllerRotation, 0)
+        controller.add(pawMesh.clone(true))
+    }
+
+    // line
+    let line = controller.getObjectByName('line')
+    if (!line) {
+        const geometry = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(0, 0, -1),
+        ])
+        line = new THREE.Line(geometry)
+        line.material.color.set(0xff0000)
+        line.name = 'line'
+        line.scale.z = 5
+
+        controller.add(line)
+    }
+}
+
 // Starts pulling trigger
 function onSelectStart(event) {
     selectedController = event.target
@@ -396,7 +393,7 @@ function intersectObjects(controller) {
     if (controller.userData.selected !== undefined) return
     const line = controller.getObjectByName('line')
     const intersections = getIntersections(controller)
-    line.scale.z = 5
+    if (line) line.scale.z = 5
     if (intersections.length > 0) {
         // for each of the intersections, look for userData.isPickable
         let collided = false
@@ -405,7 +402,7 @@ function intersectObjects(controller) {
             let focusedObject = object
             while (focusedObject) {
                 if (focusedObject.userData.isPickable) {
-                    line.scale.z = distance
+                    if (line) line.scale.z = distance
                     intersected.push(focusedObject)
                     collided = true
                     break
