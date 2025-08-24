@@ -21,3 +21,4 @@ node_modules/.vite/deps/_metadata.json
 extra/words/*.txt
 test-zip
 test-zip-clean
+js13k-2025-*.zip

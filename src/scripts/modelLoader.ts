@@ -1,6 +1,7 @@
 import { cassetteModel } from '../models/cassette'
 import { arenaModel } from '../models/arena'
 import { catModel } from '../models/cat'
+import { pawModel } from '../models/paw'
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 
 import { BasicShader } from '../shaders/BasicShader'
@@ -15,10 +16,12 @@ const createModel = (modelArray: Model): THREE.Group => {
 
     const parsePyramidGeometry = (item: string) => {
         const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = item.split('_')
-        const radius = width / 2
-        const geometry = new THREE.CylinderGeometry(0, radius, height, 4)
+        // Pyramid width is one side, cylinder radius is the hypotenuse
+        const radius = Math.sqrt(width * width + width * width) / 2
+        const geometry = new THREE.CylinderGeometry(0, radius, height, 4, 1, false, Math.PI / 4)
         geometry.scale(1, 1, depth / width)
-        geometry.translate(x - oX, y - oY, z - oZ)
+        // Three origin is midpoint, Blockbench origin is center of mass (lower 3 vs 1.2)
+        geometry.translate(x - oX, y - oY + 0.3 * height, z - oZ)
         geometry.rotateX(THREE.MathUtils.degToRad(rX))
         geometry.rotateY(THREE.MathUtils.degToRad(rY))
         geometry.rotateZ(THREE.MathUtils.degToRad(rZ))
@@ -61,6 +64,7 @@ const createModel = (modelArray: Model): THREE.Group => {
         const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = item.split('_')
         const radius = width / 2
         const geometry = new THREE.CylinderGeometry(radius, radius, height, 32)
+        geometry.scale(1, 1, depth / width)
         geometry.translate(x - oX, y - oY, z - oZ)
         geometry.rotateX(THREE.MathUtils.degToRad(rX))
         geometry.rotateY(THREE.MathUtils.degToRad(rY))
@@ -154,6 +158,11 @@ export const loadModelByName = (name: string) => {
     } else if (name === 'cat') {
         const model = createModel(catModel())
         model.name = 'cat'
+        return model
+    } else if (name === 'paw') {
+        const model = createModel(pawModel())
+        model.name = 'paw'
+        model.scale.set(0.03125, 0.03125, 0.03125)
         return model
     }
     return null
