@@ -1,6 +1,7 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { initCanvas } from '../scripts/Utils'
 import { BLACK, BLUE, GREEN, MAGENTA } from '../scripts/Colors'
+import { ColorMaterial } from '../scripts/TextureUtils'
 
 const INCHES_TO_METERS_SCALE = 0.0254
 
@@ -63,22 +64,21 @@ export const Vinyl = ({ color, artist, title }: VinylProps): THREE.Object3D => {
     // innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength
     const geometry = new THREE.RingGeometry(4, 7, 32)
     geometry.scale(INCHES_TO_METERS_SCALE, INCHES_TO_METERS_SCALE, INCHES_TO_METERS_SCALE)
-    const material = new THREE.MeshPhongMaterial({
-        color: color,
-        side: THREE.DoubleSide,
-        emissive: 0x000000,
-        specular: 0x111111,
-        shininess: 50,
-    })
-    result.add(new THREE.Mesh(geometry, material)) // Remember to scene.add later
+    // const material = new THREE.MeshPhongMaterial({
+    //     color: color,
+    //     side: THREE.DoubleSide,
+    //     emissive: 0x000000,
+    //     specular: 0x111111,
+    //     shininess: 50,
+    // })
+    const material = ColorMaterial(color, { glow: true })
+
+    result.add(new THREE.Mesh(geometry, material))
 
     // Inner ring
     const innerRingGeometry = new THREE.RingGeometry(0.25, 4, 32)
     innerRingGeometry.scale(INCHES_TO_METERS_SCALE, INCHES_TO_METERS_SCALE, INCHES_TO_METERS_SCALE)
-    const innerRingMaterial = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
-        side: THREE.DoubleSide,
-    })
+    const innerRingMaterial = ColorMaterial(0xffffff, {})
     result.add(new THREE.Mesh(innerRingGeometry, innerRingMaterial))
 
     // Artist Label

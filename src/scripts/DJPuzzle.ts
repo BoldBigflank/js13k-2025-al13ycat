@@ -62,7 +62,6 @@ export class DJPuzzle {
 
     addVinylByIndex(index: number) {
         const { color, artist, title } = this.vinyls[index]
-        const [COLOR_SOLUTION, ARTIST_SOLUTION, TITLE_SOLUTION] = SOLUTION_INDEXES
         const colorIndex = SOLUTION_COLOR.indexOf(color)
         const artistIndex = SOLUTION_ARTIST.indexOf(artist)
         const titleIndex = SOLUTION_TITLE.indexOf(title)
@@ -70,11 +69,11 @@ export class DJPuzzle {
         if (colorIndex === this.progress.color.currentIndex + 1) {
             this.progress.color.correctCount++
             if (this.progress.color.correctCount === SOLUTION_COLOR.length) this.progress.color.solved = true
+            this.progress.color.currentIndex = colorIndex
         } else {
             this.progress.color.currentIndex = -1 // Force them to put 0 first
             this.progress.color.correctCount = 0
         }
-        this.progress.color.currentIndex = colorIndex
 
         if (artistIndex === (this.progress.artist.currentIndex + 1) % SOLUTION_ARTIST.length) {
             this.progress.artist.correctCount++
@@ -92,8 +91,13 @@ export class DJPuzzle {
         }
         this.progress.title.currentIndex = titleIndex
 
+        this.queue.unshift(index)
         Events.Instance.emit('progress', this.progress)
         Events.Instance.emit('debug', JSON.stringify(this.progress))
+    }
+
+    getVinylInQueue(index: number) {
+        return this.vinyls[this.queue[index]]
     }
 
     isSolved(comboType: 'color' | 'artist' | 'title') {
@@ -111,22 +115,22 @@ export class DJPuzzle {
                 solved: false,
             },
             artist: {
-                currentIndex: -1,
+                currentIndex: -2,
                 correctCount: 0,
                 solved: false,
             },
             title: {
-                currentIndex: -1,
+                currentIndex: -2,
                 correctCount: 0,
                 solved: false,
             },
         }
-        this.vinyls = SOLUTION_COLOR.map((_color, index) => {
+        this.vinyls = SOLUTION_COLOR.map((color, index) => {
             return {
                 index,
-                color: SOLUTION_COLOR[COLOR_SOLUTION[index]], // This is wrong
-                artist: SOLUTION_ARTIST[ARTIST_SOLUTION[index]],
-                title: SOLUTION_TITLE[TITLE_SOLUTION[index]],
+                color,
+                artist: '',
+                title: '',
             }
         })
 

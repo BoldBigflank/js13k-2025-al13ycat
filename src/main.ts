@@ -12,6 +12,7 @@ import { GameOverDialog } from './models/GameOverDialog'
 import { Events } from './libraries/Events'
 import { BLUE, GREEN, RED } from './scripts/Colors'
 import { TestMusic } from './audio/music'
+import { TextMaterial } from './scripts/TextureUtils'
 
 const DEBUG = false
 
@@ -30,13 +31,14 @@ let controller1: THREE.Group | undefined, controller2: THREE.Group | undefined
 let cassetteMesh
 const intersected: THREE.Object3D[] = []
 
-let controls, baseReferenceSpace
+let baseReferenceSpace
 const START_POSITION = new THREE.Vector3(0, 0, 0.3)
 
 const initGame = async () => {
     if (DEBUG) TestMusic()
     // Clean up intro and start canvas
     document.getElementById('intro')!.style.display = 'none'
+    document.getElementById('playButton')!.setAttribute('disabled', 'true')
     const canvasElement = document.getElementById('c')
     const canvas: HTMLCanvasElement | null = canvasElement as unknown as HTMLCanvasElement
     if (!canvas) return
@@ -82,7 +84,7 @@ const initGame = async () => {
     }
 
     const gameOverDialog = GameOverDialog()
-    gameOverDialog.position.set(0, 1.5, -1)
+    gameOverDialog.position.set(0, 4, -1)
     scene.add(gameOverDialog)
 
     cassetteMesh = loadModelByName('cassette') as InteractiveObject3D
@@ -236,6 +238,7 @@ const initGame = async () => {
         }
 
         for (let i = 0; i < 6; i++) {
+            const vinyl = djPuzzle.getVinylInQueue(progress[bestCombo].correctCount - i - 1)
             const progressMesh = arenaMesh.getObjectByName(`progress-${i}`)
             let color = i < progress[bestCombo].correctCount ? COMBO_COLORS[bestCombo] : 0x000000
             if (i < progress[bestCombo].correctCount && bestCombo === 'color') color = SOLUTION_COLOR[i]
@@ -244,6 +247,22 @@ const initGame = async () => {
                 progressMesh.material.color.set(color)
                 progressMesh.material.emissive.set(color)
                 progressMesh.material.needsUpdate = true
+
+                // Progress label
+                let progressLabel = progressMesh.getObjectByName('progress-label')
+                if (!progressLabel) {
+                    const labelGeometry = new THREE.PlaneGeometry(1, 1)
+                    labelGeometry.translate(0.1, 0.1, 0.15)
+                    labelGeometry.rotateZ(Math.PI / 8)
+                    progressLabel = new THREE.Mesh(labelGeometry)
+                    progressLabel.renderOrder = 1
+                    progressLabel.name = 'progress-label'
+                    progressMesh.add(progressLabel)
+                }
+                progressLabel.visible = i < progress[bestCombo].correctCount && vinyl ? true : false
+                if (vinyl) progressLabel.material = TextMaterial([vinyl[bestCombo]], color)
+                if (bestCombo === 'color') progressLabel.visible = false
+                if (progress[bestCombo].solved) progressLabel.visible = false
             }
         }
         // Update solved
