@@ -27,14 +27,14 @@ export const Witch = (scene: THREE.Scene, renderer: THREE.WebGLRenderer): Intera
         if (renderer.xr?.getCamera()) {
             const camera = renderer.xr?.getCamera()
             // Get the camera's orientation, turn it 180 degrees around the Y axis, then push it to lookAtPos
-            lookAtPos.push(camera.quaternion.clone())
+            const yAxisRot = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI, 0))
+            const rotatedQuat = yAxisRot.multiply(camera.quaternion.clone())
+            lookAtPos.push(rotatedQuat)
 
             if (lookAtPos.length > 60) {
                 let q = lookAtPos.shift()
-                const yAxisRot = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI, 0))
                 if (q) {
-                    // multiply q to get it PI radians around the Y axis
-                    parent.quaternion.copy(yAxisRot.multiply(q))
+                    parent.quaternion.copy(q)
                 }
             }
         }

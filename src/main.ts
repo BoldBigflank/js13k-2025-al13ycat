@@ -14,6 +14,7 @@ import { BLUE, GREEN, RED } from './scripts/Colors'
 import { Song3, TestMusic } from './audio/music'
 import { TextMaterial } from './scripts/TextureUtils'
 import { sleep } from './scripts/Utils'
+import { Crowd } from './scripts/Crowd'
 
 const DEBUG = false
 
@@ -105,20 +106,26 @@ const initGame = async () => {
     const arenaMesh = loadModelByName('arena') as InteractiveObject3D
     const tableA = arenaMesh.getObjectByName('tableA') as InteractiveObject3D
     scene.add(arenaMesh)
+    const floor = arenaMesh.getObjectByName('floor')
+
+    const crowd = Crowd(floor, renderer)
+    crowd.name = 'Crowd'
+    // scene.add(crowd)
 
     const catMesh = loadModelByName('cat')
     catMesh.position.set(-3, 1, 0)
     catMesh.scale.set(0.1, 0.1, 0.1)
+    catMesh.rotation.set(0, -Math.PI / 4, 0)
     scene.add(catMesh)
     const catMesh2 = catMesh.clone(true)
     catMesh2.name = 'catMesh2'
-    catMesh2.position.set(3, 1, -1)
-    catMesh2.rotation.set(0, Math.PI / 2, 0)
+    catMesh2.position.set(3, 1, 0)
+    catMesh2.rotation.set(0, Math.PI / 4, 0)
     scene.add(catMesh2)
 
-    const witch = Witch(scene, renderer)
-    witch.position.set(0, 1.5, -1)
-    witch.rotation.set(0, Math.PI, 0)
+    // const witch = Witch(scene, renderer)
+    // witch.position.set(0, 1.5, -1)
+    // witch.rotation.set(0, Math.PI, 0)
 
     djPuzzle.vinyls.forEach((record, i) => {
         const mesh = Vinyl(record)

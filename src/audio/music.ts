@@ -15,15 +15,6 @@ Events.Instance.on('progress', (progress: GameProgress) => {
     // bestComboCount can be 0-3, so we need to map it appropriately
     const rawCount = progress.bestComboCount || 0
     currentSequenceNumber = Math.min(rawCount, 6) // Cap at 6 for the 12-second buffer
-
-    console.log('progress event:', {
-        bestComboCount: progress.bestComboCount,
-        bestComboType: progress.bestComboType,
-        color: progress.color.correctCount,
-        artist: progress.artist.correctCount,
-        title: progress.title.correctCount,
-        mappedSequence: currentSequenceNumber,
-    })
 })
 
 export const BlipSFX = () => zzfx(...[, , 76, 0.02, 0.02, 0.01, 1, 0.44, , , , , , 0.5, , , , , 0.01, 0.57]) // Blip 60
