@@ -11,8 +11,9 @@ import { DebugScreen } from './models/DebugScreen'
 import { GameOverDialog } from './models/GameOverDialog'
 import { Events } from './libraries/Events'
 import { BLUE, GREEN, RED } from './scripts/Colors'
-import { TestMusic } from './audio/music'
+import { Song3, TestMusic } from './audio/music'
 import { TextMaterial } from './scripts/TextureUtils'
+import { sleep } from './scripts/Utils'
 
 const DEBUG = false
 
@@ -35,7 +36,7 @@ let baseReferenceSpace
 const START_POSITION = new THREE.Vector3(0, 0, 0.3)
 
 const initGame = async () => {
-    if (DEBUG) TestMusic()
+    Song3()
     // Clean up intro and start canvas
     document.getElementById('intro')!.style.display = 'none'
     document.getElementById('playButton')!.setAttribute('disabled', 'true')

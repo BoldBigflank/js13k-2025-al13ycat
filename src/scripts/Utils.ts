@@ -12,3 +12,5 @@ export const initCanvas = (size = 512): [HTMLCanvasElement, CanvasRenderingConte
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
     return [canvas, ctx]
 }
+
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
