@@ -96,11 +96,15 @@ export class DJPuzzle {
         }
         this.progress.title.currentIndex = titleIndex
 
-        this.progress.bestComboCount = Math.max(
+        const newBestComboCount = Math.max(
             this.progress.color.correctCount,
             this.progress.artist.correctCount,
             this.progress.title.correctCount,
         )
+        if (this.progress.bestComboCount < 6 && newBestComboCount < this.progress.bestComboCount) {
+            Events.Instance.emit('comboBroken')
+        }
+        this.progress.bestComboCount = newBestComboCount
         this.progress.bestComboType =
             this.progress.color.correctCount === this.progress.bestComboCount
                 ? 'color'

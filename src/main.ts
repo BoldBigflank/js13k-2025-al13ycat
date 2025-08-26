@@ -3,7 +3,6 @@ import { loadModelByName } from './scripts/modelLoader'
 import DJPuzzle, { GameProgress, SOLUTION_COLOR } from './scripts/DJPuzzle'
 import { SequenceType } from './scripts/DJPuzzle'
 import { VRButton } from './libraries/VRButton'
-import { Witch } from './models/witch'
 import { InteractiveObject3D } from './types'
 import { Vinyl } from './models/vinyl'
 import { AnimationFactory } from './scripts/AnimationFactory'
@@ -11,10 +10,12 @@ import { DebugScreen } from './models/DebugScreen'
 import { GameOverDialog } from './models/GameOverDialog'
 import { Events } from './libraries/Events'
 import { BLUE, GREEN, RED } from './scripts/Colors'
-import { Song3, TestMusic } from './audio/music'
+import { PickupSFX, RecordSFX, Song3 } from './audio/music'
 import { TextMaterial } from './scripts/TextureUtils'
 import { sleep } from './scripts/Utils'
 import { Crowd } from './scripts/Crowd'
+
+const CLOCK = new THREE.Clock()
 
 const DEBUG = false
 
@@ -103,6 +104,29 @@ const initGame = async () => {
         loop: true,
     })
 
+    const gridGeometry = new THREE.PlaneGeometry(20, 20, 20, 20)
+    gridGeometry.rotateX(Math.PI / 2)
+    const gridMesh = new THREE.Mesh(
+        gridGeometry,
+        new THREE.MeshBasicMaterial({
+            color: '#ff00ff',
+            wireframe: true,
+        }),
+    )
+    gridMesh.position.set(0, -1, -5)
+    scene.add(gridMesh)
+
+    Events.Instance.on('tick', () => {
+        const positions = gridGeometry.getAttribute('position')
+        for (let i = 0; i < positions.array.length; i += 3) {
+            const x = positions.array[i]
+            const y = positions.array[i + 1]
+            const z = positions.array[i + 2]
+            positions.array[i + 1] = Math.sin(Math.sqrt(x * x + z * z) - 4 * CLOCK.getElapsedTime())
+        }
+        positions.needsUpdate = true
+    })
+
     const arenaMesh = loadModelByName('arena') as InteractiveObject3D
     const tableA = arenaMesh.getObjectByName('tableA') as InteractiveObject3D
     scene.add(arenaMesh)
@@ -184,6 +208,7 @@ const initGame = async () => {
                 })
                 // Move any other meshes
                 tableA.attach(mesh)
+                PickupSFX()
                 AnimationFactory.Instance.animateTransform({
                     mesh,
                     end: {
@@ -234,6 +259,10 @@ const initGame = async () => {
 
     // Event listeners
     window.addEventListener('resize', onWindowResize, false)
+
+    Events.Instance.on('comboBroken', () => {
+        RecordSFX()
+    })
 
     Events.Instance.on('progress', (progress: GameProgress) => {
         // Update combo
@@ -286,6 +315,9 @@ const initGame = async () => {
                 completeMesh.material.needsUpdate = true
             }
         }
+
+        // Update gridmesh
+        gridMesh.material.visible = progress.bestComboCount > 5
     })
 
     djPuzzle.reset()

@@ -17,6 +17,8 @@ Events.Instance.on('progress', (progress: GameProgress) => {
     currentSequenceNumber = Math.min(rawCount, 6) // Cap at 6 for the 12-second buffer
 })
 
+export const RecordSFX = () => zzfx(...[, , 143, 0.03, 0.17, 0.09, 2, 1.5, 10, -17, , , , , 4, , , 0.73, 0.09]) // Shoot 95
+
 export const BlipSFX = () => zzfx(...[, , 76, 0.02, 0.02, 0.01, 1, 0.44, , , , , , 0.5, , , , , 0.01, 0.57]) // Blip 60
 export const SolvedSFX = () =>
     zzfx(...[2.07, 0, 130.81, 0.01, 0.26, 0.47, 3, 1.15, , 0.1, , , 0.05, , , , 0.14, 0.26, 0.15, 0.02]) // Music 112 - Mutation 2
