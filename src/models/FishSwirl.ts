@@ -35,12 +35,31 @@ export const FishSwirl = (): THREE.Group => {
             fish.position.addScaledVector(fish.userData.velocity, dt)
             if (fish.position.y < 0) {
                 // Reset, go again
-                fish.position.y = 0
 
-                fish.rotation.y += Math.PI
+                // Turn to center
+                // Get direction to center (0,0,0) from fish's current position
+                const toCenter = new THREE.Vector3(Math.random() * 4 - 2, 0, Math.random() * 4 - 2)
+                    .sub(fish.position)
+                    .normalize()
+                // Create rotation to face that direction
+                const targetRotation = new THREE.Quaternion()
+                targetRotation.setFromUnitVectors(new THREE.Vector3(0, 0, -1), toCenter)
+                fish.quaternion.copy(targetRotation)
+                fish.position.y = 0
+                // Use y rotation to set velocity
+
+                const forward = new THREE.Vector3(0, 0, -1)
+                forward.applyQuaternion(fish.quaternion)
+                forward.multiplyScalar(5) // Keep same speed as before
+                fish.userData.velocity.x = forward.x
+                fish.userData.velocity.z = forward.z
                 fish.userData.velocity.y = 5 + 6 * Math.random()
-                fish.userData.velocity.z = -1 * fish.userData.velocity.z
             }
+            // Set the fish rotation to the direction of the velocity
+            // quaternion setfrom unitvectors
+            const fishFaceQuaternion = new THREE.Quaternion()
+            fishFaceQuaternion.setFromUnitVectors(new THREE.Vector3(0, 0, -1), fish.userData.velocity)
+            fish.quaternion.copy(fishFaceQuaternion)
         })
     })
     Events.Instance.on('progress', (progress: GameProgress) => {

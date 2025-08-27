@@ -13,7 +13,7 @@ export class Grid {
         this.clock = new THREE.Clock()
         this.parent = new THREE.Group()
         this.parent.name = 'Grid'
-        this.geometry = new THREE.PlaneGeometry(20, 20, 20, 20)
+        this.geometry = new THREE.PlaneGeometry(20, 26, 20, 26)
         this.geometry.rotateX(Math.PI / 2)
         this._mesh = new THREE.Mesh(
             this.geometry,

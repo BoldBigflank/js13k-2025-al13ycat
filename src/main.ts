@@ -38,14 +38,9 @@ let baseReferenceSpace
 const START_POSITION = new THREE.Vector3(0, 0, 0.3)
 
 const initGame = async () => {
-    Song3()
-    // Clean up intro and start canvas
-    document.getElementById('intro')!.style.display = 'none'
+    // Change to a loading state
     document.getElementById('playButton')!.setAttribute('disabled', 'true')
-    const canvasElement = document.getElementById('c')
-    const canvas: HTMLCanvasElement | null = canvasElement as unknown as HTMLCanvasElement
-    if (!canvas) return
-    canvas.style.display = 'block'
+    document.getElementById('playButton')!.innerHTML = 'LOADING...'
 
     // Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -91,14 +86,14 @@ const initGame = async () => {
     const tableA = arenaMesh.getObjectByName('tableA')
 
     const runner = Runner(6)
-    runner.position.set(-4, -1, -11)
+    runner.position.set(-3, -1, -20)
     scene.add(runner)
     const runner2 = Runner(6)
-    runner2.position.set(4, -1, -11)
+    runner2.position.set(3, -1, -20)
     scene.add(runner2)
 
     const fishSwirl = FishSwirl()
-    fishSwirl.position.set(0, 0, -1)
+    fishSwirl.position.set(0, 0, -10)
     scene.attach(fishSwirl)
 
     djPuzzle.vinyls.forEach((record, i) => {
@@ -273,6 +268,7 @@ const initGame = async () => {
     // djPuzzle.addVinylByIndex(1)
     // djPuzzle.addVinylByIndex(2)
     // djPuzzle.addVinylByIndex(3)
+    // await sleep(3000)
     // djPuzzle.addVinylByIndex(4)
     // djPuzzle.addVinylByIndex(5)
 
@@ -291,6 +287,11 @@ const initGame = async () => {
     // djPuzzle.addVinylByIndex(1)
     // djPuzzle.addVinylByIndex(4)
     // djPuzzle.addVinylByIndex(2)
+    Song3()
+
+    // Update the UI
+    document.getElementById('intro')!.style.display = 'none'
+    document.getElementById('c')!.style.display = 'block'
 }
 
 function onXRSessionStart() {

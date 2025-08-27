@@ -31,11 +31,11 @@ export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
 
     const cassetteMesh = Cassette()
     mesh.add(cassetteMesh)
-    cassetteMesh.position.set(0, 0, -20)
+    cassetteMesh.position.set(0, 0, -30)
 
     const grid = new Grid()
     mesh.add(grid.mesh)
-    grid.mesh.position.set(0, -1, -5)
+    grid.mesh.position.set(0, -1, -7)
 
     const gameOverDialog = GameOverDialog()
     mesh.add(gameOverDialog)
