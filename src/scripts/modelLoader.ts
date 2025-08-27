@@ -1,7 +1,7 @@
-import { cassetteModel } from '../models/cassette'
-import { arenaModel } from '../models/arena'
-import { catModel } from '../models/cat'
-import { pawModel } from '../models/paw'
+import { cassetteModel } from '../models/exported/cassette'
+import { arenaModel } from '../models/exported/arena'
+import { catModel } from '../models/exported/cat'
+import { pawModel } from '../models/exported/paw'
 import * as BufferGeometryUtils from '../libraries/BufferGeometryUtils.js'
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 

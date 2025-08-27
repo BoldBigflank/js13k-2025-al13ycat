@@ -4,7 +4,7 @@ import { catModel } from '../models/cat'
 import { createGeometry, loadModelByName } from './modelLoader'
 import { Events } from '../libraries/Events.js'
 
-export const Crowd = (floor: THREE.Object3D, renderer: THREE.WebGLRenderer) => {
+export const Crowd = (renderer: THREE.WebGLRenderer) => {
     const catMeshes: THREE.Object3D[] = []
     let pc = 0
     const lookAtPos: THREE.Quaternion[] = []
@@ -29,7 +29,6 @@ export const Crowd = (floor: THREE.Object3D, renderer: THREE.WebGLRenderer) => {
         parent.add(model)
         catMeshes.push(model)
     }
-    floor.add(parent)
 
     Events.Instance.on('tick', () => {
         if (!renderer.xr?.getCamera()) return

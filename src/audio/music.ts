@@ -3,12 +3,10 @@ import CPlayer from '../libraries/player-small'
 
 import { zzfx } from '../libraries/zzfx'
 import { GameProgress } from '../scripts/DJPuzzle'
-import song from './song(3)'
+import song from './song(4)'
 
 const audioContext = new AudioContext()
 let currentSequenceNumber = 0
-
-let musicController: Song3Controller | null = null
 
 Events.Instance.on('progress', (progress: GameProgress) => {
     // Map bestComboCount to sequence numbers (0-6)
@@ -116,9 +114,6 @@ export const Song3 = async (): Promise<Song3Controller> => {
         getCurrentSequence: () => currentSequenceNumber,
         isPlaying: () => isPlaying,
     }
-
-    // Store the controller globally so the progress event can access it
-    musicController = controller
 
     return controller
 }

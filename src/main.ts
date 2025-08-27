@@ -1,21 +1,21 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
-import { loadModelByName } from './scripts/modelLoader'
 import DJPuzzle, { GameProgress, SOLUTION_COLOR } from './scripts/DJPuzzle'
 import { SequenceType } from './scripts/DJPuzzle'
 import { VRButton } from './libraries/VRButton'
-import { InteractiveObject3D } from './types'
 import { Vinyl } from './models/vinyl'
 import { AnimationFactory } from './scripts/AnimationFactory'
 import { DebugScreen } from './models/DebugScreen'
-import { GameOverDialog } from './models/GameOverDialog'
 import { Events } from './libraries/Events'
 import { BLUE, GREEN, RED } from './scripts/Colors'
 import { PickupSFX, RecordSFX, Song3 } from './audio/music'
 import { TextMaterial } from './scripts/TextureUtils'
 import { sleep } from './scripts/Utils'
-import { Crowd } from './scripts/Crowd'
+import { Arena } from './models/Arena'
+import { Runner } from './models/Runner'
+import { Paw } from './models/Paw'
 
 const CLOCK = new THREE.Clock()
+let beat = 0
 
 const DEBUG = false
 
@@ -31,7 +31,6 @@ let camera: THREE.Camera | undefined,
     renderer: THREE.Renderer | undefined
 let selectedController: THREE.Group | undefined
 let controller1: THREE.Group | undefined, controller2: THREE.Group | undefined
-let cassetteMesh
 const intersected: THREE.Object3D[] = []
 
 let baseReferenceSpace
@@ -86,70 +85,16 @@ const initGame = async () => {
         scene.add(debugScreen)
     }
 
-    const gameOverDialog = GameOverDialog()
-    gameOverDialog.position.set(0, 4, -1)
-    scene.add(gameOverDialog)
-
-    cassetteMesh = loadModelByName('cassette') as InteractiveObject3D
-    cassetteMesh.position.set(0, 0, -20)
-    cassetteMesh.userData.isPickable = true
-    scene.add(cassetteMesh)
-    AnimationFactory.Instance.animateTransform({
-        mesh: cassetteMesh,
-        end: {
-            rotation: new THREE.Euler(0, 2 * Math.PI - 0.01, 0),
-        },
-        duration: 3000,
-        ease: (t) => t,
-        loop: true,
-    })
-
-    const gridGeometry = new THREE.PlaneGeometry(20, 20, 20, 20)
-    gridGeometry.rotateX(Math.PI / 2)
-    const gridMesh = new THREE.Mesh(
-        gridGeometry,
-        new THREE.MeshBasicMaterial({
-            color: '#ff00ff',
-            wireframe: true,
-        }),
-    )
-    gridMesh.position.set(0, -1, -5)
-    scene.add(gridMesh)
-
-    Events.Instance.on('tick', () => {
-        const positions = gridGeometry.getAttribute('position')
-        for (let i = 0; i < positions.array.length; i += 3) {
-            const x = positions.array[i]
-            const y = positions.array[i + 1]
-            const z = positions.array[i + 2]
-            positions.array[i + 1] = Math.sin(Math.sqrt(x * x + z * z) - 4 * CLOCK.getElapsedTime())
-        }
-        positions.needsUpdate = true
-    })
-
-    const arenaMesh = loadModelByName('arena') as InteractiveObject3D
-    const tableA = arenaMesh.getObjectByName('tableA') as InteractiveObject3D
+    const arenaMesh = Arena(renderer)
     scene.add(arenaMesh)
-    const floor = arenaMesh.getObjectByName('floor')
+    const tableA = arenaMesh.getObjectByName('tableA')
 
-    const crowd = Crowd(floor, renderer)
-    crowd.name = 'Crowd'
-    // scene.add(crowd)
-
-    const catMesh = loadModelByName('cat')
-    catMesh.position.set(-3, 1, 0)
-    catMesh.scale.set(0.1, 0.1, 0.1)
-    catMesh.rotation.set(0, -Math.PI / 4, 0)
-    scene.add(catMesh)
-    const catMesh2 = catMesh.clone(true)
-    catMesh2.name = 'catMesh2'
-    catMesh2.position.set(3, 1, 0)
-    catMesh2.rotation.set(0, Math.PI / 4, 0)
-    scene.add(catMesh2)
-
-    // const witch = Witch(scene, renderer)
-    // witch.position.set(0, 1.5, -1)
-    // witch.rotation.set(0, Math.PI, 0)
+    const runner = Runner(6)
+    runner.position.set(-4, -1, -11)
+    scene.add(runner)
+    const runner2 = Runner(6)
+    runner2.position.set(4, -1, -11)
+    scene.add(runner2)
 
     djPuzzle.vinyls.forEach((record, i) => {
         const mesh = Vinyl(record)
@@ -315,9 +260,6 @@ const initGame = async () => {
                 completeMesh.material.needsUpdate = true
             }
         }
-
-        // Update gridmesh
-        gridMesh.material.visible = progress.bestComboCount > 5
     })
 
     djPuzzle.reset()
@@ -380,10 +322,10 @@ function onControllerConnected(event) {
 
     let pawMesh = controller.getObjectByName('paw')
     if (!pawMesh) {
-        pawMesh = loadModelByName('paw')
+        pawMesh = Paw()
         pawMesh.position.set(0, 0, 0.15)
         pawMesh.rotation.set((3 * Math.PI) / 2, controllerRotation, 0)
-        controller.add(pawMesh.clone(true))
+        controller.add(pawMesh)
     }
 
     // line
@@ -480,8 +422,14 @@ function cleanIntersected() {
 }
 
 function animate() {
+    const d = CLOCK.getDelta()
+    beat += d
+    if (beat >= 1) {
+        Events.Instance.emit('beat')
+        beat -= 1
+    }
     AnimationFactory.Instance.update()
-    Events.Instance.emit('tick')
+    Events.Instance.emit('tick', d)
     cleanIntersected()
 
     intersectObjects(controller1)
