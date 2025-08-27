@@ -1,5 +1,7 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 
+export const INCHES_TO_METERS_SCALE = 0.0254
+
 export const Clamp = (value: number, min: number, max: number) => {
     return Math.min(Math.max(value, min), max)
 }

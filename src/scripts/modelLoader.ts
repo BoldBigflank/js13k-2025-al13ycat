@@ -2,6 +2,7 @@ import { cassetteModel } from '../models/exported/cassette'
 import { arenaModel } from '../models/exported/arena'
 import { catModel } from '../models/exported/cat'
 import { pawModel } from '../models/exported/paw'
+import { goldfishModel } from '../models/exported/goldfish'
 import * as BufferGeometryUtils from '../libraries/BufferGeometryUtils.js'
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 
@@ -270,6 +271,10 @@ export const loadModelByName = (name: string) => {
         const model = createModel(pawModel())
         model.name = 'paw'
         model.scale.set(0.03125, 0.03125, 0.03125)
+        return model
+    } else if (name === 'goldfish') {
+        const model = createModel(goldfishModel())
+        model.name = 'goldfish'
         return model
     }
     return null

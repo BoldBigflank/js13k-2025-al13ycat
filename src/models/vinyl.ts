@@ -1,9 +1,7 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
-import { initCanvas } from '../scripts/Utils'
+import { INCHES_TO_METERS_SCALE, initCanvas } from '../scripts/Utils'
 import { BLACK, BLUE, GREEN, MAGENTA } from '../scripts/Colors'
 import { ColorMaterial } from '../scripts/TextureUtils'
-
-const INCHES_TO_METERS_SCALE = 0.0254
 
 type VinylProps = {
     color: string

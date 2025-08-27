@@ -13,6 +13,7 @@ import { sleep } from './scripts/Utils'
 import { Arena } from './models/Arena'
 import { Runner } from './models/Runner'
 import { Paw } from './models/Paw'
+import { FishSwirl } from './models/FishSwirl'
 
 const CLOCK = new THREE.Clock()
 let beat = 0
@@ -95,6 +96,10 @@ const initGame = async () => {
     const runner2 = Runner(6)
     runner2.position.set(4, -1, -11)
     scene.add(runner2)
+
+    const fishSwirl = FishSwirl()
+    fishSwirl.position.set(0, 0, -1)
+    scene.attach(fishSwirl)
 
     djPuzzle.vinyls.forEach((record, i) => {
         const mesh = Vinyl(record)
