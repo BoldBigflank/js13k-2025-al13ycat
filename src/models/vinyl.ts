@@ -9,7 +9,7 @@ type VinylProps = {
     title: string
 }
 
-const LabelMaterial = (artist, title) => {
+const LabelMaterial = (artist: string, title: string) => {
     const RES = 1024
     const [canvas, ctx] = initCanvas()
     // ctx.fillStyle = MAGENTA;
