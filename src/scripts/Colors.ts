@@ -25,3 +25,6 @@ export const NEON_GREEN = '#a6fd29'
 export const NEON_BLUE = '#8ea5ff'
 export const NEON_PURPLE = '#af3dff'
 export const NEON_BROWN = '#39013a'
+
+export const CAT_BLACK = '#333333'
+export const CAT_GREY = '#888888'

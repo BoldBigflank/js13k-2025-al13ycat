@@ -10,6 +10,21 @@ import { BasicShader } from '../shaders/BasicShader'
 
 type Model = (string | string[])[]
 
+const BB_PALETTE_KEYS = ['Light Blue', 'Yellow', 'Orange', 'Red', 'Purple', 'Blue', 'Green', 'Lime', 'Pink', 'Silver']
+
+const BB_DEFAULT_PALETTE = {
+    'Light Blue': '#9999ff', //light blue
+    Yellow: '#fffb00', //yellow
+    Orange: '#ff7300', //orange
+    Red: '#ff0000', //red
+    Purple: '#c300ff', // purple
+    Blue: '#0000ff', // blue
+    Green: '#00ff00', //green
+    Lime: '#b0ffb0', // lime green
+    Pink: '#ff00ff', //pink
+    Silver: '#d3d3d3', //silver
+}
+
 // Shared parse geometry functions
 const parsePyramidGeometry = (item: string): THREE.BufferGeometry => {
     const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = item.split('_')
@@ -193,11 +208,16 @@ export const createGeometry = (modelArray: Model): THREE.BufferGeometry => {
     }
 }
 
-const createModel = (modelArray: Model): THREE.Group => {
+const createModel = (modelArray: Model, customPalette?: Partial<typeof BB_DEFAULT_PALETTE>): THREE.Group => {
     const parent = new THREE.Group()
     parent.position.set(0, 0, 0)
     parent.rotation.set(0, 0, 0)
     parent.scale.set(1, 1, 1)
+
+    const modelPalette = {
+        ...BB_DEFAULT_PALETTE,
+        ...customPalette,
+    }
 
     modelArray.forEach((item) => {
         if (item === null) {
@@ -205,7 +225,7 @@ const createModel = (modelArray: Model): THREE.Group => {
             return
         }
         if (Array.isArray(item)) {
-            parent.add(createModel(item))
+            parent.add(createModel(item, modelPalette))
         } else {
             const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = item.split('_')
 
@@ -223,7 +243,7 @@ const createModel = (modelArray: Model): THREE.Group => {
                 })
             } else {
                 material = new THREE.MeshStandardMaterial({
-                    color: color,
+                    color: modelPalette[BB_PALETTE_KEYS[color] as keyof typeof modelPalette],
                     side: THREE.DoubleSide,
                 }) // TODO: use color
             }
@@ -254,26 +274,26 @@ export const createCylinder = (options: { radius: number; depth: number; color: 
     return new THREE.Mesh(geometry, material)
 }
 
-export const loadModelByName = (name: string) => {
+export const loadModelByName = (name: string, customPalette?: Partial<typeof BB_DEFAULT_PALETTE>) => {
     if (name === 'cassette') {
-        const model = createModel(cassetteModel())
+        const model = createModel(cassetteModel(), customPalette)
         model.name = 'cassette'
         return model
     } else if (name === 'arena') {
-        const model = createModel(arenaModel())
+        const model = createModel(arenaModel(), customPalette)
         model.name = 'arena'
         return model
     } else if (name === 'cat') {
-        const model = createModel(catModel())
+        const model = createModel(catModel(), customPalette)
         model.name = 'cat'
         return model
     } else if (name === 'paw') {
-        const model = createModel(pawModel())
+        const model = createModel(pawModel(), customPalette)
         model.name = 'paw'
         model.scale.set(0.03125, 0.03125, 0.03125)
         return model
     } else if (name === 'goldfish') {
-        const model = createModel(goldfishModel())
+        const model = createModel(goldfishModel(), customPalette)
         model.name = 'goldfish'
         return model
     }

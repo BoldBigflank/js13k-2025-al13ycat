@@ -11,7 +11,6 @@ import { PickupSFX, RecordSFX, Song3 } from './audio/music'
 import { TextMaterial } from './scripts/TextureUtils'
 import { sleep } from './scripts/Utils'
 import { Arena } from './models/Arena'
-import { Runner } from './models/Runner'
 import { Paw } from './models/Paw'
 import { FishSwirl } from './models/FishSwirl'
 
@@ -84,13 +83,6 @@ const initGame = async () => {
     const arenaMesh = Arena(renderer)
     scene.add(arenaMesh)
     const tableA = arenaMesh.getObjectByName('tableA')
-
-    const runner = Runner(6)
-    runner.position.set(-3, -1, -20)
-    scene.add(runner)
-    const runner2 = Runner(6)
-    runner2.position.set(3, -1, -20)
-    scene.add(runner2)
 
     const fishSwirl = FishSwirl()
     fishSwirl.position.set(0, 0, -10)
