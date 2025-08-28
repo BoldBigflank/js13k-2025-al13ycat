@@ -1,14 +1,12 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
-import DJPuzzle, { GameProgress, SOLUTION_COLOR, TYPE_COLORS } from './scripts/DJPuzzle'
+import DJPuzzle, { GameProgress, TYPE_COLORS } from './scripts/DJPuzzle'
 import { SequenceType } from './scripts/DJPuzzle'
 import { VRButton } from './libraries/VRButton'
-import { Vinyl } from './models/vinyl'
+import { Vinyl } from './models/Vinyl'
 import { AnimationFactory } from './scripts/AnimationFactory'
 import { DebugScreen } from './models/DebugScreen'
 import { Events } from './libraries/Events'
-import { BLUE, GREEN, RED } from './scripts/Colors'
 import { PickupSFX, RecordSFX, Song3 } from './audio/music'
-import { TextMaterial } from './scripts/TextureUtils'
 import { sleep } from './scripts/Utils'
 import { Arena } from './models/Arena'
 import { Paw } from './models/Paw'
@@ -196,43 +194,6 @@ const initGame = async () => {
     })
 
     Events.Instance.on('progress', (progress: GameProgress) => {
-        // Update combo
-        let bestCombo: SequenceType = 'color'
-        if (progress.artist.correctCount >= progress[bestCombo].correctCount) {
-            bestCombo = 'artist'
-        }
-        if (progress.title.correctCount >= progress[bestCombo].correctCount) {
-            bestCombo = 'title'
-        }
-
-        // for (let i = 0; i < 6; i++) {
-        //     const vinyl = djPuzzle.getVinylInQueue(progress[bestCombo].correctCount - i - 1)
-        //     const progressMesh = arenaMesh.getObjectByName(`progress-${i}`)
-        //     let color = i < progress[bestCombo].correctCount ? COMBO_COLORS[bestCombo] : 0x000000
-        //     if (i < progress[bestCombo].correctCount && bestCombo === 'color') color = SOLUTION_COLOR[i]
-        //     if (progressMesh) {
-        //         progressMesh.visible = true
-        //         progressMesh.material.color.set(color)
-        //         progressMesh.material.emissive.set(color)
-        //         progressMesh.material.needsUpdate = true
-
-        //         // Progress label
-        //         let progressLabel = progressMesh.getObjectByName('progress-label')
-        //         if (!progressLabel) {
-        //             const labelGeometry = new THREE.PlaneGeometry(1, 1)
-        //             labelGeometry.translate(0.1, 0.1, 0.15)
-        //             labelGeometry.rotateZ(Math.PI / 8)
-        //             progressLabel = new THREE.Mesh(labelGeometry)
-        //             progressLabel.renderOrder = 1
-        //             progressLabel.name = 'progress-label'
-        //             progressMesh.add(progressLabel)
-        //         }
-        //         progressLabel.visible = i < progress[bestCombo].correctCount && vinyl ? true : false
-        //         if (vinyl) progressLabel.material = TextMaterial([vinyl[bestCombo]], color)
-        //         if (bestCombo === 'color') progressLabel.visible = false
-        //         if (progress[bestCombo].solved) progressLabel.visible = false
-        //     }
-        // }
         // Update solved
         const puzzleKeys = Object.keys(progress) as SequenceType[]
         for (let i = 0; i < puzzleKeys.length; i++) {

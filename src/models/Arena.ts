@@ -51,7 +51,7 @@ export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
 
     const gameOverDialog = GameOverDialog()
     mesh.add(gameOverDialog)
-    gameOverDialog.position.set(0, 4, -1)
+    gameOverDialog.position.set(0, 2, -1)
 
     // MAke a Runner for all the pillars
     const runner = Runner(6)

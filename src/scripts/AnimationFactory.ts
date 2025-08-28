@@ -3,7 +3,7 @@ import { Clamp } from './Utils'
 
 export type AnimationTransform = {
     position?: THREE.Vector3
-    rotation?: THREE.Vector3
+    rotation?: THREE.Euler
     scaling?: THREE.Vector3
 }
 
@@ -76,7 +76,7 @@ export class AnimationFactory {
                         animation.mesh.position.copy(animation.start.position)
                     }
                     if (animation.end.rotation) {
-                        animation.mesh.rotation.copy(animation.start.rotation)
+                        animation.mesh.rotation.copy(animation.start.rotation!)
                     }
                     if (animation.end.scaling) {
                         animation.mesh.scale.copy(animation.start.scaling)
@@ -110,6 +110,9 @@ export class AnimationFactory {
                 const startEuler = animation.start.rotation!
                 const endEuler = animation.end.rotation
                 const currentEuler = new THREE.Euler()
+
+                // Preserve the rotation order from the start Euler, fallback to default if not set
+                currentEuler.order = startEuler.order || THREE.Euler.DefaultOrder
 
                 // Interpolate each axis independently
                 currentEuler.x = startEuler.x + (endEuler.x - startEuler.x) * animation.easeFunc(lerpAmount)
