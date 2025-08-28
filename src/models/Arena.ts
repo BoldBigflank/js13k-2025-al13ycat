@@ -4,6 +4,7 @@ import { Crowd } from '../scripts/Crowd'
 import { Cassette } from './Cassette'
 import { Grid } from './Grid'
 import { GameOverDialog } from './GameOverDialog'
+import { Progress } from './Progress'
 import { Runner } from './Runner'
 import { DARK_GREY, GREY, LIGHT_GREY, WALL_GREEN } from '../scripts/Colors'
 
@@ -15,6 +16,11 @@ export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
         Orange: GREY,
         Red: DARK_GREY, // Dance floor
     }) as THREE.Object3D
+
+    // Progress console
+    const progress = Progress()
+    mesh.add(progress)
+    progress.position.set(-0.1, 0.9, -0.7)
 
     // Crowd
     const crowd = Crowd(renderer)

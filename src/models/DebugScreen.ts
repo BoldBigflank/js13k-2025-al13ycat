@@ -8,7 +8,7 @@ export const DebugScreen = (): THREE.Object3D => {
     result.renderOrder = 1
     const lines: string[] = []
     const geometry = new THREE.PlaneGeometry(5, 5)
-    const [canvas, ctx] = initCanvas(1024)
+    const [canvas, ctx] = initCanvas()
     const texture = new THREE.CanvasTexture(canvas)
     texture.encoding = THREE.LinearSRGBColorSpace
     const material = new THREE.MeshBasicMaterial({

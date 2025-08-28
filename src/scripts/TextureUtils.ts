@@ -25,31 +25,39 @@ export const ColorMaterial = (color: string, opts?: ColorOpts) => {
 }
 
 type TextOpts = {
-    color: string
-    bgColor: string
+    color: string | number
+    bgColor?: string
+    textAlign?: CanvasTextAlign
+    ratio?: number
+    fontSize?: number
 }
 
-export const TextMaterial = (lines: string[], color: string | number) => {
+export const TextMaterial = (lines: string[], opts: TextOpts) => {
+    const { color, bgColor, textAlign, ratio, fontSize } = opts
     c.set(color)
     const hexColor = typeof color === 'string' ? color : `#${c.getHexString()}`
     const key = `text-${hexColor}-${lines.join('')}`
     if (textures[key]) return textures[key]
-    const RES = 1024
-    const [canvas, ctx] = initCanvas(RES)
+    const width = 1024
+    const height = ratio ? width / ratio : width
+    const [canvas, ctx] = initCanvas(width, height)
 
     // TODO: Container fill
 
     // The Text
-    ctx.textAlign = 'center'
+    ctx.textAlign = textAlign || 'center'
+    let x = 16
+    if (ctx.textAlign === 'center') x = 0.5 * width
+    let y = 16
     lines.forEach((line, i) => {
-        const fontSize = 64
+        const size = fontSize !== undefined ? fontSize : 64
         ctx.strokeStyle = BLACK
-        ctx.font = `${fontSize}px monospace`
-        ctx.textBaseline = 'middle'
+        ctx.font = `${size}px monospace`
+        ctx.textBaseline = 'top'
         ctx.lineWidth = 8
-        ctx.strokeText(line, 0.5 * RES, 0.5 * (RES - fontSize * lines.length) + fontSize * i)
+        ctx.strokeText(line, x, y + size * i)
         ctx.fillStyle = hexColor
-        ctx.fillText(line, 0.5 * RES, 0.5 * (RES - fontSize * lines.length) + fontSize * i)
+        ctx.fillText(line, x, y + size * i)
     })
 
     const texture = new THREE.CanvasTexture(canvas)

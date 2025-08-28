@@ -66,7 +66,7 @@ Plugin.register('js13k_export', {
                     const [rX, rY, rZ] = plane.rotation
                     const [oX, oY, oZ] = plane.origin
                     const color = plane.color
-                    return `plane_${name}_${width}_${height}_${depth}_${roundHundredth(x)}_${roundHundredth(y)}_${roundHundredth(z)}_${roundHundredth(rX)}_${roundHundredth(rY)}_${roundHundredth(rZ)}_${roundHundredth(oX)}_${roundHundredth(oY)}_${roundHundredth(oZ)}_${color}`
+                    return `plane_${name}_${roundHundredth(width)}_${roundHundredth(height)}_${roundHundredth(depth)}_${roundHundredth(x)}_${roundHundredth(y)}_${roundHundredth(z)}_${roundHundredth(rX)}_${roundHundredth(rY)}_${roundHundredth(rZ)}_${roundHundredth(oX)}_${roundHundredth(oY)}_${roundHundredth(oZ)}_${color}`
                 }
 
                 const convertSphere = (sphere) => {

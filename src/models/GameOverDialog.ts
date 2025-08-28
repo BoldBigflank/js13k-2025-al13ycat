@@ -12,13 +12,13 @@ export const GameOverDialog = (): THREE.Object3D => {
     const geometry = new THREE.PlaneGeometry(5, 5)
     geometry.translate(0, -2, 0)
 
-    // const [canvas, ctx] = initCanvas(1024)
+    // const [canvas, ctx] = initCanvas()
     // const texture = new THREE.CanvasTexture(canvas)
     // texture.encoding = THREE.LinearSRGBColorSpace
     // const material = new THREE.MeshBasicMaterial({
     //     map: texture,
     // })
-    const material = TextMaterial(lines, 'white')
+    const material = TextMaterial(lines, { color: 'white' })
     const mesh = new THREE.Mesh(geometry, material)
     result.add(mesh)
     mesh.position.set(0, 0, 0)

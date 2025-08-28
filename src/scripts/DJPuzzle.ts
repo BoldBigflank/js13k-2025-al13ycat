@@ -1,6 +1,12 @@
 import { Events } from '../libraries/Events'
 import { BLUE, GREEN, ORANGE, RED, VIOLET, YELLOW } from './Colors'
 
+export const TYPE_COLORS = {
+    color: RED,
+    artist: GREEN,
+    title: BLUE,
+}
+
 export const SOLUTION_COLOR = [RED, ORANGE, YELLOW, GREEN, BLUE, VIOLET]
 
 const SOLUTION_ARTIST = ['Shiny Toy Guns', 'B.B. King', 'Jack White', 'Black Sabbath', 'Faith Hill', 'Cliff Sheen']
@@ -18,6 +24,18 @@ const SOLUTION_TITLE = [
 // off side  show  case load out back hand book marks man power
 // NOTE: This one has the incorrect "outback/outman", "handbook/handoff"
 
+const TYPE_SOLUTIONS = {
+    color: SOLUTION_COLOR,
+    artist: SOLUTION_ARTIST,
+    title: SOLUTION_TITLE,
+}
+
+export const TYPE_FONTSIZES = {
+    color: 0,
+    artist: 24,
+    title: 34,
+}
+
 const SOLUTION_INDEXES = [
     // Manual shuffling :/
     // Each column is a vinyl
@@ -27,6 +45,8 @@ const SOLUTION_INDEXES = [
 ]
 
 export type SequenceType = 'color' | 'artist' | 'title'
+
+export const SequenceTypes: SequenceType[] = ['color', 'artist', 'title']
 
 type Vinyl = {
     index: number
@@ -41,6 +61,7 @@ export type GameProgress = {
     title: Progress
     bestComboType: SequenceType
     bestComboCount: number
+    displayText: string
 }
 
 export type Progress = {
@@ -113,6 +134,7 @@ export class DJPuzzle {
                   : 'title'
 
         this.queue.unshift(index)
+        this.progress.displayText = this.getDisplayText()
         Events.Instance.emit('progress', this.progress)
         Events.Instance.emit('debug', JSON.stringify(this.progress))
     }
@@ -123,6 +145,20 @@ export class DJPuzzle {
 
     isSolved(comboType: 'color' | 'artist' | 'title') {
         return this.progress[comboType].solved
+    }
+
+    getDisplayText() {
+        let result = ''
+
+        const { currentIndex, correctCount, solved } = this.progress[this.progress.bestComboType]
+        const solution = TYPE_SOLUTIONS[this.progress.bestComboType]
+        for (let i = 0; i < correctCount; i++) {
+            let index = currentIndex - i
+            if (index < 0) index += solution.length
+            result = `${solution[index]}→${result}`
+        }
+
+        return result
     }
 
     reset() {

@@ -3,6 +3,7 @@ import { arenaModel } from '../models/exported/arena'
 import { catModel } from '../models/exported/cat'
 import { pawModel } from '../models/exported/paw'
 import { goldfishModel } from '../models/exported/goldfish'
+import { progressModel } from '../models/exported/progress'
 import * as BufferGeometryUtils from '../libraries/BufferGeometryUtils.js'
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 
@@ -295,6 +296,10 @@ export const loadModelByName = (name: string, customPalette?: Partial<typeof BB_
     } else if (name === 'goldfish') {
         const model = createModel(goldfishModel(), customPalette)
         model.name = 'goldfish'
+        return model
+    } else if (name === 'progress') {
+        const model = createModel(progressModel(), customPalette)
+        model.name = 'progress'
         return model
     }
     return null

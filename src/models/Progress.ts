@@ -1,0 +1,55 @@
+import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
+import { AnimationFactory } from '../scripts/AnimationFactory'
+import { loadModelByName } from '../scripts/modelLoader'
+import { BLACK, BLUE, CAT_BLACK, GREEN, LIGHT_GREY, RED, WHITE } from '../scripts/Colors'
+import { Events } from '../libraries/Events'
+import {
+    GameProgress,
+    SequenceType,
+    SequenceTypes,
+    SOLUTION_COLOR,
+    TYPE_COLORS,
+    TYPE_FONTSIZES,
+} from '../scripts/DJPuzzle'
+import { TextMaterial } from '../scripts/TextureUtils'
+
+export const Progress = (): THREE.Object3D => {
+    const mesh = loadModelByName('progress', {
+        Red: BLACK, // Display,
+        Green: LIGHT_GREY, // Case
+        Blue: BLUE, // Base
+        Silver: BLACK, // LEDs
+    }) as THREE.Object3D
+    mesh.scale.set(0.1, 0.1, 0.1)
+
+    Events.Instance.on('progress', (progress: GameProgress) => {
+        // The label
+        const display = mesh.getObjectByName('display')
+        // 11.8 by 0.8
+        display.material = TextMaterial([progress.displayText], {
+            color: TYPE_COLORS[progress.bestComboType],
+            textAlign: 'left',
+            ratio: 11.8 / 0.8,
+            fontSize: TYPE_FONTSIZES[progress.bestComboType],
+        })
+
+        // The lights
+        SequenceTypes.forEach((type: SequenceType) => {
+            for (let i = 0; i < 6; i++) {
+                const progressMesh = mesh.getObjectByName(`progress-${type}-${i}`)
+                if (!progressMesh) continue
+
+                let color = CAT_BLACK
+                if (progress[type].solved || i < progress[type].correctCount) color = TYPE_COLORS[type]
+                if ((progress[type].solved || i < progress[type].correctCount) && type === 'color')
+                    color = SOLUTION_COLOR[i]
+
+                progressMesh.material.color.set(color)
+                progressMesh.material.emissive.set(color)
+                progressMesh.material.needsUpdate = true
+            }
+        })
+    })
+
+    return mesh
+}
