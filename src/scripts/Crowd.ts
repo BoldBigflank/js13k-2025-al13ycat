@@ -1,5 +1,6 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
-import { loadModelByName } from './modelLoader'
+import { createModel } from './modelLoader'
+import { catModel } from '../models/exported/cat'
 import { Events } from '../libraries/Events.js'
 import { CAT_BLACK, CAT_GREY, LIGHT_GREY } from './Colors.js'
 
@@ -16,7 +17,7 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
     let pc = 0
     const lookAtPos: THREE.Quaternion[] = []
     const parent = new THREE.Group()
-    const cat = loadModelByName('cat', CAT_COLORS[0]) // TODO: More cat colors, randomize
+    const cat = createModel(catModel(), CAT_COLORS[0]) // TODO: More cat colors, randomize
     cat.scale.set(0.03125, 0.03125, 0.03125)
     // Raise the box floor.height units up
     const xSpan = 10

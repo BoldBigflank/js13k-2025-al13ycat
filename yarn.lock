@@ -1721,7 +1721,7 @@ __metadata:
   dependencies:
     husky: "npm:^9.1.7"
     kontra: "npm:^10.0.2"
-    l13: "npm:^0.0.1-rc.12"
+    l13: "npm:^0.0.1-rc.13"
     pinst: "npm:^3.0.0"
     prettier: "npm:3.6.2"
     roadroller: "npm:^2.1.0"
@@ -1750,9 +1750,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"l13@npm:^0.0.1-rc.12":
-  version: 0.0.1-rc.12
-  resolution: "l13@npm:0.0.1-rc.12"
+"l13@npm:^0.0.1-rc.13":
+  version: 0.0.1-rc.13
+  resolution: "l13@npm:0.0.1-rc.13"
   dependencies:
     7z-wasm: "npm:^1.2.0"
     clean-css: "npm:^5.3.3"
@@ -1768,7 +1768,7 @@ __metadata:
     js13k: dist/index.js
     l13: dist/index.js
     lab13: dist/index.js
-  checksum: 10c0/361f34642e1d763981a7fbfb856b5862e8d80b2d9200b653b9a2549169c5893cba9aef4e6ca215bdcab401d78924d5860dc57bebf943157074d593e080462ce2
+  checksum: 10c0/7db180f80abe2e02a533d350f349cf496387dd21128c00719c681447cb95e0d8af7b875ed1c188d023ac956d8132b3f1eb4c3b2efce266573e392682de114b24
   languageName: node
   linkType: hard
 

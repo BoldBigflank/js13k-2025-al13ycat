@@ -1,6 +1,4 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
-import { AnimationFactory } from '../scripts/AnimationFactory'
-import { loadModelByName } from '../scripts/modelLoader'
 import { Events } from '../libraries/Events'
 import { BLACK, BLUE, GREEN, ORANGE, RED, VIOLET, YELLOW } from '../scripts/Colors'
 

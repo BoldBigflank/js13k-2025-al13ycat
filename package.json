@@ -2,15 +2,15 @@
     "name": "js13k-2025",
     "packageManager": "yarn@4.6.0",
     "scripts": {
-        "dev": "l13 dev",
-        "build": "l13 build",
+        "dev": "l13 dev --experimental",
+        "build": "l13 build --experimental --production",
         "preview": "vite preview",
         "prepare": "husky",
         "tsc": "tsc"
     },
     "devDependencies": {
         "husky": "^9.1.7",
-        "l13": "^0.0.1-rc.12",
+        "l13": "^0.0.1-rc.13",
         "pinst": "^3.0.0",
         "prettier": "3.6.2",
         "roadroller": "^2.1.0",

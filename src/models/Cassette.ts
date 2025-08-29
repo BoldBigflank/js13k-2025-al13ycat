@@ -1,9 +1,10 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { AnimationFactory } from '../scripts/AnimationFactory'
-import { loadModelByName } from '../scripts/modelLoader'
+import { createModel } from '../scripts/modelLoader'
+import { cassetteModel } from './exported/cassette'
 
 export const Cassette = (): THREE.Object3D => {
-    const mesh = loadModelByName('cassette') as THREE.Object3D
+    const mesh = createModel(cassetteModel()) as THREE.Object3D
     AnimationFactory.Instance.animateTransform({
         mesh: mesh,
         end: {

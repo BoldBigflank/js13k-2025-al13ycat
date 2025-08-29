@@ -13,9 +13,15 @@ Plugin.register('js13k_export', {
             const roundedFloat = Math.round(num * 100) / 100
             const roundedString = roundedFloat.toFixed(2)
             // Remove trailing zeroes and decimal point if there are no decimal places
-            return Number(roundedString)
+            if (roundedFloat === 0) return ''
+            return roundedString.replace(/\.?0+$/, '')
         }
-        const roundWhole = (num) => Math.round(num)
+        const roundWhole = (num) => {
+            const roundedFloat = Math.round(num)
+            const roundedString = roundedFloat.toFixed(0)
+            if (roundedFloat === 0) return ''
+            return roundedString.replace(/\.?0+$/, '')
+        }
         const codec = new Codec('js13k_export', {
             name: 'JS13k Mesh',
             remember: true,
@@ -37,7 +43,7 @@ Plugin.register('js13k_export', {
                     const [rX, rY, rZ] = pyramid.rotation
                     const [oX, oY, oZ] = pyramid.origin
                     const color = pyramid.color
-                    return `pyramid_${name}_${roundHundredth(width)}_${roundHundredth(height)}_${roundHundredth(depth)}_${roundHundredth(x)}_${roundHundredth(y)}_${roundHundredth(z)}_${roundWhole(rX)}_${roundWhole(rY)}_${roundWhole(rZ)}_${roundHundredth(oX)}_${roundHundredth(oY)}_${roundHundredth(oZ)}_${color}`
+                    return `py,${name},${roundHundredth(width)},${roundHundredth(height)},${roundHundredth(depth)},${roundHundredth(x)},${roundHundredth(y)},${roundHundredth(z)},${roundWhole(rX)},${roundWhole(rY)},${roundWhole(rZ)},${roundHundredth(oX)},${roundHundredth(oY)},${roundHundredth(oZ)},${color}`
                 }
                 const convertCylinder = (cylinder) => {
                     const name = cylinder.name.replace('cylinder_', '') || 'cylinder'
@@ -54,7 +60,7 @@ Plugin.register('js13k_export', {
                     const [rX, rY, rZ] = cylinder.rotation
                     const [oX, oY, oZ] = cylinder.origin
                     const color = cylinder.color
-                    return `cylinder_${name}_${width}_${height}_${depth}_${roundHundredth(x)}_${roundHundredth(y)}_${roundHundredth(z)}_${roundWhole(rX)}_${roundWhole(rY)}_${roundWhole(rZ)}_${roundHundredth(oX)}_${roundHundredth(oY)}_${roundHundredth(oZ)}_${color}`
+                    return `cy,${name},${width},${height},${depth},${roundHundredth(x)},${roundHundredth(y)},${roundHundredth(z)},${roundWhole(rX)},${roundWhole(rY)},${roundWhole(rZ)},${roundHundredth(oX)},${roundHundredth(oY)},${roundHundredth(oZ)},${color}`
                 }
                 const convertPlane = (plane) => {
                     const name = plane.name.replace('plane_', '') || 'plane'
@@ -66,7 +72,7 @@ Plugin.register('js13k_export', {
                     const [rX, rY, rZ] = plane.rotation
                     const [oX, oY, oZ] = plane.origin
                     const color = plane.color
-                    return `plane_${name}_${roundHundredth(width)}_${roundHundredth(height)}_${roundHundredth(depth)}_${roundHundredth(x)}_${roundHundredth(y)}_${roundHundredth(z)}_${roundHundredth(rX)}_${roundHundredth(rY)}_${roundHundredth(rZ)}_${roundHundredth(oX)}_${roundHundredth(oY)}_${roundHundredth(oZ)}_${color}`
+                    return `p,${name},${roundHundredth(width)},${roundHundredth(height)},${roundHundredth(depth)},${roundHundredth(x)},${roundHundredth(y)},${roundHundredth(z)},${roundHundredth(rX)},${roundHundredth(rY)},${roundHundredth(rZ)},${roundHundredth(oX)},${roundHundredth(oY)},${roundHundredth(oZ)},${color}`
                 }
 
                 const convertSphere = (sphere) => {
@@ -93,7 +99,7 @@ Plugin.register('js13k_export', {
 
                     const color = sphere.color
 
-                    return `sphere_${name}_${width}_${height}_${depth}_${roundHundredth(x)}_${roundHundredth(y)}_${roundHundredth(z)}_${roundWhole(rX)}_${roundWhole(rY)}_${roundWhole(rZ)}_${roundHundredth(oX)}_${roundHundredth(oY)}_${roundHundredth(oZ)}_${color}`
+                    return `s,${name},${width},${height},${depth},${roundHundredth(x)},${roundHundredth(y)},${roundHundredth(z)},${roundWhole(rX)},${roundWhole(rY)},${roundWhole(rZ)},${roundHundredth(oX)},${roundHundredth(oY)},${roundHundredth(oZ)},${color}`
                 }
 
                 const convertCube = (cube) => {
@@ -119,7 +125,7 @@ Plugin.register('js13k_export', {
                     const oZ = roundHundredth(cube.origin[2])
                     const color = cube.color
 
-                    return `cube_${name}_${width}_${height}_${depth}_${x}_${y}_${z}_${rX}_${rY}_${rZ}_${oX}_${oY}_${oZ}_${color}`
+                    return `c,${name},${width},${height},${depth},${x},${y},${z},${rX},${rY},${rZ},${oX},${oY},${oZ},${color}`
                 }
 
                 const handleObject = (obj) => {

@@ -3,7 +3,8 @@ import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import type { InteractiveObject3D } from '../types'
 import { PickupSFX } from '../audio/music'
 import { Events } from '../libraries/Events'
-import { loadModelByName } from '../scripts/modelLoader'
+import { createModel } from '../scripts/modelLoader'
+import { catModel } from './exported/cat'
 
 let pc = 0
 
@@ -15,7 +16,7 @@ export const Witch = (scene: THREE.Scene, renderer: THREE.WebGLRenderer): Intera
     // Meta
     let attention = false
 
-    const cat = loadModelByName('cat')
+    const cat = createModel(catModel())
     cat.scale.set(0.03, 0.03, 0.03)
     parent.add(cat)
     cat.position.set(0, -0.25, -0.05)

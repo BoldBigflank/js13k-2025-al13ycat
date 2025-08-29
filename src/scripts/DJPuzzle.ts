@@ -9,6 +9,8 @@ export const TYPE_COLORS = {
 
 export const SOLUTION_COLOR = [RED, ORANGE, YELLOW, GREEN, BLUE, VIOLET]
 
+// TODO: Build one around Pussycat Dolls (or other cat bands)
+//                                                                    Black eyed peas   Carrot Top  Cap Sheen
 const SOLUTION_ARTIST = ['Shiny Toy Guns', 'B.B. King', 'Jack White', 'Black Sabbath', 'Faith Hill', 'Cliff Sheen']
 
 const SOLUTION_TITLE = [
@@ -136,7 +138,7 @@ export class DJPuzzle {
         this.queue.unshift(index)
         this.progress.displayText = this.getDisplayText()
         Events.Instance.emit('progress', this.progress)
-        Events.Instance.emit('debug', JSON.stringify(this.progress))
+        if (import.meta.env.DEV) Events.Instance.emit('debug', JSON.stringify(this.progress))
     }
 
     getVinylInQueue(index: number) {

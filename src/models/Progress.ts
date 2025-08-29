@@ -1,6 +1,7 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { AnimationFactory } from '../scripts/AnimationFactory'
-import { loadModelByName } from '../scripts/modelLoader'
+import { createModel } from '../scripts/modelLoader'
+import { progressModel } from './exported/progress'
 import { BLACK, BLUE, CAT_BLACK, GREEN, LIGHT_GREY, RED, WHITE } from '../scripts/Colors'
 import { Events } from '../libraries/Events'
 import {
@@ -14,7 +15,7 @@ import {
 import { TextMaterial } from '../scripts/TextureUtils'
 
 export const Progress = (): THREE.Object3D => {
-    const mesh = loadModelByName('progress', {
+    const mesh = createModel(progressModel(), {
         Red: BLACK, // Display,
         Green: LIGHT_GREY, // Case
         Blue: BLUE, // Base

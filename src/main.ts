@@ -10,11 +10,12 @@ import { PickupSFX, RecordSFX, Song3 } from './audio/music'
 import { Arena } from './models/Arena'
 import { Paw } from './models/Paw'
 import { FishSwirl } from './models/FishSwirl'
+import { Sky } from './models/Sky'
 
 const CLOCK = new THREE.Clock()
 let beat = 0
 
-const DEBUG = false
+const DEBUG = import.meta.env.DEV
 
 let camera: THREE.Camera | undefined,
     scene: THREE.Scene | undefined,
@@ -29,8 +30,8 @@ const START_POSITION = new THREE.Vector3(0, 0, 0.3)
 
 const initGame = async () => {
     // Change to a loading state
-    document.getElementById('playButton')!.setAttribute('disabled', 'true')
-    document.getElementById('playButton')!.innerHTML = 'LOADING...'
+    document.getElementById('p')!.setAttribute('disabled', 'true')
+    document.getElementById('p')!.innerHTML = 'LOADING...'
 
     // Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -64,12 +65,9 @@ const initGame = async () => {
     scene.add(directionalLight)
     scene.add(directionalLight.target)
 
-    if (DEBUG) {
-        const debugScreen = DebugScreen()
-        debugScreen.position.set(0, 1, -5)
-        Events.Instance.emit('debug', 'Hello🔒, world!')
-        scene.add(debugScreen)
-    }
+    const skyMesh = Sky()
+    skyMesh.position.set(0, 0, 5)
+    scene.add(skyMesh)
 
     const arenaMesh = Arena(renderer)
     scene.add(arenaMesh)
@@ -216,29 +214,33 @@ const initGame = async () => {
     document.getElementById('intro')!.style.display = 'none'
     document.getElementById('c')!.style.display = 'block'
 
-    // Color
-    // djPuzzle.addVinylByIndex(0)
-    // djPuzzle.addVinylByIndex(1)
-    // djPuzzle.addVinylByIndex(2)
-    // djPuzzle.addVinylByIndex(3)
-    // djPuzzle.addVinylByIndex(4)
-    // djPuzzle.addVinylByIndex(5)
-
-    // Artist
-    // djPuzzle.addVinylByIndex(0)
-    // djPuzzle.addVinylByIndex(2)
-    // djPuzzle.addVinylByIndex(4)
-    // djPuzzle.addVinylByIndex(1)
-    // djPuzzle.addVinylByIndex(5)
-    // djPuzzle.addVinylByIndex(3)
-
-    // Title
-    // djPuzzle.addVinylByIndex(0)
-    // djPuzzle.addVinylByIndex(3)
-    // djPuzzle.addVinylByIndex(5)
-    // djPuzzle.addVinylByIndex(1)
-    // djPuzzle.addVinylByIndex(4)
-    // djPuzzle.addVinylByIndex(2)
+    if (DEBUG) {
+        const debugScreen = DebugScreen()
+        debugScreen.position.set(0, 1, -5)
+        if (DEBUG) Events.Instance.emit('debug', 'Hello🔒, world!')
+        scene.add(debugScreen)
+        // Color
+        // djPuzzle.addVinylByIndex(0)
+        // djPuzzle.addVinylByIndex(1)
+        // djPuzzle.addVinylByIndex(2)
+        // djPuzzle.addVinylByIndex(3)
+        // djPuzzle.addVinylByIndex(4)
+        // djPuzzle.addVinylByIndex(5)
+        // Artist
+        // djPuzzle.addVinylByIndex(0)
+        // djPuzzle.addVinylByIndex(2)
+        // djPuzzle.addVinylByIndex(4)
+        // djPuzzle.addVinylByIndex(1)
+        // djPuzzle.addVinylByIndex(5)
+        // djPuzzle.addVinylByIndex(3)
+        // Title
+        // djPuzzle.addVinylByIndex(0)
+        // djPuzzle.addVinylByIndex(3)
+        // djPuzzle.addVinylByIndex(5)
+        // djPuzzle.addVinylByIndex(1)
+        // djPuzzle.addVinylByIndex(4)
+        // djPuzzle.addVinylByIndex(2)
+    }
 }
 
 function onXRSessionStart() {
@@ -261,7 +263,7 @@ function onControllerConnected(event) {
     const controller = event.target
     const handedness = event.data.handedness === 'left' ? -1 : 1
     const controllerRotation = event.data.hand ? 0 : (handedness * Math.PI) / 2
-    Events.Instance.emit('debug', `Hand: ${event.data.hand}`)
+    if (DEBUG) Events.Instance.emit('debug', `Hand: ${event.data.hand}`)
 
     // TODO: Move target to the controller's grip space
     const targetMesh = controller.getObjectByName('target')
@@ -398,6 +400,6 @@ const onWindowResize = () => {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    const b = document.getElementById('playButton') as HTMLButtonElement
+    const b = document.getElementById('p') as HTMLButtonElement
     b.onclick = initGame
 })

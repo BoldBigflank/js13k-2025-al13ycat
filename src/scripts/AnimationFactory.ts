@@ -1,5 +1,4 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
-import { Clamp } from './Utils'
 
 export type AnimationTransform = {
     position?: THREE.Vector3
@@ -65,7 +64,7 @@ export class AnimationFactory {
         this.animations = this.animations.filter((animation) => {
             const msElapsed = now - animation.startTime
             const duration = animation.endTime - animation.startTime
-            const lerpAmount = Clamp(msElapsed / duration, 0, 1)
+            const lerpAmount = THREE.MathUtils.clamp(msElapsed / duration, 0, 1)
 
             // It's over
             if (now >= animation.endTime) {

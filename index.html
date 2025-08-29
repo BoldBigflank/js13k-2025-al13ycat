@@ -6,6 +6,21 @@
             href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22400%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%3E%3Crect%20width%3D%2216%22%20height%3D%2216%22%20rx%3D%224%22%20fill%3D%22%2387ceeb%22%2F%3E%3Ccircle%20cx%3D%228%22%20cy%3D%229%22%20r%3D%226%22%20fill%3D%22black%22%2F%3EC%3C%2Fsvg%3E"
         />
         <style>
+            html,
+            body {
+                height: 100vh;
+                margin: 0;
+                padding: 0;
+            }
+
+            * {
+                font:
+                    normal 24px Helvetica,
+                    sans-serif;
+                text-align: center;
+                color: #fff;
+            }
+
             #c {
                 display: block;
                 margin: 0 auto;
@@ -16,39 +31,71 @@
             }
 
             body {
-                background-color: #87ceeb;
-                bottom: 0;
-                height: 100%;
-                left: 0;
-                margin: 0;
-                padding: 0;
+                background:
+                    radial-gradient(circle at 20% 30%, rgba(48, 142, 179, 0.8) 0, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(48, 142, 179, 0.6) 0, transparent 40%),
+                    radial-gradient(circle at 40% 70%, rgba(12, 12, 74, 0.7) 0, transparent 50%),
+                    radial-gradient(circle at 90% 80%, rgba(12, 12, 74, 0.5) 0, transparent 40%),
+                    linear-gradient(180deg, rgba(48, 142, 179, 1) 0, rgba(12, 12, 74, 1) 40%);
+                background-attachment: fixed;
+                min-height: 100vh;
+            }
+
+            button,
+            #VRButton {
+                padding: 12px 24px;
+                border: 2px solid rgba(255, 255, 255, 0.8);
+                border-radius: 2px;
+                background: #ef3eda;
+                color: #fff;
+                outline: none;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                transition: all 0.2s ease;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            button:hover,
+            #VRButton:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+                border-color: #fff;
+            }
+
+            button:active,
+            #VRButton:active {
+                transform: translateY(0);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+                border-color: rgba(255, 255, 255, 0.9);
+            }
+
+            #VRButton {
                 position: absolute;
+                bottom: 20px;
+                left: 0;
                 right: 0;
-                top: 0;
-                width: 100%;
+                margin: 0 auto;
+                width: fit-content;
+                z-index: 999;
+                cursor: pointer;
+                display: none;
             }
 
-            @font-face {
-                font-family: emoji;
-                src: url(https://cdn.jsdelivr.net/npm/twemoji-colr-font@14.0.2/twemoji.woff2);
+            #VRButton[data-disabled='true'] {
+                cursor: auto;
             }
 
-            #playButton {
-                color: white;
-                background: black;
-                border-radius: 12px;
-                padding: 15px 25px;
-                font-size: 32px;
-                border: 2px solid transparent;
-            }
-
-            #playButton:hover {
-                background-color: #666;
-                border: 2px solid black;
-            }
-
-            #playButton:active {
-                background-color: #0065bf;
+            .webxr-message {
+                position: absolute;
+                bottom: 20px;
+                left: 0;
+                right: 0;
+                margin: 0 auto;
+                width: fit-content;
+                z-index: 999;
+                text-decoration: none;
+                color: #fff;
             }
         </style>
         <title>JS13k Jam 2025</title>
@@ -57,10 +104,8 @@
     </head>
 
     <body>
-        <div
-            id="intro"
-            style="text-align: center; font-family: Helvetica, sans-serif; max-width: 420px; margin: 8px auto"
-        >
+        <canvas id="c" style="display: none"></canvas>
+        <div id="intro" style="text-align: center; max-width: 420px; margin: 8px auto">
             <h1>livecat</h1>
             <h2>Created By Alex Swan</h2>
             <h2>For JS13KGames 2025</h2>
@@ -73,9 +118,7 @@
                 <li>VR Headset and controls required.</li>
                 <li>Squeeze to grab, release to drop.</li>
             </ul>
-            <button id="playButton">PLAY</button>
+            <button id="p">JOIN</button>
         </div>
-        <canvas id="c" style="display: none"></canvas>
-        <div id="extra"></div>
     </body>
 </html>

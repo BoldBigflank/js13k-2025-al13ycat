@@ -2,10 +2,6 @@ import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 
 export const INCHES_TO_METERS_SCALE = 0.0254
 
-export const Clamp = (value: number, min: number, max: number) => {
-    return Math.min(Math.max(value, min), max)
-}
-
 export const initCanvas = (width = 1024, height = 1024): [HTMLCanvasElement, CanvasRenderingContext2D] => {
     const canvas = document.createElement('canvas') as HTMLCanvasElement
     canvas.width = width
@@ -16,3 +12,11 @@ export const initCanvas = (width = 1024, height = 1024): [HTMLCanvasElement, Can
 }
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+export const vectorFromRadians = (a: number, b: number, len: number): THREE.Vector3 => {
+    const start = new THREE.Vector3(1, 0, 0)
+    const e = new THREE.Euler(0, a, -Math.PI / 2 + b)
+    return start.applyEuler(e).normalize().multiplyScalar(len)
+}
+
+export const floatVal = (val: string | number | undefined) => parseFloat(`${val || 0}`)

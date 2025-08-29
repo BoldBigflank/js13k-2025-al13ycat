@@ -1,5 +1,7 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
-import { loadModelByName } from '../scripts/modelLoader'
+import { createModel } from '../scripts/modelLoader'
+import { arenaModel } from './exported/arena'
+import { catModel } from './exported/cat'
 import { Crowd } from '../scripts/Crowd'
 import { Cassette } from './Cassette'
 import { Grid } from './Grid'
@@ -10,7 +12,7 @@ import { DARK_GREY, GREY, LIGHT_GREY, WALL_GREEN } from '../scripts/Colors'
 
 export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
     // Main arena
-    const mesh = loadModelByName('arena', {
+    const mesh = createModel(arenaModel(), {
         Green: WALL_GREEN, // Awnings
         Yellow: LIGHT_GREY, // Pillars
         Orange: GREY,
@@ -28,7 +30,7 @@ export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
     mesh.getObjectByName('floor').add(crowd)
 
     // Cats
-    const catMesh = loadModelByName('cat', { Purple: '#333333', Silver: '#888888' })
+    const catMesh = createModel(catModel(), { Purple: '#333333', Silver: '#888888' })
     catMesh.name = 'catMesh'
     catMesh.position.set(-3, 1, 0)
     catMesh.scale.set(0.1, 0.1, 0.1)

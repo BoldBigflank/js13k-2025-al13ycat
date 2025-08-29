@@ -22,3 +22,4 @@ extra/words/*.txt
 test-zip
 test-zip-clean
 js13k-2025-*.zip
+js13k-2025-**

@@ -1,6 +1,7 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { AnimationFactory } from '../scripts/AnimationFactory'
-import { loadModelByName } from '../scripts/modelLoader'
+import { createModel } from '../scripts/modelLoader'
+import { goldfishModel } from './exported/goldfish'
 import { Events } from '../libraries/Events'
 import { GameProgress } from '../scripts/DJPuzzle'
 import { INCHES_TO_METERS_SCALE } from '../scripts/Utils'
@@ -14,7 +15,7 @@ export const FishSwirl = (): THREE.Group => {
 
     const swirl = new THREE.Group()
 
-    const mesh = loadModelByName('goldfish')
+    const mesh = createModel(goldfishModel())
 
     for (let i = 0; i < 10; i++) {
         const clone = mesh.clone(true)
