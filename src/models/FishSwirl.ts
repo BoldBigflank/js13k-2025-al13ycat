@@ -5,6 +5,16 @@ import { goldfishModel } from './exported/goldfish'
 import { Events } from '../libraries/Events'
 import { GameProgress } from '../scripts/DJPuzzle'
 import { INCHES_TO_METERS_SCALE } from '../scripts/Utils'
+import { BLACK, NEON_BLUE, NEON_PURPLE } from '../scripts/Colors'
+
+const FISH_PALETTES = [
+    {},
+    {
+        Orange: NEON_PURPLE, // Body
+        Purple: BLACK, // Eyes
+        Silver: NEON_BLUE, // Fins
+    },
+]
 
 export const FishSwirl = (): THREE.Group => {
     const axis = new THREE.Vector3(1, 0, 0)
@@ -15,7 +25,7 @@ export const FishSwirl = (): THREE.Group => {
 
     const swirl = new THREE.Group()
 
-    const mesh = createModel(goldfishModel())
+    const mesh = createModel(goldfishModel(), FISH_PALETTES[THREE.MathUtils.randInt(0, FISH_PALETTES.length)])
 
     for (let i = 0; i < 10; i++) {
         const clone = mesh.clone(true)
@@ -64,8 +74,9 @@ export const FishSwirl = (): THREE.Group => {
         })
     })
     Events.Instance.on('progress', (progress: GameProgress) => {
+        const showFish = progress.bestComboCount >= 4
         fishPond.forEach((fish) => {
-            if (progress.bestComboCount >= 3 && !visible) {
+            if (showFish && !visible) {
                 AnimationFactory.Instance.cancelAnimation(fish)
                 AnimationFactory.Instance.animateTransform({
                     mesh: fish,
@@ -78,7 +89,7 @@ export const FishSwirl = (): THREE.Group => {
                     },
                     duration: 2000,
                 })
-            } else if (progress.bestComboCount < 3 && visible) {
+            } else if (!showFish && visible) {
                 AnimationFactory.Instance.cancelAnimation(fish)
                 AnimationFactory.Instance.animateTransform({
                     mesh: fish,
@@ -89,7 +100,7 @@ export const FishSwirl = (): THREE.Group => {
                 })
             }
         })
-        visible = progress.bestComboCount >= 3
+        visible = showFish
     })
     return parent
 }

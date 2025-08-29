@@ -20,9 +20,6 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
     const cat = createModel(catModel(), CAT_COLORS[0]) // TODO: More cat colors, randomize
     cat.scale.set(0.03125, 0.03125, 0.03125)
     // Raise the box floor.height units up
-    // const xSpan = 10
-    // const ySpan = 1
-    // const zSpan = 10
     const xSpan = 6
     const ySpan = 1
     const zSpan = 6

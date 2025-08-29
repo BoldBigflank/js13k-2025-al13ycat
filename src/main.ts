@@ -1,6 +1,5 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
-import DJPuzzle, { GameProgress, TYPE_COLORS } from './scripts/DJPuzzle'
-import { SequenceType } from './scripts/DJPuzzle'
+import DJPuzzle from './scripts/DJPuzzle'
 import { VRButton } from './libraries/VRButton'
 import { Vinyl } from './models/Vinyl'
 import { AnimationFactory } from './scripts/AnimationFactory'
@@ -190,21 +189,21 @@ const initGame = async () => {
         RecordSFX()
     })
 
-    Events.Instance.on('progress', (progress: GameProgress) => {
-        // Update solved
-        const puzzleKeys = Object.keys(progress) as SequenceType[]
-        for (let i = 0; i < puzzleKeys.length; i++) {
-            const puzzleKey = puzzleKeys[i]
-            const completeMesh = arenaMesh.getObjectByName(`complete-${i}`)
-            const color = progress[puzzleKey].solved ? TYPE_COLORS[puzzleKey] : 0x000000
-            if (completeMesh) {
-                completeMesh.visible = true
-                completeMesh.material.color.set(color)
-                completeMesh.material.emissive.set(color)
-                completeMesh.material.needsUpdate = true
-            }
-        }
-    })
+    // Events.Instance.on('progress', (progress: GameProgress) => {
+    //     // Update solved
+    //     const puzzleKeys = Object.keys(progress) as SequenceType[]
+    //     for (let i = 0; i < puzzleKeys.length; i++) {
+    //         const puzzleKey = puzzleKeys[i]
+    //         const completeMesh = arenaMesh.getObjectByName(`complete-${i}`)
+    //         const color = progress[puzzleKey].solved ? TYPE_COLORS[puzzleKey] : 0x000000
+    //         if (completeMesh) {
+    //             completeMesh.visible = true
+    //             completeMesh.material.color.set(color)
+    //             completeMesh.material.emissive.set(color)
+    //             completeMesh.material.needsUpdate = true
+    //         }
+    //     }
+    // })
 
     Song3()
 

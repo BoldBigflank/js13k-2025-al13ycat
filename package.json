@@ -2,8 +2,8 @@
     "name": "js13k-2025",
     "packageManager": "yarn@4.6.0",
     "scripts": {
-        "dev": "l13 dev --experimental",
-        "build": "l13 build --experimental --production",
+        "dev": "js13k dev --experimental",
+        "build": "js13k build --experimental --production",
         "preview": "vite preview",
         "prepare": "husky",
         "tsc": "tsc"

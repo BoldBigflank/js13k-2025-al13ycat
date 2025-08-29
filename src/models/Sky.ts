@@ -2,6 +2,8 @@ import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { vectorFromRadians } from '../scripts/Utils'
 import { Events } from '../libraries/Events'
 
+// https://dustinpfister.github.io/2021/06/18/threejs-vector3-apply-euler/
+// https://threejs.org/examples/#webgl_instancing_dynamic
 export const Sky = (): THREE.Group => {
     const parent = new THREE.Group()
     parent.name = 'Sky'
@@ -15,6 +17,7 @@ export const Sky = (): THREE.Group => {
     const seeds = []
     const baseColors = []
     let offset = 0
+    let zAmp = 0
 
     const mesh = new THREE.InstancedMesh(geometry, material, size * size)
     mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
@@ -53,16 +56,21 @@ export const Sky = (): THREE.Group => {
             dummy.matrix.decompose(dummy.position, dummy.quaternion, dummy.scale)
 
             const zCol = Math.floor(i / size)
+            const direction = zCol % 2 ? 1 : -1
             const x = i % size
+            const z = -zCol * 4
             const bPos = (2 * x * Math.PI) / size // Original b angle
-            const bOffset = speed * (zCol % 2 ? 1 : -1) * offset // Offset
-            const zPos = dummy.position.z
+            const bOffset = speed * direction * offset // Offset
+
             dummy.position.copy(vectorFromRadians(0, bPos + bOffset, 15))
-            dummy.position.z = zPos
+            dummy.position.z = z + zAmp * direction * Math.sin(offset)
             dummy.updateMatrix()
             mesh.setMatrixAt(i, dummy.matrix)
         }
         mesh.instanceMatrix.needsUpdate = true
+    })
+    Events.Instance.on('progress', (progress) => {
+        zAmp = progress.bestComboCount >= 2 ? 1 : 0
     })
     return parent
 }

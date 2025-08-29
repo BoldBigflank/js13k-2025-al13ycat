@@ -29,7 +29,7 @@ export class Grid {
             for (let i = 0; i < positions.array.length; i += 3) {
                 const x = positions.array[i]
                 const z = positions.array[i + 2]
-                positions.array[i + 1] = Math.sin(Math.sqrt(x * x + z * z) - 4 * this.clock.getElapsedTime())
+                positions.array[i + 1] = 0.5 * Math.sin(Math.sqrt(x * x + z * z) - 2 * this.clock.getElapsedTime())
             }
             positions.needsUpdate = true
         })

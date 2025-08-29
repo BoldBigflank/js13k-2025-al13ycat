@@ -4,6 +4,7 @@ import { arenaModel } from './exported/arena'
 import { catModel } from './exported/cat'
 import { Crowd } from '../scripts/Crowd'
 import { Cassette } from './Cassette'
+import { Tuna } from './Tuna'
 import { Grid } from './Grid'
 import { GameOverDialog } from './GameOverDialog'
 import { Progress } from './Progress'
@@ -24,6 +25,11 @@ export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
     const progress = Progress()
     mesh.add(progress)
     progress.position.set(-0.1, 0.9, -0.7)
+
+    // Tuna
+    const tuna = Tuna()
+    mesh.add(tuna)
+    tuna.position.set(-0.4, 1.0, -0.3)
 
     // Crowd
     const crowd = Crowd(renderer)
