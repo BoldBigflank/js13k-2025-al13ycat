@@ -216,7 +216,8 @@ const initGame = async () => {
 
     if (DEBUG) {
         const debugScreen = DebugScreen()
-        debugScreen.position.set(0, 1, -5)
+        debugScreen.position.set(0, 1, 5)
+        debugScreen.rotation.set(0, Math.PI, 0)
         if (DEBUG) Events.Instance.emit('debug', 'Hello🔒, world!')
         scene.add(debugScreen)
         // Color
@@ -379,9 +380,9 @@ function cleanIntersected() {
 function animate() {
     const d = CLOCK.getDelta()
     beat += d
-    if (beat >= 1) {
+    if (beat >= 0.5) {
         Events.Instance.emit('beat')
-        beat -= 1
+        beat -= 0.5
     }
     AnimationFactory.Instance.update()
     Events.Instance.emit('tick', d)

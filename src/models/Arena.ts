@@ -9,6 +9,7 @@ import { GameOverDialog } from './GameOverDialog'
 import { Progress } from './Progress'
 import { Runner } from './Runner'
 import { DARK_GREY, GREY, LIGHT_GREY, WALL_GREEN } from '../scripts/Colors'
+import { Scene } from 'kontra'
 
 export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
     // Main arena
@@ -27,7 +28,9 @@ export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
     // Crowd
     const crowd = Crowd(renderer)
     crowd.name = 'Crowd'
-    mesh.getObjectByName('floor').add(crowd)
+    // mesh.getObjectByName('floor').add(crowd)
+    mesh.add(crowd)
+    crowd.position.set(0, -1, -10)
 
     // Cats
     const catMesh = createModel(catModel(), { Purple: '#333333', Silver: '#888888' })

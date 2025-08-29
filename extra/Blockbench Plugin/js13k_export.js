@@ -14,13 +14,13 @@ Plugin.register('js13k_export', {
             const roundedString = roundedFloat.toFixed(2)
             // Remove trailing zeroes and decimal point if there are no decimal places
             if (roundedFloat === 0) return ''
-            return roundedString.replace(/\.?0+$/, '')
+            return parseFloat(roundedString)
         }
         const roundWhole = (num) => {
             const roundedFloat = Math.round(num)
             const roundedString = roundedFloat.toFixed(0)
             if (roundedFloat === 0) return ''
-            return roundedString.replace(/\.?0+$/, '')
+            return parseInt(roundedString)
         }
         const codec = new Codec('js13k_export', {
             name: 'JS13k Mesh',

@@ -20,9 +20,12 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
     const cat = createModel(catModel(), CAT_COLORS[0]) // TODO: More cat colors, randomize
     cat.scale.set(0.03125, 0.03125, 0.03125)
     // Raise the box floor.height units up
-    const xSpan = 10
+    // const xSpan = 10
+    // const ySpan = 1
+    // const zSpan = 10
+    const xSpan = 6
     const ySpan = 1
-    const zSpan = 10
+    const zSpan = 6
 
     for (let i = 0; i < 10; i++) {
         const model = cat.clone()
@@ -30,7 +33,7 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
         // Randomly position the model within the floor bounding box
         model.position.set(
             xSpan * Math.random() - 0.5 * xSpan,
-            2 + ySpan * Math.random() - 0.5 * ySpan,
+            ySpan * Math.random() - 0.5 * ySpan,
             zSpan * Math.random() - 0.5 * zSpan,
         )
         model.userData.offset = 60 * THREE.MathUtils.randInt(0, 1000)
