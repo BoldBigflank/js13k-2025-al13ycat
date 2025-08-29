@@ -3,7 +3,7 @@
     "packageManager": "yarn@4.6.0",
     "scripts": {
         "dev": "js13k dev --experimental",
-        "build": "js13k build --experimental --production",
+        "build": "js13k build --experimental",
         "preview": "vite preview",
         "prepare": "husky",
         "tsc": "tsc"
