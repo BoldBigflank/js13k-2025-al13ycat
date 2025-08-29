@@ -1720,7 +1720,6 @@ __metadata:
   resolution: "js13k-2025@workspace:."
   dependencies:
     husky: "npm:^9.1.7"
-    kontra: "npm:^10.0.2"
     l13: "npm:^0.0.1-rc.13"
     pinst: "npm:^3.0.0"
     prettier: "npm:3.6.2"
@@ -1740,13 +1739,6 @@ __metadata:
     graceful-fs:
       optional: true
   checksum: 10c0/7f4f43b08d1869ded8a6822213d13ae3b99d651151d77efd1557ced0889c466296a7d9684e397bd126acf5eb2cfcb605808c3e681d0fdccd2fe5a04b47e76c0d
-  languageName: node
-  linkType: hard
-
-"kontra@npm:^10.0.2":
-  version: 10.0.2
-  resolution: "kontra@npm:10.0.2"
-  checksum: 10c0/36e4c2a320b6e1c063781d0b5687b9fd1b939df4b1635db0a6330d063e79707f5e43e9963ce59653e84a372de92971015c4d858be6d675ef7fa78eca101f46ce
   languageName: node
   linkType: hard
 

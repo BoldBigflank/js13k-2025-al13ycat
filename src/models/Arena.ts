@@ -9,8 +9,7 @@ import { Grid } from './Grid'
 import { GameOverDialog } from './GameOverDialog'
 import { Progress } from './Progress'
 import { Runner } from './Runner'
-import { DARK_GREY, GREY, LIGHT_GREY, WALL_GREEN } from '../scripts/Colors'
-import { Scene } from 'kontra'
+import { BLUE, DARK_GREY, GREY, LIGHT_GREY, WALL_GREEN } from '../scripts/Colors'
 
 export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
     // Main arena
@@ -19,6 +18,7 @@ export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
         Yellow: LIGHT_GREY, // Pillars
         Orange: GREY,
         Red: DARK_GREY, // Dance floor
+        'Light Blue': BLUE, // Records/Turntable
     }) as THREE.Object3D
 
     // Progress console
