@@ -83,6 +83,7 @@ export const Song3 = async (): Promise<Song3Controller> => {
 
         // Check for sequence changes periodically since looping buffers never end
         const checkInterval = setInterval(() => {
+            Events.Instance.emit('downbeat')
             if (currentSequenceNumber !== sequenceNumber) {
                 console.log('Sequence change detected:', sequenceNumber, '→', currentSequenceNumber)
                 clearInterval(checkInterval)

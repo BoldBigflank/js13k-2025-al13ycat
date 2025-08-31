@@ -1,5 +1,4 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
-import { AnimationFactory } from '../scripts/AnimationFactory'
 import { createModel } from '../scripts/modelLoader'
 import { progressModel } from './exported/progress'
 import { BLACK, BLUE, CAT_BLACK, GREEN, LIGHT_GREY, RED, WHITE } from '../scripts/Colors'
@@ -44,9 +43,11 @@ export const Progress = (): THREE.Object3D => {
                 if (progress[type].solved || i < progress[type].correctCount) color = TYPE_COLORS[type]
                 if ((progress[type].solved || i < progress[type].correctCount) && type === 'color')
                     color = SOLUTION_COLOR[i]
+                const lit = color !== CAT_BLACK
 
                 progressMesh.material.color.set(color)
-                progressMesh.material.emissive.set(color)
+                progressMesh.material.emissive.set(lit ? color : BLACK)
+                progressMesh.material.emissiveIntensity = lit ? 1 : 0
                 progressMesh.material.needsUpdate = true
             }
         })

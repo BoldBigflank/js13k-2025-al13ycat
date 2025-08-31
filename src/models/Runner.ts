@@ -1,6 +1,7 @@
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { Events } from '../libraries/Events'
 import { BLACK, BLUE, GREEN, ORANGE, RED, VIOLET, YELLOW } from '../scripts/Colors'
+import { AnimationFactory, sinusoidal } from '../scripts/AnimationFactory'
 
 export const Runner = (length: number): THREE.Group => {
     const parent = new THREE.Group()
@@ -38,7 +39,7 @@ export const Runner = (length: number): THREE.Group => {
 
     for (let y = 0; y < length; y++) {
         for (let x = 0; x < length; x++) {
-            const material = new THREE.MeshBasicMaterial({ color: BLACK })
+            const material = new THREE.MeshStandardMaterial({ color: BLACK })
             const mesh = new THREE.Mesh(geometry, material)
             mesh.name = `runner-${x}-${y}`
             mesh.userData.x = x
@@ -51,11 +52,25 @@ export const Runner = (length: number): THREE.Group => {
     Events.Instance.on('beat', () => {
         offset += 1
         if (offset < 0) return
-        parent.children.forEach((mesh) => {
+        parent.children.forEach((mesh: THREE.Object3D) => {
             const { x, y } = mesh.userData
-            const color = functions[offset % functions.length](x, y) ? colors[offset % colors.length] : BLACK
-            colors[mesh.userData.index]
+            const lit = functions[offset % functions.length](x, y)
+            const color = lit ? colors[offset % colors.length] : BLACK
+            mesh.material.needsUpdate = true
             mesh.material.color.set(color)
+            mesh.material.emissive.set(lit ? color : BLACK)
+            mesh.material.needsUpdate = true
+            mesh.material.emissiveIntensity = lit ? 1 : 0
+            if (lit) {
+                AnimationFactory.Instance.animateTransform({
+                    mesh,
+                    end: {
+                        scaling: new THREE.Vector3(1, lit ? 1.1 : 1, 1),
+                    },
+                    duration: 500,
+                    ease: sinusoidal,
+                })
+            }
         })
     })
     return parent

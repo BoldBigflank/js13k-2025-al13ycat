@@ -34,7 +34,7 @@ export const easeOutCubic = (t: number): number => 1 - Math.pow(1 - t, 3)
 
 export const easeInOutCubic = (t: number): number => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
 
-export const sinusoidal = (t: number): number => 0.5 * Math.cos(2 * t * Math.PI + Math.PI) // 0 to 1 to 0
+export const sinusoidal = (t: number): number => 0.5 * Math.cos(2 * t * Math.PI + Math.PI) + 0.5 // 0 to 1 to 0
 
 export class AnimationFactory {
     private static _instance: AnimationFactory
@@ -64,30 +64,46 @@ export class AnimationFactory {
     public update() {
         const now = this.clock.getElapsedTime() * 1000 // Convert to milliseconds
         this.animations = this.animations.filter((animation) => {
+            const { mesh, start, end, easeFunc, loop } = animation
             const msElapsed = now - animation.startTime
             const duration = animation.endTime - animation.startTime
             const lerpAmount = THREE.MathUtils.clamp(msElapsed / duration, 0, 1)
 
+            if (end.position) mesh.position.lerpVectors(start.position!, end.position, easeFunc(lerpAmount))
+            if (end.rotation) {
+                // Lerp individual Euler angles directly
+                const startEuler = start.rotation!
+                const endEuler = end.rotation
+                const currentEuler = new THREE.Euler()
+
+                // Preserve the rotation order from the start Euler, fallback to default if not set
+                currentEuler.order = startEuler.order || THREE.Euler.DefaultOrder
+
+                // Interpolate each axis independently
+                currentEuler.x = startEuler.x + (endEuler.x - startEuler.x) * easeFunc(lerpAmount)
+                currentEuler.y = startEuler.y + (endEuler.y - startEuler.y) * easeFunc(lerpAmount)
+                currentEuler.z = startEuler.z + (endEuler.z - startEuler.z) * easeFunc(lerpAmount)
+
+                mesh.rotation.copy(currentEuler)
+            }
+            if (end.scaling) mesh.scale.lerpVectors(start.scaling!, end.scaling, easeFunc(lerpAmount))
+
             // It's over
             if (now >= animation.endTime) {
-                if (animation.loop) {
+                if (loop) {
                     animation.startTime = now
                     animation.endTime = now + duration
-                    if (animation.end.position) {
-                        animation.mesh.position.copy(animation.start.position)
+                    if (end.position) {
+                        mesh.position.copy(start.position)
                     }
-                    if (animation.end.rotation) {
-                        animation.mesh.rotation.copy(animation.start.rotation!)
+                    if (end.rotation) {
+                        mesh.rotation.copy(start.rotation!)
                     }
-                    if (animation.end.scaling) {
-                        animation.mesh.scale.copy(animation.start.scaling)
+                    if (end.scaling) {
+                        mesh.scale.copy(start.scaling)
                     }
                     return true
                 }
-
-                if (animation.end.position) animation.mesh.position.copy(animation.end.position)
-                if (animation.end.rotation) animation.mesh.rotation.copy(animation.end.rotation)
-                if (animation.end.scaling) animation.mesh.scale.copy(animation.end.scaling)
 
                 // Resolve the promise if it exists and this is not a looped animation
                 if (animation.resolve) {
@@ -100,34 +116,6 @@ export class AnimationFactory {
                 return false
             }
 
-            if (animation.end.position)
-                animation.mesh.position.lerpVectors(
-                    animation.start.position!,
-                    animation.end.position,
-                    animation.easeFunc(lerpAmount),
-                )
-            if (animation.end.rotation) {
-                // Lerp individual Euler angles directly
-                const startEuler = animation.start.rotation!
-                const endEuler = animation.end.rotation
-                const currentEuler = new THREE.Euler()
-
-                // Preserve the rotation order from the start Euler, fallback to default if not set
-                currentEuler.order = startEuler.order || THREE.Euler.DefaultOrder
-
-                // Interpolate each axis independently
-                currentEuler.x = startEuler.x + (endEuler.x - startEuler.x) * animation.easeFunc(lerpAmount)
-                currentEuler.y = startEuler.y + (endEuler.y - startEuler.y) * animation.easeFunc(lerpAmount)
-                currentEuler.z = startEuler.z + (endEuler.z - startEuler.z) * animation.easeFunc(lerpAmount)
-
-                animation.mesh.rotation.copy(currentEuler)
-            }
-            if (animation.end.scaling)
-                animation.mesh.scale.lerpVectors(
-                    animation.start.scaling!,
-                    animation.end.scaling,
-                    animation.easeFunc(lerpAmount),
-                )
             return true
         })
     }
@@ -172,15 +160,16 @@ export class AnimationFactory {
         if (!animations.length) return
 
         animations.forEach((animation) => {
+            const { end } = animation
             if (jumpToEnd) {
-                if (animation.end.position) {
-                    mesh.position.copy(animation.end.position)
+                if (end.position) {
+                    mesh.position.copy(end.position)
                 }
-                if (animation.end.rotation) {
-                    mesh.rotation.copy(animation.end.rotation)
+                if (end.rotation) {
+                    mesh.rotation.copy(end.rotation)
                 }
-                if (animation.end.scaling) {
-                    mesh.scale.copy(animation.end.scaling)
+                if (end.scaling) {
+                    mesh.scale.copy(end.scaling)
                 }
             }
 

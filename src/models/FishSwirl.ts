@@ -16,6 +16,8 @@ const FISH_PALETTES = [
     },
 ]
 
+const FISH_SCALE = new THREE.Vector3(0.05, 0.05, 0.05)
+
 export const FishSwirl = (): THREE.Group => {
     const axis = new THREE.Vector3(1, 0, 0)
     const parent = new THREE.Group()
@@ -75,28 +77,16 @@ export const FishSwirl = (): THREE.Group => {
     })
     Events.Instance.on('progress', (progress: GameProgress) => {
         const showFish = progress.bestComboCount >= 4
+        const shouldUpdate = showFish !== visible
         fishPond.forEach((fish) => {
-            if (showFish && !visible) {
+            if (shouldUpdate) {
                 AnimationFactory.Instance.cancelAnimation(fish)
                 AnimationFactory.Instance.animateTransform({
                     mesh: fish,
                     end: {
-                        scaling: new THREE.Vector3(
-                            INCHES_TO_METERS_SCALE,
-                            INCHES_TO_METERS_SCALE,
-                            INCHES_TO_METERS_SCALE,
-                        ),
+                        scaling: showFish ? FISH_SCALE : new THREE.Vector3(0, 0, 0),
                     },
-                    duration: 2000,
-                })
-            } else if (!showFish && visible) {
-                AnimationFactory.Instance.cancelAnimation(fish)
-                AnimationFactory.Instance.animateTransform({
-                    mesh: fish,
-                    end: {
-                        scaling: new THREE.Vector3(0, 0, 0),
-                    },
-                    duration: 1000,
+                    duration: showFish ? 2000 : 1000,
                 })
             }
         })

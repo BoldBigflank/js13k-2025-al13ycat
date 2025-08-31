@@ -37,6 +37,7 @@ export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
     // mesh.getObjectByName('floor').add(crowd)
     mesh.add(crowd)
     crowd.position.set(0, -1, -10)
+    crowd.rotation.set(0, Math.PI, 0) // Just turn it around
 
     // Cats
     const catMesh = createModel(catModel(), { Purple: '#333333', Silver: '#888888' })

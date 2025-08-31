@@ -99,6 +99,7 @@ const initGame = async () => {
         // Select a record
         mesh.onPointerPick = (controller: THREE.Group) => {
             if (controller.userData.selected) return // Don't let it grab twice
+            if (djPuzzle.isSolved()) return
             djPuzzle.selected[controller.id] = i
             const target = controller.getObjectByName('target')
             if (target) {
@@ -189,23 +190,13 @@ const initGame = async () => {
         RecordSFX()
     })
 
-    // Events.Instance.on('progress', (progress: GameProgress) => {
-    //     // Update solved
-    //     const puzzleKeys = Object.keys(progress) as SequenceType[]
-    //     for (let i = 0; i < puzzleKeys.length; i++) {
-    //         const puzzleKey = puzzleKeys[i]
-    //         const completeMesh = arenaMesh.getObjectByName(`complete-${i}`)
-    //         const color = progress[puzzleKey].solved ? TYPE_COLORS[puzzleKey] : 0x000000
-    //         if (completeMesh) {
-    //             completeMesh.visible = true
-    //             completeMesh.material.color.set(color)
-    //             completeMesh.material.emissive.set(color)
-    //             completeMesh.material.needsUpdate = true
-    //         }
-    //     }
-    // })
-
     Song3()
+    Events.Instance.on('downbeat', () => {
+        if (beat > 100) {
+            Events.Instance.emit('beat')
+            beat = 0
+        }
+    })
 
     djPuzzle.reset()
 

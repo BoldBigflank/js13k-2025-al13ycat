@@ -145,7 +145,9 @@ export class DJPuzzle {
         return this.vinyls[this.queue[index]]
     }
 
-    isSolved(comboType: 'color' | 'artist' | 'title') {
+    isSolved(comboType?: 'color' | 'artist' | 'title') {
+        if (!comboType) return
+        this.progress.color.solved && this.progress.artist.solved && this.progress.title.solved
         return this.progress[comboType].solved
     }
 

@@ -20,3 +20,7 @@ export const vectorFromRadians = (a: number, b: number, len: number): THREE.Vect
 }
 
 export const floatVal = (val: string | number | undefined) => parseFloat(`${val || 0}`)
+
+export const sample = (arr: any[]): any => arr[Math.floor(Math.random() * arr.length)]
+
+export const DEBUG = import.meta.env.DEV
