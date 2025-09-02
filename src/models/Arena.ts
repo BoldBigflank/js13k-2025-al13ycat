@@ -1,5 +1,6 @@
+// @ts-ignore
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
-import { createModel } from '../scripts/modelLoader'
+import { createModel } from '../scripts/ModelLoader'
 import { arenaModel } from './exported/arena'
 import { catModel } from './exported/cat'
 import { Crowd } from '../scripts/Crowd'

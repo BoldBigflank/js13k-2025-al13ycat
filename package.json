@@ -9,11 +9,13 @@
         "tsc": "tsc"
     },
     "devDependencies": {
+        "@types/three": "^0",
         "husky": "^9.1.7",
-        "l13": "^0.0.2",
+        "l13": "^0.0.9",
         "pinst": "^3.0.0",
         "prettier": "3.6.2",
         "roadroller": "^2.1.0",
+        "three": "^0.179.1",
         "typescript": "^5.9.2",
         "vite": "^7.0.6"
     },

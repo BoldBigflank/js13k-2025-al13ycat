@@ -1,6 +1,7 @@
+// @ts-ignore
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { AnimationFactory } from '../scripts/AnimationFactory'
-import { createModel } from '../scripts/modelLoader'
+import { createModel } from '../scripts/ModelLoader'
 import { goldfishModel } from './exported/goldfish'
 import { Events } from '../libraries/Events'
 import { GameProgress } from '../scripts/DJPuzzle'

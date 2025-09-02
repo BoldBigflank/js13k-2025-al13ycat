@@ -1,6 +1,7 @@
+// @ts-ignore
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { AnimationFactory } from '../scripts/AnimationFactory'
-import { createModel } from '../scripts/modelLoader'
+import { createModel } from '../scripts/ModelLoader'
 import { cassetteModel } from './exported/cassette'
 import { BLUE, LIGHT_GREY, NEON_BROWN, NEON_ORANGE, NEON_RED, NEON_YELLOW } from '../scripts/Colors'
 

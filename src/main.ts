@@ -1,3 +1,4 @@
+// @ts-ignore
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import DJPuzzle from './scripts/DJPuzzle'
 import { VRButton } from './libraries/VRButton'
@@ -253,7 +254,6 @@ function onControllerConnected(event) {
     console.log('controller connected', event)
     const controller = event.target
     const handedness = event.data.handedness === 'left' ? -1 : 1
-    const controllerRotation = event.data.hand ? 0 : (handedness * Math.PI) / 2
     if (DEBUG) Events.Instance.emit('debug', `Hand: ${event.data.hand}`)
 
     // TODO: Move target to the controller's grip space
@@ -270,7 +270,6 @@ function onControllerConnected(event) {
     if (!pawMesh) {
         pawMesh = Paw()
         pawMesh.position.set(0, 0, 0.15)
-        pawMesh.rotation.set((3 * Math.PI) / 2, controllerRotation, 0)
         controller.add(pawMesh)
     }
 

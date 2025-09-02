@@ -1,8 +1,6 @@
-import { catModel } from '../models/exported/cat'
-import { pawModel } from '../models/exported/paw'
+// @ts-ignore
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 
-import { BasicShader } from '../shaders/BasicShader'
 import { floatVal } from './Utils'
 
 type Model = (string | string[])[]

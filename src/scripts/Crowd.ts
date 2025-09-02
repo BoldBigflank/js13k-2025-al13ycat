@@ -1,6 +1,5 @@
+// @ts-ignore
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
-import { createModel } from './modelLoader'
-import { catModel } from '../models/exported/cat'
 import { Events } from '../libraries/Events.js'
 import {
     CAT_BLACK,
@@ -14,7 +13,6 @@ import {
     YELLOW,
 } from './Colors.js'
 import { sample } from './Utils.js'
-import { Paw } from '../models/Paw.js'
 
 const CAT_COLORS = [
     {
@@ -37,65 +35,98 @@ const CAT_COLORS = [
     },
 ]
 
-type Transform = {
-    id: number
-    position: THREE.Vector3
-    rotation: THREE.Quaternion
-}
-
 type Pose = {
     camera?: THREE.Matrix4
     controllers: THREE.Matrix4[]
 }
 
 export const Crowd = (renderer: THREE.WebGLRenderer) => {
-    const catOffset = new THREE.Vector3(0, -1, 0)
-    const catMeshes: THREE.Object3D[] = []
-    let pc = 0
-    const poses: Pose[] = []
     const parent = new THREE.Group()
-    // Raise the box floor.height units up
-    const xSpan = 6
-    const ySpan = 0.5
-    const zSpan = 6
+    parent.name = 'Crowd'
+    const dummy = new THREE.Object3D()
 
-    for (let i = 0; i < 10; i++) {
-        const palette = sample(CAT_COLORS)
-        const cat = createModel(catModel(), palette)
-        cat.scale.set(0.03125, 0.03125, 0.03125)
-        parent.add(cat)
+    // Instanced meshes
+    const rows = 8
+    const cols = 10
+    const headsGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5)
+    const headsMaterial = new THREE.MeshStandardMaterial()
+    const headsMesh = new THREE.InstancedMesh(headsGeometry, headsMaterial, rows * cols)
+    headsMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
 
-        for (let n = 0; n < 2; n++) {
-            const paw = Paw(palette)
-            paw.name = `paw-${i}-${n}`
-            paw.position.copy(cat.position)
-            paw.position.z += 1
-            parent.add(paw)
+    // const handsGeometry = new THREE.SphereGeometry(0.3, 8, 8)
+    const handsGeometry = new THREE.BoxGeometry(0.2, 0.2, 0.6)
+    const handsMaterial = new THREE.MeshStandardMaterial()
+    const handsMesh = new THREE.InstancedMesh(handsGeometry, handsMaterial, rows * cols * 2)
+    handsMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
+
+    // Color setup for instances
+    const headColor = new THREE.Color()
+    const handColor = new THREE.Color()
+
+    // Add instanced meshes to parent
+    parent.add(headsMesh)
+    parent.add(handsMesh)
+
+    // Store instance data
+    const catOffset = new THREE.Vector3(0, -1, 0)
+    const instanceData: Array<{
+        positionOffset: THREE.Vector3
+        poseDelay: number
+        palette: any
+    }> = []
+
+    const poses: Pose[] = []
+
+    // Initialize instance data and set up matrices
+    for (let z = 0; z < rows; z++) {
+        for (let x = 0; x < cols; x++) {
+            const i = x + z * rows
+            const palette = sample(CAT_COLORS)
+            const positionOffset = new THREE.Vector3(2 * x - cols + 0.5, 0, 2 * z - rows + 0.5)
+            if (Math.abs(positionOffset.x) >= 5) positionOffset.y += 5
+            const jank = new THREE.Vector3(
+                THREE.MathUtils.randFloatSpread(0.3),
+                THREE.MathUtils.randFloatSpread(0.1),
+                THREE.MathUtils.randFloatSpread(0.3),
+            )
+            positionOffset.add(jank)
+
+            // Set up head instance
+            dummy.position.copy(positionOffset).add(catOffset)
+            dummy.lookAt(0, 6, 0)
+            dummy.updateMatrix()
+            headsMesh.setMatrixAt(i, dummy.matrix)
+
+            // Set head color
+            headColor.setStyle(palette.Purple)
+            headsMesh.setColorAt(i, headColor)
+
+            // Set up hand instances
+            for (let n = 0; n < 2; n++) {
+                const handIndex = i * 2 + n
+                dummy.position.copy(positionOffset)
+                dummy.updateMatrix()
+                handsMesh.setMatrixAt(handIndex, dummy.matrix)
+
+                // Set hand color
+                handColor.setStyle(palette.Purple)
+                handsMesh.setColorAt(handIndex, handColor)
+            }
+
+            instanceData.push({
+                positionOffset,
+                poseDelay: THREE.MathUtils.randInt(0, 15),
+                palette,
+            })
         }
-
-        // Randomly position the model within the floor bounding box
-        cat.userData.positionOffset = new THREE.Vector3(
-            xSpan * Math.random() - 0.5 * xSpan,
-            ySpan * Math.random() - 0.5 * ySpan,
-            zSpan * Math.random() - 0.5 * zSpan,
-        )
-        cat.userData.poseOffset = THREE.MathUtils.randInt(0, poses.length)
-        cat.lookAt(0, 6, 0)
-        catMeshes.push(cat)
     }
 
     Events.Instance.on('tick', () => {
         // Record the current pose
         if (!renderer.xr?.getCamera()) return
         const camera = renderer.xr?.getCamera()
-        const dummy = new THREE.Object3D()
         const pose: Pose = {
             controllers: [],
-        }
-        // Save the camera matrix
-        if (camera) {
-            pc++
-            pose.camera = camera.matrix.clone()
         }
         // Save the controller matrix
         ;[0, 1].forEach((controllerIndex) => {
@@ -106,35 +137,50 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
                     pose.controllers.push(pawMesh.matrixWorld.clone())
                 }
             }
-            poses.push(pose)
         })
+        // Save the camera matrix
+        if (camera) {
+            pose.camera = camera.matrix.clone()
+            poses.push(pose)
+            if (poses.length > 60) poses.shift()
+        }
 
         // Cut short when we haven't saved anything
-        if (poses.length == 0) return
+        if (poses.length == 0) {
+            headsMesh.visible = false
+            handsMesh.visible = false
+            return
+        }
 
-        // Play the pose back
-        catMeshes.forEach((cat, i) => {
-            const pose = poses[cat.userData.poseOffset]
-            // Apply the camera matrix
+        // Update instanced meshes
+        instanceData.forEach((data, i) => {
+            const pose = poses[Math.max(0, poses.length - 1 - data.poseDelay)]
+            if (!pose?.camera) return
+
+            // Update head instance
             dummy.matrix.copy(pose.camera)
             dummy.matrix.decompose(dummy.position, dummy.quaternion, dummy.scale)
-            cat.quaternion.copy(dummy.quaternion)
-            cat.position.copy(dummy.position.add(cat.userData.positionOffset).add(catOffset))
-            // Apply the controller matrices
+            dummy.position.add(data.positionOffset).add(catOffset)
+            // dummy.lookAt(0, 6, 0)
+            dummy.updateMatrix()
+            headsMesh.setMatrixAt(i, dummy.matrix)
+
+            // Update hand instances
             pose.controllers.forEach((controller, controllerIndex) => {
-                const paw = parent.getObjectByName(`paw-${i}-${controllerIndex}`)
-                if (paw) {
-                    dummy.matrix.copy(controller)
-                    dummy.matrix.decompose(dummy.position, dummy.quaternion, dummy.scale)
-                    paw.position.copy(dummy.position.add(cat.userData.positionOffset))
-                    paw.quaternion.copy(dummy.quaternion)
-                }
+                const handIndex = i * 2 + controllerIndex
+                dummy.matrix.copy(controller)
+                dummy.matrix.decompose(dummy.position, dummy.quaternion, dummy.scale)
+                dummy.position.add(data.positionOffset).add(catOffset)
+                // Position hands slightly offset from the head
+                dummy.position.add(new THREE.Vector3(controllerIndex === 0 ? -0.1 : 0.1, 0.2, -0.3))
+                dummy.updateMatrix()
+                handsMesh.setMatrixAt(handIndex, dummy.matrix)
             })
-            cat.userData.poseOffset += 1
-            if (cat.userData.poseOffset % 600 === 0) {
-                cat.userData.poseOffset = THREE.MathUtils.randInt(0, Math.floor(poses.length / 600)) * 600
-            }
         })
+
+        // Mark matrices as needing update
+        headsMesh.instanceMatrix.needsUpdate = true
+        handsMesh.instanceMatrix.needsUpdate = true
     })
 
     return parent

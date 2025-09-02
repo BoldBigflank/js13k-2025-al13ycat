@@ -1,5 +1,6 @@
+// @ts-ignore
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
-import { createModel } from '../scripts/modelLoader'
+import { createModel } from '../scripts/ModelLoader'
 import { tunaModel } from './exported/tuna'
 import { NEON_RED, NEON_BLUE, WHITE } from '../scripts/Colors'
 import { InteractiveObject3D } from '../types'

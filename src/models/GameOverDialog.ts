@@ -1,3 +1,4 @@
+// @ts-ignore
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { Events } from '../libraries/Events'
 import { GameProgress } from '../scripts/DJPuzzle'

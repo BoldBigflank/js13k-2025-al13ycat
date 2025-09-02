@@ -1,3 +1,4 @@
+// @ts-ignore
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { INCHES_TO_METERS_SCALE, initCanvas } from '../scripts/Utils'
 import { BLACK, BLUE, GREEN, MAGENTA } from '../scripts/Colors'
