@@ -82,7 +82,7 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
         for (let x = 0; x < cols; x++) {
             const i = x + z * rows
             const palette = sample(CAT_COLORS)
-            const positionOffset = new THREE.Vector3(2 * x - cols + 0.5, 0, 2 * z - rows + 0.5)
+            const positionOffset = new THREE.Vector3(2 * x - cols + 0.5 + (z % 2) * 1, 0, 2 * z - rows + 0.5)
             if (Math.abs(positionOffset.x) >= 5) positionOffset.y += 5
             const jank = new THREE.Vector3(
                 THREE.MathUtils.randFloatSpread(0.3),

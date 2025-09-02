@@ -348,6 +348,8 @@ function intersectObjects(controller) {
             let focusedObject = object
             while (focusedObject) {
                 if (focusedObject.userData.isPickable) {
+                    const highlight = focusedObject.getObjectByName('highlight')
+                    if (highlight) highlight.visible = true
                     if (line) line.scale.z = distance
                     intersected.push(focusedObject)
                     collided = true
@@ -362,7 +364,8 @@ function intersectObjects(controller) {
 function cleanIntersected() {
     while (intersected.length) {
         const object = intersected.pop()
-        // object.material.emissive.r = 0;
+        const highlight = object.getObjectByName('highlight')
+        if (highlight) highlight.visible = false
     }
 }
 

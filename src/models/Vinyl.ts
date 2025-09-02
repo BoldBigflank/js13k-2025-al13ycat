@@ -1,7 +1,7 @@
 // @ts-ignore
 import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
 import { INCHES_TO_METERS_SCALE, initCanvas } from '../scripts/Utils'
-import { BLACK, BLUE, GREEN, MAGENTA } from '../scripts/Colors'
+import { BLACK, BLUE, GREEN, MAGENTA, WHITE } from '../scripts/Colors'
 import { ColorMaterial } from '../scripts/TextureUtils'
 
 type VinylProps = {
@@ -62,14 +62,8 @@ export const Vinyl = ({ color, artist, title }: VinylProps): THREE.Object3D => {
 
     // innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength
     const geometry = new THREE.RingGeometry(4, 7, 32)
+    geometry.translate(0, 0, -0.001)
     geometry.scale(INCHES_TO_METERS_SCALE, INCHES_TO_METERS_SCALE, INCHES_TO_METERS_SCALE)
-    // const material = new THREE.MeshPhongMaterial({
-    //     color: color,
-    //     side: THREE.DoubleSide,
-    //     emissive: 0x000000,
-    //     specular: 0x111111,
-    //     shininess: 50,
-    // })
     const material = ColorMaterial(color, { glow: true })
 
     result.add(new THREE.Mesh(geometry, material))
@@ -77,20 +71,30 @@ export const Vinyl = ({ color, artist, title }: VinylProps): THREE.Object3D => {
     // Inner ring
     const innerRingGeometry = new THREE.RingGeometry(0.25, 4, 32)
     innerRingGeometry.scale(INCHES_TO_METERS_SCALE, INCHES_TO_METERS_SCALE, INCHES_TO_METERS_SCALE)
+    innerRingGeometry.translate(0, 0, -0.001)
     const innerRingMaterial = ColorMaterial(0xffffff, {})
     result.add(new THREE.Mesh(innerRingGeometry, innerRingMaterial))
 
     // Artist Label
     const labelGeometry = new THREE.PlaneGeometry(14, 14)
-    labelGeometry.translate(0, 0, 0.001)
+    labelGeometry.translate(0, 0, -0.002)
     labelGeometry.scale(INCHES_TO_METERS_SCALE, INCHES_TO_METERS_SCALE, INCHES_TO_METERS_SCALE)
     const labelMaterial = LabelMaterial(artist, title, 1)
     result.add(new THREE.Mesh(labelGeometry, labelMaterial))
 
     const result2 = result.clone()
     result2.rotation.set(0, Math.PI, 0)
-    result2.position.set(0, 0, -0.002)
     result.add(result2)
+
+    // Highlight ring
+    const highlightGeometry = new THREE.RingGeometry(7, 7.5, 32)
+    highlightGeometry.scale(INCHES_TO_METERS_SCALE, INCHES_TO_METERS_SCALE, INCHES_TO_METERS_SCALE)
+    const highlightMaterial = ColorMaterial(WHITE, { glow: true })
+    highlightMaterial.emissiveIntensity = 1.0
+    const highlightMesh = new THREE.Mesh(highlightGeometry, highlightMaterial)
+    highlightMesh.visible = false
+    highlightMesh.name = 'highlight'
+    result.add(highlightMesh)
 
     return result
 }
