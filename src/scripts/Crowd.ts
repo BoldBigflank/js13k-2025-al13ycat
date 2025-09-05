@@ -1,7 +1,7 @@
-// @ts-ignore
-import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
+import * as THREE from 'three'
 import { Events } from '../libraries/Events.js'
 import {
+    BLACK,
     CAT_BLACK,
     CAT_GREY,
     LIGHT_GREEN,
@@ -10,9 +10,11 @@ import {
     NEON_RED,
     NEON_YELLOW,
     ORANGE,
+    TYPE_COLORS,
     YELLOW,
 } from './Colors.js'
-import { sample } from './Utils.js'
+import { sample, waveHeight } from './Utils.js'
+import { GameProgress } from './DJPuzzle.js'
 
 const CAT_COLORS = [
     {
@@ -44,6 +46,7 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
     const parent = new THREE.Group()
     parent.name = 'Crowd'
     const dummy = new THREE.Object3D()
+    let shouldWave = false
 
     // Instanced meshes
     const rows = 8
@@ -83,7 +86,9 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
             const i = x + z * rows
             const palette = sample(CAT_COLORS)
             const positionOffset = new THREE.Vector3(2 * x - cols + 0.5 + (z % 2) * 1, 0, 2 * z - rows + 0.5)
-            if (Math.abs(positionOffset.x) >= 5) positionOffset.y += 5
+            if (Math.abs(positionOffset.x) >= 5) {
+                positionOffset.y += 5
+            }
             const jank = new THREE.Vector3(
                 THREE.MathUtils.randFloatSpread(0.3),
                 THREE.MathUtils.randFloatSpread(0.1),
@@ -120,6 +125,12 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
             })
         }
     }
+
+    Events.Instance.on('progress', (progress: GameProgress) => {
+        shouldWave = progress.bestComboCount >= 3
+        handsMaterial.emissive.set(progress.bestComboCount >= 4 ? TYPE_COLORS[progress.bestComboType] : BLACK)
+        handsMaterial.emissiveIntensity = progress.bestComboCount >= 4 ? 0.8 : 0
+    })
 
     Events.Instance.on('tick', () => {
         // Record the current pose
@@ -161,7 +172,9 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
             dummy.matrix.copy(pose.camera)
             dummy.matrix.decompose(dummy.position, dummy.quaternion, dummy.scale)
             dummy.position.add(data.positionOffset).add(catOffset)
-            // dummy.lookAt(0, 6, 0)
+            if (shouldWave && dummy.position.y < 4) {
+                dummy.position.y += waveHeight(dummy.position.x, dummy.position.z)
+            }
             dummy.updateMatrix()
             headsMesh.setMatrixAt(i, dummy.matrix)
 
@@ -173,6 +186,9 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
                 dummy.position.add(data.positionOffset).add(catOffset)
                 // Position hands slightly offset from the head
                 dummy.position.add(new THREE.Vector3(controllerIndex === 0 ? -0.1 : 0.1, 0.2, -0.3))
+                if (shouldWave && dummy.position.y < 4) {
+                    dummy.position.y += waveHeight(dummy.position.x, dummy.position.z)
+                }
                 dummy.updateMatrix()
                 handsMesh.setMatrixAt(handIndex, dummy.matrix)
             })

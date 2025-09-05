@@ -1,3 +1,5 @@
+import { viteExternalsPlugin } from 'vite-plugin-externals'
+
 export default {
     base: '',
     server: {
@@ -8,5 +10,10 @@ export default {
             'ada3d69471bb.ngrok-free.app',
             'together-horribly-lamprey.ngrok-free.app',
         ],
+    },
+    build: {
+        rollupOptions: {
+            external: ['three'],
+        },
     },
 }

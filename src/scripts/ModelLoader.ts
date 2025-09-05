@@ -1,24 +1,11 @@
-// @ts-ignore
-import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
+import * as THREE from 'three'
 
 import { floatVal } from './Utils'
+import { BB_DEFAULT_PALETTE } from './Colors'
 
 type Model = (string | string[])[]
 
 const BB_PALETTE_KEYS = ['Light Blue', 'Yellow', 'Orange', 'Red', 'Purple', 'Blue', 'Green', 'Lime', 'Pink', 'Silver']
-
-const BB_DEFAULT_PALETTE = {
-    'Light Blue': '#9999ff', //light blue
-    Yellow: '#fffb00', //yellow
-    Orange: '#ff7300', //orange
-    Red: '#ff0000', //red
-    Purple: '#c300ff', // purple
-    Blue: '#0000ff', // blue
-    Green: '#00ff00', //green
-    Lime: '#b0ffb0', // lime green
-    Pink: '#ff00ff', //pink
-    Silver: '#d3d3d3', //silver
-}
 
 // Shared parse geometry functions
 const parsePyramidGeometry = (item: string): THREE.BufferGeometry => {
@@ -170,7 +157,13 @@ const parseGeometry = (item: string): THREE.BufferGeometry => {
     }
 }
 
-export const createModel = (modelArray: Model, customPalette?: Partial<typeof BB_DEFAULT_PALETTE>): THREE.Group => {
+type CreateModelOpts = {
+    palette?: Partial<typeof BB_DEFAULT_PALETTE>
+    glow?: boolean
+}
+
+export const createModel = (modelArray: Model, opts: CreateModelOpts): THREE.Group => {
+    const { palette: customPalette = {}, glow = false } = opts
     const parent = new THREE.Group()
     parent.position.set(0, 0, 0)
     parent.rotation.set(0, 0, 0)
@@ -187,7 +180,7 @@ export const createModel = (modelArray: Model, customPalette?: Partial<typeof BB
             return
         }
         if (Array.isArray(item)) {
-            parent.add(createModel(item, modelPalette))
+            parent.add(createModel(item, { palette: modelPalette, glow }))
         } else {
             const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = item.split(',')
 
@@ -197,6 +190,11 @@ export const createModel = (modelArray: Model, customPalette?: Partial<typeof BB
                 color: modelPalette[BB_PALETTE_KEYS[color] as keyof typeof modelPalette],
                 side: THREE.DoubleSide,
             }) // TODO: use color
+
+            if (glow) {
+                material.emissive = new THREE.Color(modelPalette[BB_PALETTE_KEYS[color] as keyof typeof modelPalette])
+                material.emissiveIntensity = 1.0
+            }
 
             const mesh = new THREE.Mesh(geometry, material)
 

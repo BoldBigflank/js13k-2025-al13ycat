@@ -1,5 +1,4 @@
-// @ts-ignore
-import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
+import * as THREE from 'three'
 import { Events } from '../libraries/Events'
 import { BLACK, BLUE, GREEN, ORANGE, RED, VIOLET, YELLOW } from '../scripts/Colors'
 import { AnimationFactory, sinusoidal } from '../scripts/AnimationFactory'
@@ -53,10 +52,11 @@ export const Runner = (length: number): THREE.Group => {
     Events.Instance.on('beat', () => {
         offset += 1
         if (offset < 0) return
+        const selectedColor = colors[offset % colors.length]
         parent.children.forEach((mesh: THREE.Object3D) => {
             const { x, y } = mesh.userData
             const lit = functions[offset % functions.length](x, y)
-            const color = lit ? colors[offset % colors.length] : BLACK
+            const color = lit ? selectedColor : BLACK
             mesh.material.needsUpdate = true
             mesh.material.color.set(color)
             mesh.material.emissive.set(lit ? color : BLACK)
@@ -73,6 +73,7 @@ export const Runner = (length: number): THREE.Group => {
                 })
             }
         })
+        Events.Instance.emit('roomGlow', selectedColor)
     })
     return parent
 }

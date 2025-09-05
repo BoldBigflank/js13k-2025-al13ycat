@@ -1,5 +1,4 @@
-// @ts-ignore
-import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
+import * as THREE from 'three'
 
 export type AnimationTransform = {
     position?: THREE.Vector3

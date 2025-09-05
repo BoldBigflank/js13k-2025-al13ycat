@@ -1,5 +1,6 @@
-// @ts-ignore
-import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
+import * as THREE from 'three'
+
+const clock = new THREE.Clock()
 
 export const INCHES_TO_METERS_SCALE = 0.0254
 
@@ -25,3 +26,15 @@ export const floatVal = (val: string | number | undefined) => parseFloat(`${val 
 export const sample = (arr: any[]): any => arr[Math.floor(Math.random() * arr.length)]
 
 export const DEBUG = import.meta.env.DEV
+
+export const waveHeight = (x: number, z: number) => {
+    const time = clock.getElapsedTime()
+    return 0.5 * Math.sin(Math.sqrt(x * x + z * z) - 2 * time)
+}
+
+export const randomUnitCirclePoint = (radius = 1) => {
+    // Random point in circle - https://stackoverflow.com/a/50746409
+    const t = 2 * Math.PI * Math.random()
+    const r = radius * Math.sqrt(Math.random())
+    return new THREE.Vector3(r * Math.cos(t), 0, r * Math.sin(t))
+}

@@ -1,53 +1,70 @@
-// @ts-ignore
-import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
+import * as THREE from 'three'
 import { AnimationFactory } from '../scripts/AnimationFactory'
 import { createModel } from '../scripts/ModelLoader'
 import { goldfishModel } from './exported/goldfish'
 import { Events } from '../libraries/Events'
 import { GameProgress } from '../scripts/DJPuzzle'
-import { INCHES_TO_METERS_SCALE } from '../scripts/Utils'
-import { BLACK, NEON_BLUE, NEON_PURPLE } from '../scripts/Colors'
+import {
+    BLACK,
+    CAT_GREY,
+    NEON_BLUE,
+    NEON_BROWN,
+    NEON_GREEN,
+    NEON_ORANGE,
+    NEON_PURPLE,
+    NEON_YELLOW,
+} from '../scripts/Colors'
+import { InteractiveObject3D } from '../types'
+import { SolvedSFX } from '../audio/music'
 
 const FISH_PALETTES = [
-    {},
+    {
+        Orange: NEON_ORANGE,
+        Purple: BLACK,
+        Silver: NEON_YELLOW,
+    },
     {
         Orange: NEON_PURPLE, // Body
         Purple: BLACK, // Eyes
         Silver: NEON_BLUE, // Fins
+    },
+    {
+        Orange: NEON_GREEN, // Body
+        Purple: NEON_BROWN, // Eyes
+        Silver: CAT_GREY, // Fins
     },
 ]
 
 const FISH_SCALE = new THREE.Vector3(0.05, 0.05, 0.05)
 
 export const FishSwirl = (): THREE.Group => {
-    const axis = new THREE.Vector3(1, 0, 0)
     const parent = new THREE.Group()
     parent.name = 'FishSwirl'
     const fishPond: THREE.Group[] = []
     let visible = true
 
-    const swirl = new THREE.Group()
-
-    const mesh = createModel(goldfishModel(), FISH_PALETTES[THREE.MathUtils.randInt(0, FISH_PALETTES.length)])
-
     for (let i = 0; i < 10; i++) {
+        const palette = FISH_PALETTES[THREE.MathUtils.randInt(0, FISH_PALETTES.length - 1)]
+        const mesh = createModel(goldfishModel(), { palette, glow: true }) as InteractiveObject3D
         const clone = mesh.clone(true)
+        clone.userData.velocity = new THREE.Vector3(0, 5 + 3 * Math.random(), -5)
+        clone.userData.isPickable = true
+        clone.onPointerPick = (controller) => {
+            SolvedSFX()
+            clone.userData.velocity.set(0, 20, 0)
+        }
         clone.position.set(Math.random() * 10 - 5, 0, 0)
         fishPond.push(clone)
-        swirl.attach(clone)
-        clone.userData.velocity = new THREE.Vector3(0, 5 + 3 * Math.random(), -5)
+        parent.attach(clone)
         clone.scale.set(0, 0, 0)
     }
-    swirl.rotation.set(0, 0, 0)
-
-    parent.attach(swirl)
 
     Events.Instance.on('tick', (dt: number) => {
         fishPond.forEach((fish) => {
             // Update the velocity
             fish.userData.velocity.y -= 10 * dt
             fish.position.addScaledVector(fish.userData.velocity, dt)
-            if (fish.position.y < 0) {
+            if (fish.position.y < -2) {
                 // Reset, go again
 
                 // Turn to center
@@ -59,7 +76,7 @@ export const FishSwirl = (): THREE.Group => {
                 const targetRotation = new THREE.Quaternion()
                 targetRotation.setFromUnitVectors(new THREE.Vector3(0, 0, -1), toCenter)
                 fish.quaternion.copy(targetRotation)
-                fish.position.y = 0
+                fish.position.y = -2
                 // Use y rotation to set velocity
 
                 const forward = new THREE.Vector3(0, 0, -1)
@@ -67,17 +84,16 @@ export const FishSwirl = (): THREE.Group => {
                 forward.multiplyScalar(5) // Keep same speed as before
                 fish.userData.velocity.x = forward.x
                 fish.userData.velocity.z = forward.z
-                fish.userData.velocity.y = 5 + 6 * Math.random()
+                fish.userData.velocity.y = 7 + 6 * Math.random()
             }
             // Set the fish rotation to the direction of the velocity
-            // quaternion setfrom unitvectors
             const fishFaceQuaternion = new THREE.Quaternion()
             fishFaceQuaternion.setFromUnitVectors(new THREE.Vector3(0, 0, -1), fish.userData.velocity)
             fish.quaternion.copy(fishFaceQuaternion)
         })
     })
     Events.Instance.on('progress', (progress: GameProgress) => {
-        const showFish = progress.bestComboCount >= 4
+        const showFish = progress.bestComboCount >= 5
         const shouldUpdate = showFish !== visible
         fishPond.forEach((fish) => {
             if (shouldUpdate) {

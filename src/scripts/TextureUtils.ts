@@ -1,5 +1,4 @@
-// @ts-ignore
-import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
+import * as THREE from 'three'
 import { initCanvas } from './Utils'
 import { BLACK } from './Colors'
 
@@ -26,7 +25,7 @@ export const ColorMaterial = (color: string, opts?: ColorOpts) => {
 }
 
 type TextOpts = {
-    color: string | number
+    color?: string | number
     bgColor?: string
     textAlign?: CanvasTextAlign
     ratio?: number
@@ -35,7 +34,7 @@ type TextOpts = {
 
 export const TextMaterial = (lines: string[], opts: TextOpts) => {
     const { color, bgColor, textAlign, ratio, fontSize } = opts
-    c.set(color)
+    c.setStyle(color || BLACK)
     const hexColor = typeof color === 'string' ? color : `#${c.getHexString()}`
     const key = `text-${hexColor}-${lines.join('')}`
     if (textures[key]) return textures[key]
@@ -65,6 +64,7 @@ export const TextMaterial = (lines: string[], opts: TextOpts) => {
     const material = new THREE.MeshBasicMaterial({
         map: texture,
         transparent: true,
+        side: THREE.DoubleSide,
     })
 
     textures[key] = material

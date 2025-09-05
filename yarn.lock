@@ -835,7 +835,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"acorn@npm:^8.14.0":
+"acorn@npm:^8.14.0, acorn@npm:^8.4.0":
   version: 8.15.0
   resolution: "acorn@npm:8.15.0"
   bin:
@@ -1900,6 +1900,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"es-module-lexer@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "es-module-lexer@npm:0.4.1"
+  checksum: 10c0/6463778f04367979d7770cefb1969b6bfc277319e8437a39718b3516df16b1b496b725ceec96a2d24975837a15cf4d56838f16d9c8c7640ad13ad9c8f93ad6fc
+  languageName: node
+  linkType: hard
+
 "es-object-atoms@npm:^1.0.0, es-object-atoms@npm:^1.1.1":
   version: 1.1.1
   resolution: "es-object-atoms@npm:1.1.1"
@@ -2347,7 +2354,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fs-extra@npm:10.1.0, fs-extra@npm:^10.0.1":
+"fs-extra@npm:10.1.0, fs-extra@npm:^10.0.0, fs-extra@npm:^10.0.1":
   version: 10.1.0
   resolution: "fs-extra@npm:10.1.0"
   dependencies:
@@ -3102,13 +3109,14 @@ __metadata:
   dependencies:
     "@types/three": "npm:^0"
     husky: "npm:^9.1.7"
-    l13: "npm:^0.0.9"
+    l13: "npm:^0.0.10"
     pinst: "npm:^3.0.0"
     prettier: "npm:3.6.2"
     roadroller: "npm:^2.1.0"
     three: "npm:^0.179.1"
     typescript: "npm:^5.9.2"
     vite: "npm:^7.0.6"
+    vite-plugin-externals: "npm:^0.6.2"
   languageName: unknown
   linkType: soft
 
@@ -3141,9 +3149,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"l13@npm:^0.0.9":
-  version: 0.0.9
-  resolution: "l13@npm:0.0.9"
+"l13@npm:^0.0.10":
+  version: 0.0.10
+  resolution: "l13@npm:0.0.10"
   dependencies:
     7z-wasm: "npm:^1.2.0"
     clean-css: "npm:^5.3.3"
@@ -3162,7 +3170,7 @@ __metadata:
     js13k: dist/index.js
     l13: dist/index.js
     lab13: dist/index.js
-  checksum: 10c0/fa7c0db7a54eeded9fb723908d3825f907a36bae364d7b89a388020902d75de16e68994f2622b1ce921f66cba800ea80da426128009777d43783987ad6eb7b2c
+  checksum: 10c0/6c1660b0520ba055e033b072e33fab3d39966605feaf0d08e7b5ba6b6dff105bb7ceb6d7c95ca55febcd47658c156fc289092adc802cd3bab78f50c2e54fc8fa
   languageName: node
   linkType: hard
 
@@ -3264,6 +3272,15 @@ __metadata:
     pseudomap: "npm:^1.0.2"
     yallist: "npm:^2.1.2"
   checksum: 10c0/1ca5306814e5add9ec63556d6fd9b24a4ecdeaef8e9cea52cbf30301e6b88c8d8ddc7cab45b59b56eb763e6c45af911585dc89925a074ab65e1502e3fe8103cf
+  languageName: node
+  linkType: hard
+
+"magic-string@npm:^0.25.7":
+  version: 0.25.9
+  resolution: "magic-string@npm:0.25.9"
+  dependencies:
+    sourcemap-codec: "npm:^1.4.8"
+  checksum: 10c0/37f5e01a7e8b19a072091f0b45ff127cda676232d373ce2c551a162dd4053c575ec048b9cbb4587a1f03adb6c5d0fd0dd49e8ab070cd2c83a4992b2182d9cb56
   languageName: node
   linkType: hard
 
@@ -4705,6 +4722,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"sourcemap-codec@npm:^1.4.8":
+  version: 1.4.8
+  resolution: "sourcemap-codec@npm:1.4.8"
+  checksum: 10c0/f099279fdaae070ff156df7414bbe39aad69cdd615454947ed3e19136bfdfcb4544952685ee73f56e17038f4578091e12b17b283ed8ac013882916594d95b9e6
+  languageName: node
+  linkType: hard
+
 "spdx-correct@npm:^3.0.0":
   version: 3.2.0
   resolution: "spdx-correct@npm:3.2.0"
@@ -5253,6 +5277,20 @@ __metadata:
   version: 1.1.2
   resolution: "vary@npm:1.1.2"
   checksum: 10c0/f15d588d79f3675135ba783c91a4083dcd290a2a5be9fcb6514220a1634e23df116847b1cc51f66bfb0644cf9353b2abb7815ae499bab06e46dd33c1a6bf1f4f
+  languageName: node
+  linkType: hard
+
+"vite-plugin-externals@npm:^0.6.2":
+  version: 0.6.2
+  resolution: "vite-plugin-externals@npm:0.6.2"
+  dependencies:
+    acorn: "npm:^8.4.0"
+    es-module-lexer: "npm:^0.4.1"
+    fs-extra: "npm:^10.0.0"
+    magic-string: "npm:^0.25.7"
+  peerDependencies:
+    vite: ">=2.0.0"
+  checksum: 10c0/7cfa34a02e8b4fe573c6bceca06c1a9127b24fcfb6456ce2b1caea3dc145cce4dda4be62afb299699f82ef315d8d90af800de76fa9e26ac35c145644279080bd
   languageName: node
   linkType: hard
 

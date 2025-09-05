@@ -16,6 +16,7 @@ Events.Instance.on('progress', (progress: GameProgress) => {
 })
 
 export const RecordSFX = () => zzfx(...[, , 143, 0.03, 0.17, 0.09, 2, 1.5, 10, -17, , , , , 4, , , 0.73, 0.09]) // Shoot 95
+export const CorrectSFX = () => zzfx(...[, 0, , , 0.07, 0.12, , 3.4, , , 109, 0.07, , , , , , 0.6, 0.05, , -1428]) // Pickup 116
 
 export const BlipSFX = () => zzfx(...[, , 76, 0.02, 0.02, 0.01, 1, 0.44, , , , , , 0.5, , , , , 0.01, 0.57]) // Blip 60
 export const SolvedSFX = () =>
@@ -85,7 +86,6 @@ export const Song3 = async (): Promise<Song3Controller> => {
         const checkInterval = setInterval(() => {
             Events.Instance.emit('downbeat')
             if (currentSequenceNumber !== sequenceNumber) {
-                console.log('Sequence change detected:', sequenceNumber, '→', currentSequenceNumber)
                 clearInterval(checkInterval)
                 playBuffer(currentSequenceNumber)
             }

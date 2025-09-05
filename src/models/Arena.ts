@@ -1,5 +1,4 @@
-// @ts-ignore
-import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
+import * as THREE from 'three'
 import { createModel } from '../scripts/ModelLoader'
 import { arenaModel } from './exported/arena'
 import { catModel } from './exported/cat'
@@ -15,11 +14,13 @@ import { BLUE, DARK_GREY, GREY, LIGHT_GREY, WALL_GREEN } from '../scripts/Colors
 export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
     // Main arena
     const mesh = createModel(arenaModel(), {
-        Green: WALL_GREEN, // Awnings
-        Yellow: LIGHT_GREY, // Pillars
-        Orange: GREY,
-        Red: DARK_GREY, // Dance floor
-        'Light Blue': BLUE, // Records/Turntable
+        palette: {
+            Green: WALL_GREEN, // Awnings
+            Yellow: LIGHT_GREY, // Pillars
+            Orange: GREY,
+            Red: DARK_GREY, // Dance floor
+            'Light Blue': BLUE, // Records/Turntable
+        },
     }) as THREE.Object3D
 
     // Progress console
@@ -27,7 +28,7 @@ export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
     mesh.add(progress)
     progress.position.set(-0.1, 0.9, -0.7)
 
-    // Tuna
+    // Tuna (100bytes)
     const tuna = Tuna()
     mesh.add(tuna)
     tuna.position.set(-0.4, 1.0, -0.3)
@@ -40,8 +41,8 @@ export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
     crowd.position.set(0, -1, -10)
     crowd.rotation.set(0, Math.PI, 0) // Just turn it around
 
-    // Cats
-    const catMesh = createModel(catModel(), { Purple: '#333333', Silver: '#888888' })
+    // Cats (440 bytes)
+    const catMesh = createModel(catModel(), { palette: { Purple: '#333333', Silver: '#888888' } })
     catMesh.name = 'catMesh'
     catMesh.position.set(-3, 1, 0)
     catMesh.scale.set(0.1, 0.1, 0.1)
@@ -60,7 +61,7 @@ export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
 
     const grid = new Grid()
     mesh.add(grid.mesh)
-    grid.mesh.position.set(0, -1, -7)
+    grid.mesh.position.set(0, -1, -10)
 
     const gameOverDialog = GameOverDialog()
     mesh.add(gameOverDialog)

@@ -1,16 +1,19 @@
-// @ts-ignore
-import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
+import * as THREE from 'three'
 import DJPuzzle from './scripts/DJPuzzle'
 import { VRButton } from './libraries/VRButton'
 import { Vinyl } from './models/Vinyl'
 import { AnimationFactory } from './scripts/AnimationFactory'
 import { DebugScreen } from './models/DebugScreen'
 import { Events } from './libraries/Events'
-import { PickupSFX, RecordSFX, Song3 } from './audio/music'
+import { CorrectSFX, RecordSFX, Song3 } from './audio/music'
 import { Arena } from './models/Arena'
 import { Paw } from './models/Paw'
 import { FishSwirl } from './models/FishSwirl'
 import { Sky } from './models/Sky'
+import { BLACK, NEON_BLUE, RED } from './scripts/Colors'
+import { InteractiveObject3D } from './types'
+import { Splash } from './models/Splash'
+import { sleep } from './scripts/Utils'
 
 const CLOCK = new THREE.Clock()
 let beat = 0
@@ -27,12 +30,9 @@ const intersected: THREE.Object3D[] = []
 
 let baseReferenceSpace
 const START_POSITION = new THREE.Vector3(0, 0, 0.3)
+const c = new THREE.Color()
 
 const initGame = async () => {
-    // Change to a loading state
-    document.getElementById('p')!.setAttribute('disabled', 'true')
-    document.getElementById('p')!.innerHTML = 'LOADING...'
-
     // Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setPixelRatio(window.devicePixelRatio)
@@ -56,14 +56,21 @@ const initGame = async () => {
     scene.add(camera)
     AnimationFactory.Instance.initScene(scene)
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8)
+    const ambientLightBaseColor = new THREE.Color().setStyle('#888888')
+    const ambientLight = new THREE.AmbientLight(ambientLightBaseColor, 0.2)
+    ambientLight.name = 'ambientLight'
     scene.add(ambientLight)
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8)
+    const directionalLightBaseColor = new THREE.Color().setStyle('#ffffff')
+    const directionalLight = new THREE.DirectionalLight(directionalLightBaseColor, 0.3)
+    directionalLight.name = 'directionalLight'
     directionalLight.position.set(6, 10, 8)
     directionalLight.castShadow = true
     directionalLight.target.position.set(0, 0, 0)
     scene.add(directionalLight)
     scene.add(directionalLight.target)
+
+    const splash = Splash()
+    scene.add(splash)
 
     const skyMesh = Sky()
     skyMesh.position.set(0, 0, 5)
@@ -72,6 +79,8 @@ const initGame = async () => {
     const arenaMesh = Arena(renderer)
     scene.add(arenaMesh)
     const tableA = arenaMesh.getObjectByName('tableA')
+
+    const pad = arenaMesh.getObjectByName('pad')
 
     const fishSwirl = FishSwirl()
     fishSwirl.position.set(0, 0, -10)
@@ -115,11 +124,15 @@ const initGame = async () => {
                     duration: 60,
                 })
                 controller.userData.selected = mesh
+
+                // Light up the pad
+                pad.material.emissive.setStyle(NEON_BLUE)
             }
         }
         mesh.onPointerDrop = (controller: THREE.Group) => {
             // If it's near an open table mesh
             AnimationFactory.Instance.cancelAnimation(mesh, true)
+            pad.material.emissive.setStyle(BLACK)
             const tableDistance = mesh
                 .getWorldPosition(new THREE.Vector3())
                 .distanceTo(tableA.getWorldPosition(new THREE.Vector3()))
@@ -135,7 +148,6 @@ const initGame = async () => {
                 })
                 // Move any other meshes
                 tableA.attach(mesh)
-                PickupSFX()
                 AnimationFactory.Instance.animateTransform({
                     mesh,
                     end: {
@@ -187,8 +199,17 @@ const initGame = async () => {
     // Event listeners
     window.addEventListener('resize', onWindowResize, false)
 
-    Events.Instance.on('comboBroken', () => {
-        RecordSFX()
+    Events.Instance.on('comboBroken', (isComboBroken: boolean) => {
+        isComboBroken ? RecordSFX() : CorrectSFX()
+        if (!isComboBroken) {
+            Events.Instance.emit('splash', tableA?.getWorldPosition(new THREE.Vector3()))
+        }
+    })
+
+    Events.Instance.on('roomGlow', (color: string) => {
+        const ambientLight = scene.getObjectByName('ambientLight') as THREE.AmbientLight
+        c.setStyle(color)
+        ambientLight.color.set(c.add(ambientLightBaseColor).multiplyScalar(0.5))
     })
 
     Song3()
@@ -200,10 +221,6 @@ const initGame = async () => {
     })
 
     djPuzzle.reset()
-
-    // Update the UI
-    document.getElementById('intro')!.style.display = 'none'
-    document.getElementById('c')!.style.display = 'block'
 
     if (DEBUG) {
         const debugScreen = DebugScreen()
@@ -251,7 +268,6 @@ function onXRSessionStart() {
 }
 
 function onControllerConnected(event) {
-    console.log('controller connected', event)
     const controller = event.target
     const handedness = event.data.handedness === 'left' ? -1 : 1
     if (DEBUG) Events.Instance.emit('debug', `Hand: ${event.data.hand}`)
@@ -281,7 +297,7 @@ function onControllerConnected(event) {
             new THREE.Vector3(0, 0, -1),
         ])
         line = new THREE.Line(geometry)
-        line.material.color.set(0xff0000)
+        line.material.color.set(RED)
         line.name = 'line'
         line.scale.z = 5
 
@@ -292,19 +308,20 @@ function onControllerConnected(event) {
 // Starts pulling trigger
 function onSelectStart(event) {
     selectedController = event.target
+    if (!selectedController) return
     const intersections = getIntersections(selectedController)
     if (intersections.length > 0) {
         let collided = false
         intersections.forEach(({ object, distance }) => {
             if (collided) return
-            let focusedObject = object
+            let focusedObject = object as InteractiveObject3D
             while (focusedObject) {
                 if (focusedObject.onPointerPick) {
                     focusedObject.onPointerPick(selectedController)
                     collided = true
                     // hide the line
-                    const line = selectedController.getObjectByName('line')
-                    line.visible = false
+                    const line = selectedController!.getObjectByName('line')
+                    if (line) line.visible = false
                     break
                 }
                 focusedObject = focusedObject.parent
@@ -392,7 +409,34 @@ const onWindowResize = () => {
     renderer.setSize(window.innerWidth, window.innerHeight)
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+const setLoading = async (isLoading: boolean) => {
+    const b = document.getElementById('p')!
+    if (isLoading) {
+        b.setAttribute('disabled', 'true')
+        b.innerHTML = 'LOADING...'
+    } else {
+        b.removeAttribute('disabled')
+        b.innerHTML = 'JOIN'
+    }
+}
+
+function setupButton() {
     const b = document.getElementById('p') as HTMLButtonElement
-    b.onclick = initGame
-})
+    b.style.display = 'inline-block'
+    if (b)
+        b.onclick = async () => {
+            await setLoading(true)
+            await sleep(1) // Wait a tick for the UI to update
+            await initGame()
+            setLoading(false)
+            // Update the UI
+            document.getElementById('intro')!.style.display = 'none'
+            document.getElementById('c')!.style.display = 'block'
+        }
+}
+
+if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', setupButton)
+} else {
+    setupButton()
+}

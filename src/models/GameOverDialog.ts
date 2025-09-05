@@ -1,5 +1,4 @@
-// @ts-ignore
-import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
+import * as THREE from 'three'
 import { Events } from '../libraries/Events'
 import { GameProgress } from '../scripts/DJPuzzle'
 import { TextMaterial } from '../scripts/TextureUtils'
@@ -23,7 +22,6 @@ export const GameOverDialog = (): THREE.Object3D => {
 
     Events.Instance.on('progress', (progress: GameProgress) => {
         if (progress.color.solved && progress.artist.solved && progress.title.solved) {
-            console.log('time to show')
             mesh.userData.solved = true
             mesh.visible = true
             mesh.material.needsUpdate = true

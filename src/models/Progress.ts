@@ -1,25 +1,20 @@
-// @ts-ignore
-import * as THREE from 'https://js13kgames.com/2025/webxr/three.module.js'
+import * as THREE from 'three'
 import { createModel } from '../scripts/ModelLoader'
 import { progressModel } from './exported/progress'
 import { BLACK, BLUE, CAT_BLACK, LIGHT_GREY } from '../scripts/Colors'
 import { Events } from '../libraries/Events'
-import {
-    GameProgress,
-    SequenceType,
-    SequenceTypes,
-    SOLUTION_COLOR,
-    TYPE_COLORS,
-    TYPE_FONTSIZES,
-} from '../scripts/DJPuzzle'
+import { TYPE_COLORS } from '../scripts/Colors'
+import { GameProgress, SequenceType, SequenceTypes, SOLUTION_COLOR_HEX, TYPE_FONTSIZES } from '../scripts/DJPuzzle'
 import { TextMaterial } from '../scripts/TextureUtils'
 
 export const Progress = (): THREE.Object3D => {
     const mesh = createModel(progressModel(), {
-        Red: BLACK, // Display,
-        Green: LIGHT_GREY, // Case
-        Blue: BLUE, // Base
-        Silver: BLACK, // LEDs
+        palette: {
+            Red: BLACK, // Display,
+            Green: LIGHT_GREY, // Case
+            Blue: BLUE, // Base
+            Silver: BLACK, // LEDs
+        },
     }) as THREE.Object3D
     mesh.scale.set(0.1, 0.1, 0.1)
 
@@ -43,7 +38,7 @@ export const Progress = (): THREE.Object3D => {
                 let color = CAT_BLACK
                 if (progress[type].solved || i < progress[type].correctCount) color = TYPE_COLORS[type]
                 if ((progress[type].solved || i < progress[type].correctCount) && type === 'color')
-                    color = SOLUTION_COLOR[i]
+                    color = SOLUTION_COLOR_HEX[i]
                 const lit = color !== CAT_BLACK
 
                 progressMesh.material.color.set(color)

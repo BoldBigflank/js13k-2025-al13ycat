@@ -1,13 +1,9 @@
 import { Events } from '../libraries/Events'
 import { BLUE, GREEN, ORANGE, RED, VIOLET, YELLOW } from './Colors'
 
-export const TYPE_COLORS = {
-    color: RED,
-    artist: GREEN,
-    title: BLUE,
-}
+export const SOLUTION_COLOR_HEX = [RED, ORANGE, YELLOW, GREEN, BLUE, VIOLET]
 
-export const SOLUTION_COLOR = [RED, ORANGE, YELLOW, GREEN, BLUE, VIOLET]
+const SOLUTION_COLOR = ['Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Violet']
 
 // TODO: Build one around Pussycat Dolls (or other cat bands)
 //                                                                    Black eyed peas   Carrot Top  Cap Sheen
@@ -33,7 +29,7 @@ const TYPE_SOLUTIONS = {
 }
 
 export const TYPE_FONTSIZES = {
-    color: 0,
+    color: 42,
     artist: 24,
     title: 34,
 }
@@ -63,6 +59,7 @@ export type GameProgress = {
     title: Progress
     bestComboType: SequenceType
     bestComboCount: number
+    bestComboUsedVinyls: number[]
     displayText: string
 }
 
@@ -83,27 +80,33 @@ export class DJPuzzle {
         this.selected = {}
         this.vinyls = []
         this.reset()
-        this.progress.bestComboType = 'color'
     }
 
     addVinylByIndex(index: number) {
         if (this.queue[0] === index) return
+        // Add the vinyl to the front of the queue
+        this.queue.unshift(index)
 
+        // Update progress state
         const { color, artist, title } = this.vinyls[index]
         const colorIndex = SOLUTION_COLOR.indexOf(color)
         const artistIndex = SOLUTION_ARTIST.indexOf(artist)
         const titleIndex = SOLUTION_TITLE.indexOf(title)
-        // TODO: Color also needs to start at 0
-        if (colorIndex === this.progress.color.currentIndex + 1) {
+        // Update color
+        if (!this.progress.color.solved && colorIndex === this.progress.color.currentIndex + 1) {
             this.progress.color.correctCount++
             if (this.progress.color.correctCount === SOLUTION_COLOR.length) this.progress.color.solved = true
             this.progress.color.currentIndex = colorIndex
         } else {
-            this.progress.color.currentIndex = -1 // Force them to put 0 first
             this.progress.color.correctCount = 0
+            this.progress.color.currentIndex = -1 // Force them to put 0 first
         }
 
-        if (artistIndex === (this.progress.artist.currentIndex + 1) % SOLUTION_ARTIST.length) {
+        // Update artist
+        if (
+            !this.progress.artist.solved &&
+            artistIndex === (this.progress.artist.currentIndex + 1) % SOLUTION_ARTIST.length
+        ) {
             this.progress.artist.correctCount++
             if (this.progress.artist.correctCount === SOLUTION_ARTIST.length) this.progress.artist.solved = true
         } else {
@@ -111,7 +114,11 @@ export class DJPuzzle {
         }
         this.progress.artist.currentIndex = artistIndex
 
-        if (titleIndex === (this.progress.title.currentIndex + 1) % SOLUTION_TITLE.length) {
+        // Update title
+        if (
+            !this.progress.title.solved &&
+            titleIndex === (this.progress.title.currentIndex + 1) % SOLUTION_TITLE.length
+        ) {
             this.progress.title.correctCount++
             if (this.progress.title.correctCount === SOLUTION_TITLE.length) this.progress.title.solved = true
         } else {
@@ -119,30 +126,30 @@ export class DJPuzzle {
         }
         this.progress.title.currentIndex = titleIndex
 
+        // Update best combo
         const newBestComboCount = Math.max(
             this.progress.color.correctCount,
             this.progress.artist.correctCount,
             this.progress.title.correctCount,
         )
         if (this.progress.bestComboCount < 6 && newBestComboCount < this.progress.bestComboCount) {
-            Events.Instance.emit('comboBroken')
+            Events.Instance.emit('comboBroken', true)
+        } else {
+            Events.Instance.emit('comboBroken', false)
         }
         this.progress.bestComboCount = newBestComboCount
         this.progress.bestComboType =
-            this.progress.color.correctCount === this.progress.bestComboCount
+            this.progress.color.correctCount === this.progress.bestComboCount && !this.progress.color.solved
                 ? 'color'
-                : this.progress.artist.correctCount === this.progress.bestComboCount
+                : this.progress.artist.correctCount === this.progress.bestComboCount && !this.progress.artist.solved
                   ? 'artist'
                   : 'title'
 
-        this.queue.unshift(index)
+        this.progress.bestComboUsedVinyls = this.queue.slice(0, this.progress.bestComboCount)
+
         this.progress.displayText = this.getDisplayText()
         Events.Instance.emit('progress', this.progress)
         if (import.meta.env.DEV) Events.Instance.emit('debug', JSON.stringify(this.progress))
-    }
-
-    getVinylInQueue(index: number) {
-        return this.vinyls[this.queue[index]]
     }
 
     isSolved(comboType?: 'color' | 'artist' | 'title') {
@@ -152,17 +159,34 @@ export class DJPuzzle {
     }
 
     getDisplayText() {
-        let result = ''
-
         const { currentIndex, correctCount, solved } = this.progress[this.progress.bestComboType]
         const solution = TYPE_SOLUTIONS[this.progress.bestComboType]
+        let sequence = this.queue
+            .slice(0, correctCount)
+            .reverse()
+            .map((index) => this.vinyls[index][this.progress.bestComboType])
+
+        if (correctCount === 0) return 'Select a record to play → → → → →'
         for (let i = 0; i < correctCount; i++) {
             let index = currentIndex - i
             if (index < 0) index += solution.length
-            result = `${solution[index]}→${result}`
-        }
 
-        return result
+            // sequence.unshift(solution[index])
+        }
+        if (this.progress.color.solved && this.progress.artist.solved && this.progress.title.solved) {
+            return '🎉 Game Over 🎉'
+        }
+        if (
+            this.progress.color.correctCount === 6 ||
+            this.progress.artist.correctCount === 6 ||
+            this.progress.title.correctCount === 6
+        ) {
+            return '🎉 Sequence Complete 🎉'
+        }
+        if (sequence.length === 1) {
+            return `What follows ${this.vinyls[this.queue[0]][this.progress.bestComboType]} best? → → → → →`
+        }
+        return sequence.join('→')
     }
 
     reset() {
@@ -187,6 +211,8 @@ export class DJPuzzle {
             },
             bestComboType: 'color',
             bestComboCount: 0,
+            bestComboUsedVinyls: [],
+            displayText: 'Select a record to play → → → → →',
         }
         this.vinyls = SOLUTION_COLOR.map((color, index) => {
             return {

@@ -28,3 +28,22 @@ export const NEON_BROWN = '#39013a'
 
 export const CAT_BLACK = '#333333'
 export const CAT_GREY = '#888888'
+
+export const BB_DEFAULT_PALETTE = {
+    'Light Blue': '#9999ff', //light blue
+    Yellow: '#fffb00', //yellow
+    Orange: '#ff7300', //orange
+    Red: '#ff0000', //red
+    Purple: '#c300ff', // purple
+    Blue: '#0000ff', // blue
+    Green: '#00ff00', //green
+    Lime: '#b0ffb0', // lime green
+    Pink: '#ff00ff', //pink
+    Silver: '#d3d3d3', //silver
+}
+
+export const TYPE_COLORS = {
+    color: RED,
+    artist: GREEN,
+    title: BLUE,
+}
