@@ -14,9 +14,13 @@ import { BLACK, CAT_GREY, NEON_BLUE, RED, WHITE } from './scripts/Colors'
 import { InteractiveObject3D } from './types'
 import { Splash } from './models/Splash'
 import { sleep, DEBUG, Intro } from './scripts/Utils'
+import { TextMaterial } from './scripts/TextureUtils'
 
+const LOCALSTORAGE_KEY = 'boldbigflank-al13ycat'
 const CLOCK = new THREE.Clock()
 let beat = 0
+let fishCount = 0
+let maxFishCount = 0
 
 let camera: THREE.Camera | undefined,
     scene: THREE.Scene | undefined,
@@ -32,6 +36,7 @@ const END_POSITION = new THREE.Vector3(0, 5, 0)
 const c = new THREE.Color()
 
 const initGame = async () => {
+    maxFishCount = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY) || '{}').maxFishCount || 0
     // Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setPixelRatio(window.devicePixelRatio)
@@ -74,9 +79,11 @@ const initGame = async () => {
 
     const arenaMesh = Arena(renderer)
     scene.add(arenaMesh)
-    const tableA = arenaMesh.getObjectByName('tableA')
+    const table = arenaMesh.getObjectByName('table')
 
     const pad = arenaMesh.getObjectByName('pad')
+    const fishProgress = arenaMesh.getObjectByName('fish')
+    fishProgress.material = TextMaterial(['', '💥🐟'], { ratio: 1.5 })
 
     const fishSwirl = FishSwirl()
     fishSwirl.position.set(0, 0, -10)
@@ -130,19 +137,19 @@ const initGame = async () => {
             pad.material.emissive.setStyle(BLACK)
             const tableDistance = mesh
                 .getWorldPosition(new THREE.Vector3())
-                .distanceTo(tableA.getWorldPosition(new THREE.Vector3()))
+                .distanceTo(table.getWorldPosition(new THREE.Vector3()))
             if (tableDistance < 0.3) {
                 // Move the selected vinyl to the table
                 djPuzzle.addVinylByIndex(mesh.userData.recordIndex)
                 delete djPuzzle.selected[controller.id]
                 controller.userData.selected = undefined
-                tableA.children.forEach((child: THREE.Object3D) => {
+                table.children.forEach((child: THREE.Object3D) => {
                     if (child.userData.returnToOriginalPosition) {
                         child.userData.returnToOriginalPosition()
                     }
                 })
                 // Move any other meshes
-                tableA.attach(mesh)
+                table.attach(mesh)
                 AnimationFactory.Instance.animateTransform({
                     mesh,
                     end: {
@@ -197,7 +204,7 @@ const initGame = async () => {
     Events.Instance.on('comboBroken', (isComboBroken: boolean) => {
         isComboBroken ? RecordSFX() : CorrectSFX()
         if (!isComboBroken) {
-            Events.Instance.emit('splash', tableA?.getWorldPosition(new THREE.Vector3()))
+            Events.Instance.emit('splash', table?.getWorldPosition(new THREE.Vector3()))
         }
     })
 
@@ -216,6 +223,18 @@ const initGame = async () => {
         if (!djPuzzle.isSolved()) return
         xrMoveToLocation(END_POSITION)
         END_POSITION.set(0, 0, 0)
+    })
+
+    // Fish Game Events
+    Events.Instance.on('fishJuggled', (count: number) => {
+        fishCount = count > 0 ? fishCount + 1 : 0
+        maxFishCount = Math.max(maxFishCount, fishCount)
+        localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify({ maxFishCount }))
+        // juggles
+        fishProgress.material = TextMaterial(['', '💥🐟', '', `JUGGLES: ${fishCount}`, '', `BEST: ${maxFishCount}`], {
+            ratio: 1.5,
+            color: WHITE,
+        })
     })
 
     Song3()

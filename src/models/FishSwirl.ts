@@ -15,7 +15,7 @@ import {
     NEON_YELLOW,
 } from '../scripts/Colors'
 import { InteractiveObject3D } from '../types'
-import { SolvedSFX } from '../audio/music'
+import { PickupSFX, SolvedSFX } from '../audio/music'
 
 const FISH_PALETTES = [
     {
@@ -48,9 +48,12 @@ export const FishSwirl = (): THREE.Group => {
         const clone = mesh.clone(true)
         clone.userData.velocity = new THREE.Vector3(0, 5 + 3 * Math.random(), -5)
         clone.userData.isPickable = true
+        clone.userData.shot = 0
         clone.onPointerPick = (controller) => {
-            SolvedSFX()
+            PickupSFX()
             Events.Instance.emit('splash', clone.getWorldPosition(new THREE.Vector3()))
+            Events.Instance.emit('fishJuggled', 1)
+            clone.userData.shot += 1
             clone.userData.velocity.set(0, 10, 0)
         }
         clone.position.set(Math.random() * 10 - 5, 0, 0)
@@ -66,6 +69,11 @@ export const FishSwirl = (): THREE.Group => {
             fish.position.addScaledVector(fish.userData.velocity, dt)
             if (fish.position.y < -2) {
                 // Reset, go again
+                if (fish.userData.shot > 0) {
+                    SolvedSFX()
+                    Events.Instance.emit('fishJuggled', -1)
+                }
+                fish.userData.shot = 0
 
                 // Turn to center
                 // Get direction to center (0,0,0) from fish's current position

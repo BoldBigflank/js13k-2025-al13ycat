@@ -11,7 +11,7 @@ import { Progress } from './Progress'
 import { Runner } from './Runner'
 import { BLUE, CAT_BLACK, CAT_GREY, DARK_GREY, GREY, LIGHT_GREY, WALL_GREEN } from '../scripts/Colors'
 
-export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
+export const Arena = (renderer: THREE.WebGLRenderer): THREE.Object3D => {
     // Main arena
     const mesh = createModel(arenaModel(), {
         palette: {
@@ -20,6 +20,7 @@ export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
             Orange: GREY,
             Red: DARK_GREY, // Dance floor
             'Light Blue': BLUE, // Records/Turntable
+            // Lime: DARK_GREY, // Fish progress
         },
     }) as THREE.Object3D
 
@@ -28,10 +29,10 @@ export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
     mesh.add(progress)
     progress.position.set(-0.1, 0.9, -0.7)
 
-    // Tuna (100bytes)
-    const tuna = Tuna()
-    mesh.add(tuna)
-    tuna.position.set(-0.4, 1.0, -0.3)
+    // // Tuna (100bytes)
+    // const tuna = Tuna()
+    // mesh.add(tuna)
+    // tuna.position.set(-0.4, 1.0, -0.3)
 
     // Crowd
     const crowd = Crowd(renderer)

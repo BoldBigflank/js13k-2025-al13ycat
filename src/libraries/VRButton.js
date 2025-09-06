@@ -58,7 +58,6 @@ class VRButton {
       return button;
     } else {
       const message = document.createElement("a");
-      message.href = "https://immersiveweb.dev/";
       message.innerHTML = "WEBXR NOT AVAILABLE";
       message.className = "webxr-message";
       return message;
