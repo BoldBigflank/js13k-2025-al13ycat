@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { Events } from '../libraries/Events'
 import { initCanvas } from '../scripts/Utils'
+import { DebugEvent } from '../types'
 
 export const DebugScreen = (): THREE.Object3D => {
     const result = new THREE.Group()
@@ -34,7 +35,7 @@ export const DebugScreen = (): THREE.Object3D => {
         })
         texture.needsUpdate = true
     }
-    Events.Instance.on('debug', (message: string = '') => {
+    Events.Instance.on(DebugEvent, (message: string = '') => {
         if (typeof message !== 'string') return
         console.log(message)
         lines.unshift(message)

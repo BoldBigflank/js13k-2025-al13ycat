@@ -2,6 +2,12 @@ import * as THREE from 'three'
 
 const clock = new THREE.Clock()
 
+export const LocalStorageKey = 'AL13YCAT'
+
+// Three functions to shorten
+export const d2r = THREE.MathUtils.degToRad
+export const randF = THREE.MathUtils.randFloatSpread
+
 export const Intro = [
     'You are a cat DJ creating purrfect setlists.',
     'The vinyl you choose to play after the previous one',

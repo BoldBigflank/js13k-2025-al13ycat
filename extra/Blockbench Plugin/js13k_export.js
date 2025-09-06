@@ -29,7 +29,7 @@ Plugin.register('js13k_export', {
             export_action: button,
             compile() {
                 const convertPyramid = (pyramid) => {
-                    const name = pyramid.name.replace('pyramid_', '') || 'pyramid'
+                    const name = pyramid.name.split('_')[2] || ''
                     const width = roundHundredth(
                         pyramid.mesh.geometry.boundingBox.max.x - pyramid.mesh.geometry.boundingBox.min.x,
                     )
@@ -46,7 +46,7 @@ Plugin.register('js13k_export', {
                     return `py,${name},${roundHundredth(width)},${roundHundredth(height)},${roundHundredth(depth)},${roundHundredth(x)},${roundHundredth(y)},${roundHundredth(z)},${roundWhole(rX)},${roundWhole(rY)},${roundWhole(rZ)},${roundHundredth(oX)},${roundHundredth(oY)},${roundHundredth(oZ)},${color}`
                 }
                 const convertCylinder = (cylinder) => {
-                    const name = cylinder.name.replace('cylinder_', '') || 'cylinder'
+                    const name = cylinder.name.split('_')[2] || ''
                     const width = roundHundredth(
                         cylinder.mesh.geometry.boundingBox.max.x - cylinder.mesh.geometry.boundingBox.min.x,
                     )
@@ -63,7 +63,7 @@ Plugin.register('js13k_export', {
                     return `cy,${name},${width},${height},${depth},${roundHundredth(x)},${roundHundredth(y)},${roundHundredth(z)},${roundWhole(rX)},${roundWhole(rY)},${roundWhole(rZ)},${roundHundredth(oX)},${roundHundredth(oY)},${roundHundredth(oZ)},${color}`
                 }
                 const convertPlane = (plane) => {
-                    const name = plane.name.replace('plane_', '') || 'plane'
+                    const name = plane.name.split('_')[2] || ''
                     const width = plane.mesh.geometry.boundingBox.max.x - plane.mesh.geometry.boundingBox.min.x
                     const height = plane.mesh.geometry.boundingBox.max.z - plane.mesh.geometry.boundingBox.min.z
                     const depth = 0
@@ -76,7 +76,7 @@ Plugin.register('js13k_export', {
                 }
 
                 const convertSphere = (sphere) => {
-                    const name = sphere.name.replace('sphere_', '') || 'sphere'
+                    const name = sphere.name.split('_')[2] || ''
                     // position
                     const [x, y, z] = sphere.position
                     const { x: x0, y: y0, z: z0 } = sphere.mesh.geometry.boundingBox.min
@@ -103,7 +103,7 @@ Plugin.register('js13k_export', {
                 }
 
                 const convertCube = (cube) => {
-                    const name = cube.name.replace('cube_', '') || 'cube'
+                    const name = cube.name.split('_')[2] || ''
                     // size
                     const width = roundHundredth(cube.to[0] - cube.from[0])
                     const height = roundHundredth(cube.to[1] - cube.from[1])

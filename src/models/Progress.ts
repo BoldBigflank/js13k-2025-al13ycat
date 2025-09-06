@@ -18,7 +18,7 @@ export const Progress = (): THREE.Object3D => {
     }) as THREE.Object3D
     mesh.scale.set(0.1, 0.1, 0.1)
 
-    Events.Instance.on('progress', (progress: GameProgress) => {
+    Events.Instance.on(ProgressEvent, (progress: GameProgress) => {
         // The label
         const display = mesh.getObjectByName('display')
         // 11.8 by 0.8
@@ -32,7 +32,7 @@ export const Progress = (): THREE.Object3D => {
         // The lights
         SequenceTypes.forEach((type: SequenceType) => {
             for (let i = 0; i < 6; i++) {
-                const progressMesh = mesh.getObjectByName(`progress-${type}-${i}`)
+                const progressMesh = mesh.getObjectByName(`p-${type}-${i}`)
                 if (!progressMesh) continue
 
                 let color = CAT_BLACK

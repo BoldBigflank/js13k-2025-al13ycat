@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 
-import { floatVal } from './Utils'
+import { floatVal, d2r } from './Utils'
 import { BB_DEFAULT_PALETTE } from './Colors'
 
 type Model = (string | string[])[]
@@ -29,9 +29,9 @@ const parsePyramidGeometry = (item: string): THREE.BufferGeometry => {
     geometry.scale(1, 1, depthNum / widthNum)
     // Three origin is midpoint, Blockbench origin is center of mass (lower 3 vs 1.2)
     geometry.translate(xNum - oXNum, yNum - oYNum + 0.3 * heightNum, zNum - oZNum)
-    geometry.rotateX(THREE.MathUtils.degToRad(rXNum))
-    geometry.rotateY(THREE.MathUtils.degToRad(rYNum))
-    geometry.rotateZ(THREE.MathUtils.degToRad(rZNum))
+    geometry.rotateX(d2r(rXNum))
+    geometry.rotateY(d2r(rYNum))
+    geometry.rotateZ(d2r(rZNum))
     return geometry
 }
 
@@ -52,9 +52,9 @@ const parseCubeGeometry = (item: string): THREE.BufferGeometry => {
 
     const geometry = new THREE.BoxGeometry(widthNum, heightNum, depthNum)
     geometry.translate(xNum - oXNum, yNum - oYNum, zNum - oZNum)
-    geometry.rotateX(THREE.MathUtils.degToRad(rXNum))
-    geometry.rotateY(THREE.MathUtils.degToRad(rYNum))
-    geometry.rotateZ(THREE.MathUtils.degToRad(rZNum))
+    geometry.rotateX(d2r(rXNum))
+    geometry.rotateY(d2r(rYNum))
+    geometry.rotateZ(d2r(rZNum))
 
     geometry.computeBoundingBox()
     return geometry
@@ -78,9 +78,9 @@ const parseSphereGeometry = (item: string): THREE.BufferGeometry => {
     const geometry = new THREE.SphereGeometry(widthNum / 2, 32, 16)
     geometry.scale(widthNum / widthNum, heightNum / widthNum, depthNum / widthNum)
     geometry.translate(xNum - oXNum, yNum - oYNum, zNum - oZNum)
-    geometry.rotateX(THREE.MathUtils.degToRad(rXNum))
-    geometry.rotateY(THREE.MathUtils.degToRad(rYNum))
-    geometry.rotateZ(THREE.MathUtils.degToRad(rZNum))
+    geometry.rotateX(d2r(rXNum))
+    geometry.rotateY(d2r(rYNum))
+    geometry.rotateZ(d2r(rZNum))
     return geometry
 }
 
@@ -100,11 +100,11 @@ const parsePlaneGeometry = (item: string): THREE.BufferGeometry => {
 
     const geometry = new THREE.PlaneGeometry(widthNum, heightNum)
     // Three planes are upright, Blockbench planes are horizontal
-    geometry.rotateX(THREE.MathUtils.degToRad(-90))
+    geometry.rotateX(d2r(-90))
     geometry.translate(xNum - oXNum, yNum - oYNum, zNum - oZNum)
-    geometry.rotateX(THREE.MathUtils.degToRad(rXNum))
-    geometry.rotateY(THREE.MathUtils.degToRad(rYNum))
-    geometry.rotateZ(THREE.MathUtils.degToRad(rZNum))
+    geometry.rotateX(d2r(rXNum))
+    geometry.rotateY(d2r(rYNum))
+    geometry.rotateZ(d2r(rZNum))
     geometry.computeBoundingBox()
     return geometry
 }
@@ -128,9 +128,9 @@ const parseCylinderGeometry = (item: string): THREE.BufferGeometry => {
     const geometry = new THREE.CylinderGeometry(radius, radius, heightNum, 32)
     geometry.translate(xNum - oXNum, yNum - oYNum, zNum - oZNum)
     geometry.scale(1, 1, depthNum / widthNum)
-    const qX = THREE.MathUtils.degToRad(rXNum)
-    const qY = THREE.MathUtils.degToRad(rYNum)
-    const qZ = THREE.MathUtils.degToRad(rZNum)
+    const qX = d2r(rXNum)
+    const qY = d2r(rYNum)
+    const qZ = d2r(rZNum)
     const rotEuler = new THREE.Euler(qX, qY, qZ)
     geometry.applyQuaternion(new THREE.Quaternion().setFromEuler(rotEuler))
     geometry.computeBoundingBox()
@@ -186,7 +186,7 @@ export const createModel = (modelArray: Model, opts: CreateModelOpts): THREE.Gro
 
             const geometry = parseGeometry(item)
 
-            let material: THREE.Material | null = new THREE.MeshStandardMaterial({
+            let material: THREE.MeshStandardMaterial | null = new THREE.MeshStandardMaterial({
                 color: modelPalette[BB_PALETTE_KEYS[color] as keyof typeof modelPalette],
                 side: THREE.DoubleSide,
             }) // TODO: use color

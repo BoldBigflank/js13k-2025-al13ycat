@@ -1,4 +1,5 @@
 import { Events } from '../libraries/Events'
+import { ComboBrokenEvent, DebugEvent } from '../types'
 import { BLUE, GREEN, ORANGE, RED, VIOLET, YELLOW } from './Colors'
 
 export const SOLUTION_COLOR_HEX = [RED, ORANGE, YELLOW, GREEN, BLUE, VIOLET]
@@ -133,9 +134,9 @@ export class DJPuzzle {
             this.progress.title.correctCount,
         )
         if (this.progress.bestComboCount < 6 && newBestComboCount < this.progress.bestComboCount) {
-            Events.Instance.emit('comboBroken', true)
+            Events.Instance.emit(ComboBrokenEvent, true)
         } else {
-            Events.Instance.emit('comboBroken', false)
+            Events.Instance.emit(ComboBrokenEvent, false)
         }
         this.progress.bestComboCount = newBestComboCount
         this.progress.bestComboType =
@@ -148,8 +149,8 @@ export class DJPuzzle {
         this.progress.bestComboUsedVinyls = this.queue.slice(0, this.progress.bestComboCount)
 
         this.progress.displayText = this.getDisplayText()
-        Events.Instance.emit('progress', this.progress)
-        if (import.meta.env.DEV) Events.Instance.emit('debug', JSON.stringify(this.progress))
+        Events.Instance.emit(ProgressEvent, this.progress)
+        if (import.meta.env.DEV) Events.Instance.emit(DebugEvent, JSON.stringify(this.progress))
     }
 
     isSolved(comboType?: 'color' | 'artist' | 'title') {
@@ -236,7 +237,7 @@ export class DJPuzzle {
             this.vinyls[correctPosition].title = SOLUTION_TITLE[index]
         })
 
-        Events.Instance.emit('progress', this.progress)
+        Events.Instance.emit(ProgressEvent, this.progress)
     }
 }
 

@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { Events } from '../libraries/Events'
 import { TextMaterial } from '../scripts/TextureUtils'
 import { randomUnitCirclePoint } from '../scripts/Utils'
+import { SplashEvent, TickEvent } from '../types'
 
 export const Splash = () => {
     const parent = new THREE.Group()
@@ -29,7 +30,7 @@ export const Splash = () => {
         seeds.push(maxTTL - Math.random() * (maxTTL - minTTL))
     }
 
-    Events.Instance.on('splash', (pos: THREE.Vector3) => {
+    Events.Instance.on(SplashEvent, (pos: THREE.Vector3) => {
         // Reset everything
         parent.position.copy(pos)
         for (let i = 0; i < count; i++) {
@@ -47,7 +48,7 @@ export const Splash = () => {
         ttl = 1.0
     })
 
-    Events.Instance.on('tick', (delta: number) => {
+    Events.Instance.on(TickEvent, (delta: number) => {
         ttl -= delta
         if (ttl < 0) {
             mesh.visible = false

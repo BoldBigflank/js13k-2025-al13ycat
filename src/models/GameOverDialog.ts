@@ -19,7 +19,7 @@ export const GameOverDialog = (): THREE.Object3D => {
     result.add(mesh)
     mesh.position.set(0, -5, 0)
 
-    Events.Instance.on('progress', (progress: GameProgress) => {
+    Events.Instance.on(ProgressEvent, (progress: GameProgress) => {
         if (progress.color.solved && progress.artist.solved && progress.title.solved) {
             mesh.userData.solved = true
             mesh.visible = true

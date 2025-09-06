@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { vectorFromRadians } from '../scripts/Utils'
 import { Events } from '../libraries/Events'
 import { BLUE, NEON_BLUE, RED, WHITE } from '../scripts/Colors'
+import { TickEvent } from '../types'
 
 // https://dustinpfister.github.io/2021/06/18/threejs-vector3-apply-euler/
 // https://threejs.org/examples/#webgl_instancing_dynamic
@@ -51,7 +52,7 @@ export const Sky = (): THREE.Group => {
 
     parent.add(mesh)
 
-    Events.Instance.on('tick', (dt: number) => {
+    Events.Instance.on(TickEvent, (dt: number) => {
         offset += dt
         // Color pulse
         for (let i = 0; i < pulses.length; i++) {
@@ -82,7 +83,7 @@ export const Sky = (): THREE.Group => {
         mesh.instanceMatrix.needsUpdate = true
         mesh.instanceColor.needsUpdate = true
     })
-    Events.Instance.on('progress', (progress) => {
+    Events.Instance.on(ProgressEvent, (progress) => {
         zAmp = progress.bestComboCount >= 6 ? 1 : 0
         pulses.push(0)
     })

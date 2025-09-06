@@ -59,7 +59,7 @@ class VRButton {
     } else {
       const message = document.createElement("a");
       message.innerHTML = "WEBXR NOT AVAILABLE";
-      message.className = "webxr-message";
+      message.className = "m";
       return message;
     }
   }

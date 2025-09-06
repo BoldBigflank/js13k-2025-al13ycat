@@ -13,8 +13,9 @@ import {
     TYPE_COLORS,
     YELLOW,
 } from './Colors.js'
-import { sample, waveHeight } from './Utils.js'
+import { randF, sample, waveHeight } from './Utils.js'
 import { GameProgress } from './DJPuzzle.js'
+import { TickEvent } from '../types.js'
 
 const CAT_COLORS = [
     {
@@ -91,11 +92,7 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
             if (Math.abs(positionOffset.x) >= 5) {
                 positionOffset.y += 5
             }
-            const jank = new THREE.Vector3(
-                THREE.MathUtils.randFloatSpread(0.3),
-                THREE.MathUtils.randFloatSpread(0.1),
-                THREE.MathUtils.randFloatSpread(0.3),
-            )
+            const jank = new THREE.Vector3(randF(0.3), randF(0.1), randF(0.3))
             positionOffset.add(jank)
 
             // Set up head instance
@@ -128,13 +125,13 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
         }
     }
 
-    Events.Instance.on('progress', (progress: GameProgress) => {
+    Events.Instance.on(ProgressEvent, (progress: GameProgress) => {
         shouldWave = progress.bestComboCount >= 3
         handsMaterial.emissive.set(progress.bestComboCount >= 4 ? TYPE_COLORS[progress.bestComboType] : BLACK)
         handsMaterial.emissiveIntensity = progress.bestComboCount >= 4 ? 0.8 : 0
     })
 
-    Events.Instance.on('tick', () => {
+    Events.Instance.on(TickEvent, () => {
         // Record the current pose
         const camera = renderer.xr?.getCamera()
         if (!camera) return
@@ -145,7 +142,7 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
         ;[0, 1].forEach((controllerIndex) => {
             const controller = renderer.xr?.getController(controllerIndex)
             if (controller) {
-                const pawMesh = controller.getObjectByName('paw')
+                const pawMesh = controller.getObjectByName('p')
                 if (pawMesh) {
                     pose.controllers.push(pawMesh.matrixWorld.clone())
                 }

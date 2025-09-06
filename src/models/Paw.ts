@@ -11,7 +11,7 @@ const DEFAULT_PALETTE = {
 
 export const Paw = (palette = {}): THREE.Object3D => {
     const parent = new THREE.Group()
-    parent.name = 'paw'
+    parent.name = 'p'
 
     const mesh = createModel(pawModel(), { palette: { ...DEFAULT_PALETTE, ...palette } }) as THREE.Object3D
     mesh.scale.set(0.03125, 0.03125, 0.03125)

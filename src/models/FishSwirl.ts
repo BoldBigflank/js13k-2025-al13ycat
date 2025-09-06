@@ -14,7 +14,7 @@ import {
     NEON_PURPLE,
     NEON_YELLOW,
 } from '../scripts/Colors'
-import { InteractiveObject3D } from '../types'
+import { FishJuggledEvent, InteractiveObject3D, SplashEvent, TickEvent } from '../types'
 import { PickupSFX, SolvedSFX } from '../audio/music'
 
 const FISH_PALETTES = [
@@ -51,8 +51,8 @@ export const FishSwirl = (): THREE.Group => {
         clone.userData.shot = 0
         clone.onPointerPick = (controller) => {
             PickupSFX()
-            Events.Instance.emit('splash', clone.getWorldPosition(new THREE.Vector3()))
-            Events.Instance.emit('fishJuggled', 1)
+            Events.Instance.emit(SplashEvent, clone.getWorldPosition(new THREE.Vector3()))
+            Events.Instance.emit(FishJuggledEvent, 1)
             clone.userData.shot += 1
             clone.userData.velocity.set(0, 10, 0)
         }
@@ -62,7 +62,7 @@ export const FishSwirl = (): THREE.Group => {
         clone.scale.set(0, 0, 0)
     }
 
-    Events.Instance.on('tick', (dt: number) => {
+    Events.Instance.on(TickEvent, (dt: number) => {
         fishPond.forEach((fish) => {
             // Update the velocity
             fish.userData.velocity.y -= 10 * dt
@@ -71,7 +71,7 @@ export const FishSwirl = (): THREE.Group => {
                 // Reset, go again
                 if (fish.userData.shot > 0) {
                     SolvedSFX()
-                    Events.Instance.emit('fishJuggled', -1)
+                    Events.Instance.emit(FishJuggledEvent, -1)
                 }
                 fish.userData.shot = 0
 
@@ -100,7 +100,7 @@ export const FishSwirl = (): THREE.Group => {
             fish.quaternion.copy(fishFaceQuaternion)
         })
     })
-    Events.Instance.on('progress', (progress: GameProgress) => {
+    Events.Instance.on(ProgressEvent, (progress: GameProgress) => {
         const showFish = progress.bestComboCount >= 5
         const shouldUpdate = showFish !== visible
         fishPond.forEach((fish) => {

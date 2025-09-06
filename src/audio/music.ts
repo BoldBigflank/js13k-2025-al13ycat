@@ -3,12 +3,13 @@ import CPlayer from '../libraries/player-small'
 
 import { zzfx } from '../libraries/zzfx'
 import { GameProgress } from '../scripts/DJPuzzle'
+import { DownbeatEvent, EventName } from '../types'
 import song from './song(4)'
 
 const audioContext = new AudioContext()
 let currentSequenceNumber = 0
 
-Events.Instance.on('progress', (progress: GameProgress) => {
+Events.Instance.on(ProgressEvent, (progress: GameProgress) => {
     // Map bestComboCount to sequence numbers (0-6)
     // bestComboCount can be 0-3, so we need to map it appropriately
     const rawCount = progress.bestComboCount || 0
@@ -84,7 +85,7 @@ export const Song3 = async (): Promise<Song3Controller> => {
 
         // Check for sequence changes periodically since looping buffers never end
         const checkInterval = setInterval(() => {
-            Events.Instance.emit('downbeat')
+            Events.Instance.emit(DownbeatEvent)
             if (currentSequenceNumber !== sequenceNumber) {
                 clearInterval(checkInterval)
                 playBuffer(currentSequenceNumber)

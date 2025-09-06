@@ -117,7 +117,7 @@ export const Vinyl = ({ color, artist, title }: VinylProps): THREE.Object3D => {
     highlightMaterial.emissiveIntensity = 1.0
     const highlightMesh = new THREE.Mesh(highlightGeometry, highlightMaterial)
     highlightMesh.visible = false
-    highlightMesh.name = 'highlight'
+    highlightMesh.name = 'h'
     result.add(highlightMesh)
 
     // Combo ring
@@ -125,7 +125,7 @@ export const Vinyl = ({ color, artist, title }: VinylProps): THREE.Object3D => {
     comboMesh.material = comboMesh.material.clone()
     result.add(comboMesh)
 
-    Events.Instance.on('progress', (progress: GameProgress) => {
+    Events.Instance.on(ProgressEvent, (progress: GameProgress) => {
         comboMesh.visible = progress.bestComboUsedVinyls.includes(result.userData.recordIndex)
         comboMesh.material.color.set(TYPE_COLORS[progress.bestComboType])
         comboMesh.material.needsUpdate = true

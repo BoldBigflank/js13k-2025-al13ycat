@@ -36,7 +36,6 @@ export const Arena = (renderer: THREE.WebGLRenderer): THREE.Object3D => {
 
     // Crowd
     const crowd = Crowd(renderer)
-    // mesh.getObjectByName('floor').add(crowd)
     mesh.add(crowd)
     crowd.position.set(0, -1, -10)
     crowd.rotation.set(0, Math.PI, 0) // Just turn it around

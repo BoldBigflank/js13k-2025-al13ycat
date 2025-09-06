@@ -43,7 +43,7 @@ export class Events {
    * @param event - Name of the event.
    * @param callback - Function that will be called when the event is emitted.
    */
-  public on(event: string, callback: Function): void {
+  public on(event: number, callback: Function): void {
     this.callbacks[event] = this.callbacks[event] || [];
     this.callbacks[event].push(callback);
   }
@@ -53,7 +53,7 @@ export class Events {
    * @param event - Name of the event.
    * @param callback - The function that was passed during registration.
    */
-  public off(event: string, callback: Function): void {
+  public off(event: number, callback: Function): void {
     this.callbacks[event] = (this.callbacks[event] || []).filter(
       (fn) => fn !== callback,
     );
@@ -64,7 +64,7 @@ export class Events {
    * @param event - Name of the event.
    * @param args - Comma separated list of arguments passed to all callbacks.
    */
-  public emit(event: string, ...args: any[]): void {
+  public emit(event: number, ...args: any[]): void {
     (this.callbacks[event] || []).forEach((fn) => fn(...args));
   }
 

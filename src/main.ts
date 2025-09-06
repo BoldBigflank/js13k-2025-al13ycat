@@ -11,12 +11,21 @@ import { Paw } from './models/Paw'
 import { FishSwirl } from './models/FishSwirl'
 import { Sky } from './models/Sky'
 import { BLACK, CAT_GREY, NEON_BLUE, RED, WHITE } from './scripts/Colors'
-import { InteractiveObject3D } from './types'
+import {
+    BeatEvent,
+    ComboBrokenEvent,
+    DebugEvent,
+    DownbeatEvent,
+    FishJuggledEvent,
+    InteractiveObject3D,
+    RoomGlowEvent,
+    SplashEvent,
+    TickEvent,
+} from './types'
 import { Splash } from './models/Splash'
-import { sleep, DEBUG, Intro } from './scripts/Utils'
+import { sleep, DEBUG, Intro, LocalStorageKey } from './scripts/Utils'
 import { TextMaterial } from './scripts/TextureUtils'
 
-const LOCALSTORAGE_KEY = 'boldbigflank-al13ycat'
 const CLOCK = new THREE.Clock()
 let beat = 0
 let fishCount = 0
@@ -25,7 +34,7 @@ let maxFishCount = 0
 let camera: THREE.Camera | undefined,
     scene: THREE.Scene | undefined,
     raycaster: THREE.Raycaster | undefined,
-    renderer: THREE.Renderer | undefined
+    renderer: THREE.WebGLRenderer | undefined
 let selectedController: THREE.Group | undefined
 let controller1: THREE.Group | undefined, controller2: THREE.Group | undefined
 const intersected: THREE.Object3D[] = []
@@ -36,7 +45,7 @@ const END_POSITION = new THREE.Vector3(0, 5, 0)
 const c = new THREE.Color()
 
 const initGame = async () => {
-    maxFishCount = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY) || '{}').maxFishCount || 0
+    maxFishCount = JSON.parse(localStorage.getItem(LocalStorageKey) || '{}').maxFishCount || 0
     // Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setPixelRatio(window.devicePixelRatio)
@@ -79,7 +88,6 @@ const initGame = async () => {
 
     const arenaMesh = Arena(renderer)
     scene.add(arenaMesh)
-    const table = arenaMesh.getObjectByName('table')
 
     const pad = arenaMesh.getObjectByName('pad')
     const fishProgress = arenaMesh.getObjectByName('fish')
@@ -113,7 +121,7 @@ const initGame = async () => {
             if (controller.userData.selected) return // Don't let it grab twice
             if (djPuzzle.isSolved()) return
             djPuzzle.selected[controller.id] = i
-            const target = controller.getObjectByName('target')
+            const target = controller.getObjectByName('t')
             if (target) {
                 AnimationFactory.Instance.cancelAnimation(mesh)
                 target.attach(mesh)
@@ -132,24 +140,24 @@ const initGame = async () => {
             }
         }
         mesh.onPointerDrop = (controller: THREE.Group) => {
-            // If it's near an open table mesh
+            // If it's near a pad mesh
             AnimationFactory.Instance.cancelAnimation(mesh, true)
             pad.material.emissive.setStyle(BLACK)
-            const tableDistance = mesh
+            const padDistance = mesh
                 .getWorldPosition(new THREE.Vector3())
-                .distanceTo(table.getWorldPosition(new THREE.Vector3()))
-            if (tableDistance < 0.3) {
-                // Move the selected vinyl to the table
+                .distanceTo(pad.getWorldPosition(new THREE.Vector3()))
+            if (padDistance < 0.3) {
+                // Move the selected vinyl to the pad
                 djPuzzle.addVinylByIndex(mesh.userData.recordIndex)
                 delete djPuzzle.selected[controller.id]
                 controller.userData.selected = undefined
-                table.children.forEach((child: THREE.Object3D) => {
+                pad.children.forEach((child: THREE.Object3D) => {
                     if (child.userData.returnToOriginalPosition) {
                         child.userData.returnToOriginalPosition()
                     }
                 })
                 // Move any other meshes
-                table.attach(mesh)
+                pad.attach(mesh)
                 AnimationFactory.Instance.animateTransform({
                     mesh,
                     end: {
@@ -201,40 +209,43 @@ const initGame = async () => {
     // Event listeners
     window.addEventListener('resize', onWindowResize, false)
 
-    Events.Instance.on('comboBroken', (isComboBroken: boolean) => {
+    Events.Instance.on(ComboBrokenEvent, (isComboBroken: boolean) => {
         isComboBroken ? RecordSFX() : CorrectSFX()
         if (!isComboBroken) {
-            Events.Instance.emit('splash', table?.getWorldPosition(new THREE.Vector3()))
+            Events.Instance.emit(SplashEvent, pad?.getWorldPosition(new THREE.Vector3()))
         }
     })
 
-    Events.Instance.on('roomGlow', (color: string) => {
+    Events.Instance.on(RoomGlowEvent, (color: string) => {
         c.setStyle(color)
         ambientLight.color.set(c.add(ambientLightBaseColor).multiplyScalar(0.5))
     })
 
-    Events.Instance.on('downbeat', () => {
+    Events.Instance.on(DownbeatEvent, () => {
         if (beat > 100) {
-            Events.Instance.emit('beat')
+            Events.Instance.emit(BeatEvent)
             beat = 0
         }
     })
-    Events.Instance.on('progress', () => {
+    Events.Instance.on(ProgressEvent, () => {
         if (!djPuzzle.isSolved()) return
         xrMoveToLocation(END_POSITION)
         END_POSITION.set(0, 0, 0)
     })
 
     // Fish Game Events
-    Events.Instance.on('fishJuggled', (count: number) => {
+    Events.Instance.on(FishJuggledEvent, (count: number) => {
         fishCount = count > 0 ? fishCount + 1 : 0
         maxFishCount = Math.max(maxFishCount, fishCount)
-        localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify({ maxFishCount }))
+        localStorage.setItem(LocalStorageKey, JSON.stringify({ maxFishCount }))
         // juggles
-        fishProgress.material = TextMaterial(['', '💥🐟', '', `JUGGLES: ${fishCount}`, '', `BEST: ${maxFishCount}`], {
-            ratio: 1.5,
-            color: WHITE,
-        })
+        fishProgress.material = TextMaterial(
+            ['', LocalStorageKey, '', `JUGGLES: ${fishCount}`, '', `BEST: ${maxFishCount}`],
+            {
+                ratio: 1.5,
+                color: WHITE,
+            },
+        )
     })
 
     Song3()
@@ -244,7 +255,7 @@ const initGame = async () => {
         const debugScreen = DebugScreen()
         debugScreen.position.set(0, 1, 5)
         debugScreen.rotation.set(0, Math.PI, 0)
-        if (DEBUG) Events.Instance.emit('debug', 'Hello🔒, world!')
+        if (DEBUG) Events.Instance.emit(DebugEvent, 'Hello🔒, world!')
         scene.add(debugScreen)
         // Color
         // djPuzzle.addVinylByIndex(0)
@@ -291,19 +302,19 @@ function xrMoveToLocation(position: THREE.Vector3) {
 function onControllerConnected(event) {
     const controller = event.target
     const handedness = event.data.handedness === 'left' ? -1 : 1
-    if (DEBUG) Events.Instance.emit('debug', `Hand: ${event.data.hand}`)
+    if (DEBUG) Events.Instance.emit(DebugEvent, `Hand: ${event.data.hand}`)
 
     // TODO: Move target to the controller's grip space
-    const targetMesh = controller.getObjectByName('target')
+    const targetMesh = controller.getObjectByName('t')
     if (!targetMesh) {
         const target = new THREE.Group()
-        target.name = 'target'
+        target.name = 't'
         target.rotation.set(0, 0, 0)
         target.position.set(-1 * handedness * 0.035, 0.05, -0.12)
         controller.add(target)
     }
 
-    let pawMesh = controller.getObjectByName('paw')
+    let pawMesh = controller.getObjectByName('p')
     if (!pawMesh) {
         pawMesh = Paw()
         pawMesh.position.set(0, 0, 0.15)
@@ -311,7 +322,7 @@ function onControllerConnected(event) {
     }
 
     // line
-    let line = controller.getObjectByName('line')
+    let line = controller.getObjectByName('l')
     if (!line) {
         const geometry = new THREE.BufferGeometry().setFromPoints([
             new THREE.Vector3(0, 0, 0),
@@ -319,7 +330,7 @@ function onControllerConnected(event) {
         ])
         line = new THREE.Line(geometry)
         line.material.color.set(RED)
-        line.name = 'line'
+        line.name = 'l'
         line.scale.z = 5
 
         controller.add(line)
@@ -341,7 +352,7 @@ function onSelectStart(event) {
                     focusedObject.onPointerPick(selectedController)
                     collided = true
                     // hide the line
-                    const line = selectedController!.getObjectByName('line')
+                    const line = selectedController!.getObjectByName('l')
                     if (line) line.visible = false
                     break
                 }
@@ -359,7 +370,7 @@ function onSelectEnd(event) {
     if (focusedObject?.onPointerDrop) {
         focusedObject.onPointerDrop(selectedController)
     }
-    const line = selectedController.getObjectByName('line')
+    const line = selectedController.getObjectByName('l')
     line.visible = true
 }
 
@@ -375,7 +386,7 @@ function intersectObjects(controller) {
     if (controller.userData.targetRayMode === 'screen') return
     // Do not highlight when already selected
     if (controller.userData.selected !== undefined) return
-    const line = controller.getObjectByName('line')
+    const line = controller.getObjectByName('l')
     const intersections = getIntersections(controller)
     if (line) line.scale.z = 5
     if (intersections.length > 0) {
@@ -386,7 +397,7 @@ function intersectObjects(controller) {
             let focusedObject = object
             while (focusedObject) {
                 if (focusedObject.userData.isPickable) {
-                    const highlight = focusedObject.getObjectByName('highlight')
+                    const highlight = focusedObject.getObjectByName('h')
                     if (highlight) highlight.visible = true
                     if (line) line.scale.z = distance
                     intersected.push(focusedObject)
@@ -402,7 +413,7 @@ function intersectObjects(controller) {
 function cleanIntersected() {
     while (intersected.length) {
         const object = intersected.pop()
-        const highlight = object.getObjectByName('highlight')
+        const highlight = object.getObjectByName('h')
         if (highlight) highlight.visible = false
     }
 }
@@ -411,11 +422,11 @@ function animate() {
     const d = CLOCK.getDelta()
     beat += d
     if (beat >= 0.5) {
-        Events.Instance.emit('beat')
+        Events.Instance.emit(BeatEvent)
         beat -= 0.5
     }
     AnimationFactory.Instance.update()
-    Events.Instance.emit('tick', d)
+    Events.Instance.emit(TickEvent, d)
     cleanIntersected()
 
     intersectObjects(controller1)
