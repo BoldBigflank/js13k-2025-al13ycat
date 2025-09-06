@@ -43,6 +43,10 @@ export const TextMaterial = (lines: string[], opts: TextOpts) => {
     const [canvas, ctx] = initCanvas(width, height)
 
     // TODO: Container fill
+    if (bgColor) {
+        ctx.fillStyle = bgColor
+        ctx.fillRect(0, 0, width, height)
+    }
 
     // The Text
     ctx.textAlign = textAlign || 'center'

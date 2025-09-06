@@ -835,7 +835,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"acorn@npm:^8.14.0, acorn@npm:^8.4.0":
+"acorn@npm:^8.14.0, acorn@npm:^8.15.0, acorn@npm:^8.4.0":
   version: 8.15.0
   resolution: "acorn@npm:8.15.0"
   bin:
@@ -3109,7 +3109,7 @@ __metadata:
   dependencies:
     "@types/three": "npm:^0"
     husky: "npm:^9.1.7"
-    l13: "npm:^0.0.10"
+    l13: "npm:^0.0.15"
     pinst: "npm:^3.0.0"
     prettier: "npm:3.6.2"
     roadroller: "npm:^2.1.0"
@@ -3149,9 +3149,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"l13@npm:^0.0.10":
-  version: 0.0.10
-  resolution: "l13@npm:0.0.10"
+"l13@npm:^0.0.15":
+  version: 0.0.15
+  resolution: "l13@npm:0.0.15"
   dependencies:
     7z-wasm: "npm:^1.2.0"
     clean-css: "npm:^5.3.3"
@@ -3163,6 +3163,7 @@ __metadata:
     inquirer: "npm:^12.9.3"
     minimatch: "npm:^10.0.3"
     roadroller: "npm:^2.1.0"
+    terser: "npm:^5.44.0"
     tiged: "npm:^2.12.7"
     vite: "npm:^7.1.2"
     vite-plugin-html: "npm:^3.2.2"
@@ -3170,7 +3171,7 @@ __metadata:
     js13k: dist/index.js
     l13: dist/index.js
     lab13: dist/index.js
-  checksum: 10c0/6c1660b0520ba055e033b072e33fab3d39966605feaf0d08e7b5ba6b6dff105bb7ceb6d7c95ca55febcd47658c156fc289092adc802cd3bab78f50c2e54fc8fa
+  checksum: 10c0/036a89218264c28e80959e1874ebe2d7c910b1f2cab2465be33e8ad44da4f1c79a67a433c1dfdbeb44c2cbfb8c4738e5eed93fa2c4afc8fae98b705a82e74b9b
   languageName: node
   linkType: hard
 
@@ -5001,6 +5002,20 @@ __metadata:
   bin:
     terser: bin/terser
   checksum: 10c0/9cd3fa09ea6bcb79eb71995216b8bef0651b18c5c3877535fc699a77e1ab43b140a4da5811ac9baeb654fa9ec939b17324092f0f0bdb19c402e101e3db946986
+  languageName: node
+  linkType: hard
+
+"terser@npm:^5.44.0":
+  version: 5.44.0
+  resolution: "terser@npm:5.44.0"
+  dependencies:
+    "@jridgewell/source-map": "npm:^0.3.3"
+    acorn: "npm:^8.15.0"
+    commander: "npm:^2.20.0"
+    source-map-support: "npm:~0.5.20"
+  bin:
+    terser: bin/terser
+  checksum: 10c0/f2838dc65ac2ac6a31c7233065364080de73cc363ecb8fe723a54f663b2fa9429abf08bc3920a6bea85c5c7c29908ffcf822baf1572574f8d3859a009bbf2327
   languageName: node
   linkType: hard
 

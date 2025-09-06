@@ -39,8 +39,7 @@ const FISH_SCALE = new THREE.Vector3(0.05, 0.05, 0.05)
 
 export const FishSwirl = (): THREE.Group => {
     const parent = new THREE.Group()
-    parent.name = 'FishSwirl'
-    const fishPond: THREE.Group[] = []
+    const fishPond: InteractiveObject3D[] = []
     let visible = true
 
     for (let i = 0; i < 10; i++) {
@@ -51,7 +50,8 @@ export const FishSwirl = (): THREE.Group => {
         clone.userData.isPickable = true
         clone.onPointerPick = (controller) => {
             SolvedSFX()
-            clone.userData.velocity.set(0, 20, 0)
+            Events.Instance.emit('splash', clone.getWorldPosition(new THREE.Vector3()))
+            clone.userData.velocity.set(0, 10, 0)
         }
         clone.position.set(Math.random() * 10 - 5, 0, 0)
         fishPond.push(clone)

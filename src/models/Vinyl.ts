@@ -122,7 +122,6 @@ export const Vinyl = ({ color, artist, title }: VinylProps): THREE.Object3D => {
 
     // Combo ring
     const comboMesh = highlightMesh.clone()
-    comboMesh.name = 'combo'
     comboMesh.material = comboMesh.material.clone()
     result.add(comboMesh)
 

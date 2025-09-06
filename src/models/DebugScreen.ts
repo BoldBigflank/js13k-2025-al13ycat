@@ -4,7 +4,6 @@ import { initCanvas } from '../scripts/Utils'
 
 export const DebugScreen = (): THREE.Object3D => {
     const result = new THREE.Group()
-    result.name = 'debugScreen'
     result.renderOrder = 1
     const lines: string[] = []
     const geometry = new THREE.PlaneGeometry(5, 5)

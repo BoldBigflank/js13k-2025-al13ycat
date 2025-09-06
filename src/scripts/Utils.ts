@@ -2,6 +2,14 @@ import * as THREE from 'three'
 
 const clock = new THREE.Clock()
 
+export const Intro = [
+    'You are a cat DJ creating purrfect setlists.',
+    'The vinyl you choose to play after the previous one',
+    'will either build up your combo or break all progress.',
+    'Fill the meter to lock in a sequence.',
+    'Finish all three sequences to win!',
+]
+
 export const INCHES_TO_METERS_SCALE = 0.0254
 
 export const initCanvas = (width = 1024, height = 1024): [HTMLCanvasElement, CanvasRenderingContext2D] => {

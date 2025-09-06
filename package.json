@@ -11,7 +11,7 @@
     "devDependencies": {
         "@types/three": "^0",
         "husky": "^9.1.7",
-        "l13": "^0.0.10",
+        "l13": "^0.0.15",
         "pinst": "^3.0.0",
         "prettier": "3.6.2",
         "roadroller": "^2.1.0",

@@ -37,6 +37,9 @@ const CAT_COLORS = [
     },
 ]
 
+const MIN_POS = new THREE.Vector3(-1, 0, -1)
+const MAX_POS = new THREE.Vector3(1, 2, 1)
+
 type Pose = {
     camera?: THREE.Matrix4
     controllers: THREE.Matrix4[]
@@ -44,7 +47,6 @@ type Pose = {
 
 export const Crowd = (renderer: THREE.WebGLRenderer) => {
     const parent = new THREE.Group()
-    parent.name = 'Crowd'
     const dummy = new THREE.Object3D()
     let shouldWave = false
 
@@ -134,8 +136,8 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
 
     Events.Instance.on('tick', () => {
         // Record the current pose
-        if (!renderer.xr?.getCamera()) return
         const camera = renderer.xr?.getCamera()
+        if (!camera) return
         const pose: Pose = {
             controllers: [],
         }
@@ -171,7 +173,7 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
             // Update head instance
             dummy.matrix.copy(pose.camera)
             dummy.matrix.decompose(dummy.position, dummy.quaternion, dummy.scale)
-            dummy.position.add(data.positionOffset).add(catOffset)
+            dummy.position.clamp(MIN_POS, MAX_POS).add(data.positionOffset).add(catOffset)
             if (shouldWave && dummy.position.y < 4) {
                 dummy.position.y += waveHeight(dummy.position.x, dummy.position.z)
             }
@@ -183,7 +185,7 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
                 const handIndex = i * 2 + controllerIndex
                 dummy.matrix.copy(controller)
                 dummy.matrix.decompose(dummy.position, dummy.quaternion, dummy.scale)
-                dummy.position.add(data.positionOffset).add(catOffset)
+                dummy.position.clamp(MIN_POS, MAX_POS).add(data.positionOffset).add(catOffset)
                 // Position hands slightly offset from the head
                 dummy.position.add(new THREE.Vector3(controllerIndex === 0 ? -0.1 : 0.1, 0.2, -0.3))
                 if (shouldWave && dummy.position.y < 4) {

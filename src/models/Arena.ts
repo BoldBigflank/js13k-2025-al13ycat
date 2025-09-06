@@ -9,7 +9,7 @@ import { Grid } from './Grid'
 import { GameOverDialog } from './GameOverDialog'
 import { Progress } from './Progress'
 import { Runner } from './Runner'
-import { BLUE, DARK_GREY, GREY, LIGHT_GREY, WALL_GREEN } from '../scripts/Colors'
+import { BLUE, CAT_BLACK, CAT_GREY, DARK_GREY, GREY, LIGHT_GREY, WALL_GREEN } from '../scripts/Colors'
 
 export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
     // Main arena
@@ -35,22 +35,19 @@ export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
 
     // Crowd
     const crowd = Crowd(renderer)
-    crowd.name = 'Crowd'
     // mesh.getObjectByName('floor').add(crowd)
     mesh.add(crowd)
     crowd.position.set(0, -1, -10)
     crowd.rotation.set(0, Math.PI, 0) // Just turn it around
 
     // Cats (440 bytes)
-    const catMesh = createModel(catModel(), { palette: { Purple: '#333333', Silver: '#888888' } })
-    catMesh.name = 'catMesh'
+    const catMesh = createModel(catModel(), { palette: { Purple: CAT_BLACK, Silver: CAT_GREY } })
     catMesh.position.set(-3, 1, 0)
     catMesh.scale.set(0.1, 0.1, 0.1)
     catMesh.rotation.set(0, -Math.PI / 4, 0)
     mesh.attach(catMesh)
 
     const catMesh2 = catMesh.clone(true)
-    catMesh2.name = 'catMesh2'
     catMesh2.position.set(3, 1, 0)
     catMesh2.rotation.set(0, Math.PI / 4, 0)
     mesh.attach(catMesh2)
@@ -65,7 +62,7 @@ export const Arena = (renderer: THREE.renderer): THREE.Object3D => {
 
     const gameOverDialog = GameOverDialog()
     mesh.add(gameOverDialog)
-    gameOverDialog.position.set(0, 2, -1)
+    gameOverDialog.position.set(0, 6, -5)
 
     // MAke a Runner for all the pillars
     const runner = Runner(6)

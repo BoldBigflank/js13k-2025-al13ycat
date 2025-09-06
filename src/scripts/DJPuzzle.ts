@@ -153,8 +153,9 @@ export class DJPuzzle {
     }
 
     isSolved(comboType?: 'color' | 'artist' | 'title') {
-        if (!comboType) return
-        this.progress.color.solved && this.progress.artist.solved && this.progress.title.solved
+        if (!comboType) {
+            return this.progress.color.solved && this.progress.artist.solved && this.progress.title.solved
+        }
         return this.progress[comboType].solved
     }
 

@@ -2,7 +2,18 @@ import * as THREE from 'three'
 import { AnimationFactory } from '../scripts/AnimationFactory'
 import { createModel } from '../scripts/ModelLoader'
 import { cassetteModel } from './exported/cassette'
-import { BLUE, LIGHT_GREY, NEON_BROWN, NEON_ORANGE, NEON_RED, NEON_YELLOW } from '../scripts/Colors'
+import {
+    BLACK,
+    BLUE,
+    LIGHT_GREY,
+    NEON_BROWN,
+    NEON_ORANGE,
+    NEON_PURPLE,
+    NEON_RED,
+    NEON_YELLOW,
+    WHITE,
+} from '../scripts/Colors'
+import { TextMaterial } from '../scripts/TextureUtils'
 
 export const Cassette = (): THREE.Object3D => {
     const mesh = createModel(cassetteModel(), {
@@ -16,6 +27,8 @@ export const Cassette = (): THREE.Object3D => {
         },
         glow: true,
     }) as THREE.Object3D
+    const label = mesh.getObjectByName('label')
+    label!.material = TextMaterial(['AL13YCAT'], { color: BLACK, fontSize: 224, ratio: 4, bgColor: NEON_PURPLE })
     AnimationFactory.Instance.animateTransform({
         mesh: mesh,
         end: {

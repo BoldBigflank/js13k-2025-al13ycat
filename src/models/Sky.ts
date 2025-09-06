@@ -7,7 +7,6 @@ import { BLUE, NEON_BLUE, RED, WHITE } from '../scripts/Colors'
 // https://threejs.org/examples/#webgl_instancing_dynamic
 export const Sky = (): THREE.Group => {
     const parent = new THREE.Group()
-    parent.name = 'Sky'
     const dummy = new THREE.Object3D()
     const size = 30
     const speed = 0.05

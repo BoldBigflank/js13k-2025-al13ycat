@@ -14,7 +14,6 @@ export class Grid {
     constructor() {
         this.shouldShow = false
         this.parent = new THREE.Group()
-        this.parent.name = 'Grid'
         this.geometry = new THREE.PlaneGeometry(20, 29, 20, 29)
         this.geometry.rotateX(Math.PI / 2)
         this._mesh = new THREE.Mesh(

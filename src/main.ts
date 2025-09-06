@@ -10,15 +10,13 @@ import { Arena } from './models/Arena'
 import { Paw } from './models/Paw'
 import { FishSwirl } from './models/FishSwirl'
 import { Sky } from './models/Sky'
-import { BLACK, NEON_BLUE, RED } from './scripts/Colors'
+import { BLACK, CAT_GREY, NEON_BLUE, RED, WHITE } from './scripts/Colors'
 import { InteractiveObject3D } from './types'
 import { Splash } from './models/Splash'
-import { sleep } from './scripts/Utils'
+import { sleep, DEBUG, Intro } from './scripts/Utils'
 
 const CLOCK = new THREE.Clock()
 let beat = 0
-
-const DEBUG = import.meta.env.DEV
 
 let camera: THREE.Camera | undefined,
     scene: THREE.Scene | undefined,
@@ -30,6 +28,7 @@ const intersected: THREE.Object3D[] = []
 
 let baseReferenceSpace
 const START_POSITION = new THREE.Vector3(0, 0, 0.3)
+const END_POSITION = new THREE.Vector3(0, 5, 0)
 const c = new THREE.Color()
 
 const initGame = async () => {
@@ -37,7 +36,7 @@ const initGame = async () => {
     renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(window.innerWidth, window.innerHeight)
-    renderer.setClearColor('#000000')
+    renderer.setClearColor(BLACK)
     renderer.xr.addEventListener('sessionstart', onXRSessionStart)
     renderer.xr.enabled = true
     renderer.setAnimationLoop(animate)
@@ -52,17 +51,14 @@ const initGame = async () => {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
     camera.position.set(0, 2, 1)
     camera.rotation.set((-1 * Math.PI) / 12, 0, 0)
-    camera.name = 'camera'
     scene.add(camera)
     AnimationFactory.Instance.initScene(scene)
 
-    const ambientLightBaseColor = new THREE.Color().setStyle('#888888')
+    const ambientLightBaseColor = new THREE.Color().setStyle(CAT_GREY)
     const ambientLight = new THREE.AmbientLight(ambientLightBaseColor, 0.2)
-    ambientLight.name = 'ambientLight'
     scene.add(ambientLight)
-    const directionalLightBaseColor = new THREE.Color().setStyle('#ffffff')
+    const directionalLightBaseColor = new THREE.Color().setStyle(WHITE)
     const directionalLight = new THREE.DirectionalLight(directionalLightBaseColor, 0.3)
-    directionalLight.name = 'directionalLight'
     directionalLight.position.set(6, 10, 8)
     directionalLight.castShadow = true
     directionalLight.target.position.set(0, 0, 0)
@@ -88,7 +84,6 @@ const initGame = async () => {
 
     djPuzzle.vinyls.forEach((record, i) => {
         const mesh = Vinyl(record)
-        mesh.name = `vinyl-${i}`
         const originalPosition = new THREE.Vector3(0.7, 1.15, -0.2 - 0.125 * i)
         mesh.position.copy(originalPosition)
         mesh.userData.originalPosition = originalPosition
@@ -207,19 +202,23 @@ const initGame = async () => {
     })
 
     Events.Instance.on('roomGlow', (color: string) => {
-        const ambientLight = scene.getObjectByName('ambientLight') as THREE.AmbientLight
         c.setStyle(color)
         ambientLight.color.set(c.add(ambientLightBaseColor).multiplyScalar(0.5))
     })
 
-    Song3()
     Events.Instance.on('downbeat', () => {
         if (beat > 100) {
             Events.Instance.emit('beat')
             beat = 0
         }
     })
+    Events.Instance.on('progress', () => {
+        if (!djPuzzle.isSolved()) return
+        xrMoveToLocation(END_POSITION)
+        END_POSITION.set(0, 0, 0)
+    })
 
+    Song3()
     djPuzzle.reset()
 
     if (DEBUG) {
@@ -253,18 +252,21 @@ const initGame = async () => {
 }
 
 function onXRSessionStart() {
+    xrMoveToLocation(START_POSITION)
+}
+
+function xrMoveToLocation(position: THREE.Vector3) {
     baseReferenceSpace = renderer.xr.getReferenceSpace()
-    // Move to the dj station
     const offsetPosition = {
-        x: -1 * START_POSITION.x,
-        y: -1 * START_POSITION.y,
-        z: -1 * START_POSITION.z,
+        x: -1 * position.x,
+        y: -1 * position.y,
+        z: -1 * position.z,
         w: 1,
     }
     const offsetRotation = new THREE.Quaternion()
     const transform = new XRRigidTransform(offsetPosition, offsetRotation)
-    const teleportSpaceOffset = baseReferenceSpace.getOffsetReferenceSpace(transform)
-    renderer.xr.setReferenceSpace(teleportSpaceOffset)
+    baseReferenceSpace = baseReferenceSpace.getOffsetReferenceSpace(transform)
+    renderer.xr.setReferenceSpace(baseReferenceSpace)
 }
 
 function onControllerConnected(event) {
@@ -433,6 +435,9 @@ function setupButton() {
             document.getElementById('intro')!.style.display = 'none'
             document.getElementById('c')!.style.display = 'block'
         }
+    const intro = document.createElement('p')
+    intro.innerHTML = Intro.join('\n')
+    document.getElementById('intro')?.insertBefore(intro, p)
 }
 
 if (document.readyState === 'loading') {

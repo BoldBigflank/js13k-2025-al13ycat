@@ -5,7 +5,6 @@ import { AnimationFactory, sinusoidal } from '../scripts/AnimationFactory'
 
 export const Runner = (length: number): THREE.Group => {
     const parent = new THREE.Group()
-    parent.name = 'Runner'
     let colors = [RED, ORANGE, YELLOW, GREEN, BLUE, VIOLET]
     let functions = [
         (x, y) => x === 0 || y === 0,

@@ -6,7 +6,7 @@ export const BLUE = '#487de7'
 export const VIOLET = '#70369d'
 
 export const LIGHT_GREEN = '#1aff1a'
-export const DARK_GREEN = '#0a650a'
+export const DARK_GREEN = '#0a650a' // Unused
 export const WHITE = '#ffffff'
 export const MID_GREY = '#666666'
 export const BROWN = '#994f00'
@@ -23,7 +23,7 @@ export const NEON_ORANGE = '#ffcc00'
 export const NEON_YELLOW = '#f6ff00'
 export const NEON_GREEN = '#a6fd29'
 export const NEON_BLUE = '#8ea5ff'
-export const NEON_PURPLE = '#af3dff'
+export const NEON_PURPLE = '#200589'
 export const NEON_BROWN = '#39013a'
 
 export const CAT_BLACK = '#333333'
