@@ -2,13 +2,14 @@ import * as THREE from 'three'
 import { Events } from '../libraries/Events'
 import { GameProgress } from '../scripts/DJPuzzle'
 import { AnimationFactory, easeInOutCubic } from '../scripts/AnimationFactory'
-import { MAGENTA } from '../scripts/Colors'
+import { TYPE_COLORS } from '../scripts/Colors'
 import { waveHeight } from '../scripts/Utils'
 
 export class Grid {
     parent: THREE.Group
     _mesh: THREE.Object3D
     geometry: THREE.Geometry
+    material: THREE.Material
     shouldShow: boolean
 
     constructor() {
@@ -16,13 +17,11 @@ export class Grid {
         this.parent = new THREE.Group()
         this.geometry = new THREE.PlaneGeometry(20, 29, 20, 29)
         this.geometry.rotateX(Math.PI / 2)
-        this._mesh = new THREE.Mesh(
-            this.geometry,
-            new THREE.MeshBasicMaterial({
-                color: MAGENTA,
-                wireframe: true,
-            }),
-        )
+        this.material = new THREE.MeshStandardMaterial({
+            wireframe: true,
+        })
+        this.material.emissiveIntensity = 1
+        this._mesh = new THREE.Mesh(this.geometry, this.material)
         this.parent.add(this._mesh)
 
         Events.Instance.on('tick', (delta) => {
@@ -39,6 +38,7 @@ export class Grid {
             const visible = this._mesh.material.visible
             if (!visible && this.shouldShow) {
                 this._mesh.position.set(0, -5, 0)
+                this.material.emissive.set(TYPE_COLORS[progress.bestComboType])
                 AnimationFactory.Instance.animateTransform({
                     mesh: this._mesh,
                     end: {
