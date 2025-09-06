@@ -3,7 +3,7 @@ import CPlayer from '../libraries/player-small'
 
 import { zzfx } from '../libraries/zzfx'
 import { GameProgress } from '../scripts/DJPuzzle'
-import { DownbeatEvent, EventName } from '../types'
+import { DownbeatEvent } from '../types'
 import song from './song(4)'
 
 const audioContext = new AudioContext()

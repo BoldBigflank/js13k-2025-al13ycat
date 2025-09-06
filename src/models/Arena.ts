@@ -29,10 +29,10 @@ export const Arena = (renderer: THREE.WebGLRenderer): THREE.Object3D => {
     mesh.add(progress)
     progress.position.set(-0.1, 0.9, -0.7)
 
-    // // Tuna (100bytes)
-    // const tuna = Tuna()
-    // mesh.add(tuna)
-    // tuna.position.set(-0.4, 1.0, -0.3)
+    // Tuna (100bytes)
+    const tuna = Tuna()
+    mesh.add(tuna)
+    tuna.position.set(-0.8, 1.0, -0.2)
 
     // Crowd
     const crowd = Crowd(renderer)

@@ -161,7 +161,7 @@ const initGame = async () => {
                 AnimationFactory.Instance.animateTransform({
                     mesh,
                     end: {
-                        position: new THREE.Vector3(0, 0.01, 0),
+                        position: new THREE.Vector3(0, 0.02, 0),
                         rotation: new THREE.Euler((-1 * Math.PI) / 2, 0, 0),
                     },
                     duration: 60,
