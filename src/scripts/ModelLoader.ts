@@ -3,13 +3,30 @@ import * as THREE from 'three'
 import { floatVal, d2r } from './Utils'
 import { BB_DEFAULT_PALETTE } from './Colors'
 
-type Model = (string | string[])[]
+type CubeDef = [
+    string,
+    string, // type, name
+    number,
+    number,
+    number, // width, height, depth
+    number,
+    number,
+    number, // x, y, z
+    number,
+    number,
+    number, // rx, ry, rz
+    number,
+    number,
+    number, // ox, oy, oz
+    number, // color index
+]
+
+type Model = (CubeDef | CubeDef[])[]
 
 const BB_PALETTE_KEYS = ['Light Blue', 'Yellow', 'Orange', 'Red', 'Purple', 'Blue', 'Green', 'Lime', 'Pink', 'Silver']
 
-// Shared parse geometry functions
-const parsePyramidGeometry = (item: string): THREE.BufferGeometry => {
-    const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = item.split(',')
+const expandCubeDef = (item: CubeDef): CubeDef => {
+    const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = item
     // Pyramid width is one side, cylinder radius is the hypotenuse
     const widthNum = floatVal(width)
     const heightNum = floatVal(height)
@@ -17,120 +34,97 @@ const parsePyramidGeometry = (item: string): THREE.BufferGeometry => {
     const xNum = floatVal(x)
     const yNum = floatVal(y)
     const zNum = floatVal(z)
-    const oXNum = floatVal(oX)
-    const oYNum = floatVal(oY)
-    const oZNum = floatVal(oZ)
     const rXNum = floatVal(rX)
     const rYNum = floatVal(rY)
     const rZNum = floatVal(rZ)
+    const oXNum = floatVal(oX)
+    const oYNum = floatVal(oY)
+    const oZNum = floatVal(oZ)
+    const colorNum = floatVal(color)
+    return [
+        shape,
+        name,
+        widthNum,
+        heightNum,
+        depthNum,
+        xNum,
+        yNum,
+        zNum,
+        rXNum,
+        rYNum,
+        rZNum,
+        oXNum,
+        oYNum,
+        oZNum,
+        colorNum,
+    ]
+}
 
-    const radius = Math.sqrt(widthNum * widthNum + widthNum * widthNum) / 2
-    const geometry = new THREE.CylinderGeometry(0, radius, heightNum, 4, 1, false, Math.PI / 4)
-    geometry.scale(1, 1, depthNum / widthNum)
+// Shared parse geometry functions
+const parsePyramidGeometry = (item: CubeDef): THREE.BufferGeometry => {
+    const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = expandCubeDef(item)
+    // Pyramid width is one side, cylinder radius is the hypotenuse
+
+    const radius = Math.sqrt(width * width + width * width) / 2
+    const geometry = new THREE.CylinderGeometry(0, radius, height, 4, 1, false, Math.PI / 4)
+    geometry.scale(1, 1, depth / width)
     // Three origin is midpoint, Blockbench origin is center of mass (lower 3 vs 1.2)
-    geometry.translate(xNum - oXNum, yNum - oYNum + 0.3 * heightNum, zNum - oZNum)
-    geometry.rotateX(d2r(rXNum))
-    geometry.rotateY(d2r(rYNum))
-    geometry.rotateZ(d2r(rZNum))
+    geometry.translate(x - oX, y - oY + 0.3 * height, z - oZ)
+    geometry.rotateX(d2r(rX))
+    geometry.rotateY(d2r(rY))
+    geometry.rotateZ(d2r(rZ))
     return geometry
 }
 
-const parseCubeGeometry = (item: string): THREE.BufferGeometry => {
-    const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = item.split(',')
-    const widthNum = floatVal(width)
-    const heightNum = floatVal(height)
-    const depthNum = floatVal(depth)
-    const xNum = floatVal(x)
-    const yNum = floatVal(y)
-    const zNum = floatVal(z)
-    const oXNum = floatVal(oX)
-    const oYNum = floatVal(oY)
-    const oZNum = floatVal(oZ)
-    const rXNum = floatVal(rX)
-    const rYNum = floatVal(rY)
-    const rZNum = floatVal(rZ)
+const parseCubeGeometry = (item: CubeDef): THREE.BufferGeometry => {
+    const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = expandCubeDef(item)
 
-    const geometry = new THREE.BoxGeometry(widthNum, heightNum, depthNum)
-    geometry.translate(xNum - oXNum, yNum - oYNum, zNum - oZNum)
-    geometry.rotateX(d2r(rXNum))
-    geometry.rotateY(d2r(rYNum))
-    geometry.rotateZ(d2r(rZNum))
+    const geometry = new THREE.BoxGeometry(width, height, depth)
+    geometry.translate(x - oX, y - oY, z - oZ)
+    geometry.rotateX(d2r(rX))
+    geometry.rotateY(d2r(rY))
+    geometry.rotateZ(d2r(rZ))
 
     geometry.computeBoundingBox()
     return geometry
 }
 
-const parseSphereGeometry = (item: string): THREE.BufferGeometry => {
-    const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = item.split(',')
-    const widthNum = floatVal(width)
-    const heightNum = floatVal(height)
-    const depthNum = floatVal(depth)
-    const xNum = floatVal(x)
-    const yNum = floatVal(y)
-    const zNum = floatVal(z)
-    const oXNum = floatVal(oX)
-    const oYNum = floatVal(oY)
-    const oZNum = floatVal(oZ)
-    const rXNum = floatVal(rX)
-    const rYNum = floatVal(rY)
-    const rZNum = floatVal(rZ)
+const parseSphereGeometry = (item: CubeDef): THREE.BufferGeometry => {
+    const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = expandCubeDef(item)
 
-    const geometry = new THREE.SphereGeometry(widthNum / 2, 32, 16)
-    geometry.scale(widthNum / widthNum, heightNum / widthNum, depthNum / widthNum)
-    geometry.translate(xNum - oXNum, yNum - oYNum, zNum - oZNum)
-    geometry.rotateX(d2r(rXNum))
-    geometry.rotateY(d2r(rYNum))
-    geometry.rotateZ(d2r(rZNum))
+    const geometry = new THREE.SphereGeometry(width / 2, 32, 16)
+    geometry.scale(width / width, height / width, depth / width)
+    geometry.translate(x - oX, y - oY, z - oZ)
+    geometry.rotateX(d2r(rX))
+    geometry.rotateY(d2r(rY))
+    geometry.rotateZ(d2r(rZ))
     return geometry
 }
 
-const parsePlaneGeometry = (item: string): THREE.BufferGeometry => {
-    const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = item.split(',')
-    const widthNum = floatVal(width)
-    const heightNum = floatVal(height)
-    const xNum = floatVal(x)
-    const yNum = floatVal(y)
-    const zNum = floatVal(z)
-    const oXNum = floatVal(oX)
-    const oYNum = floatVal(oY)
-    const oZNum = floatVal(oZ)
-    const rXNum = floatVal(rX)
-    const rYNum = floatVal(rY)
-    const rZNum = floatVal(rZ)
+const parsePlaneGeometry = (item: CubeDef): THREE.BufferGeometry => {
+    const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = expandCubeDef(item)
 
-    const geometry = new THREE.PlaneGeometry(widthNum, heightNum)
+    const geometry = new THREE.PlaneGeometry(width, height)
     // Three planes are upright, Blockbench planes are horizontal
     geometry.rotateX(d2r(-90))
-    geometry.translate(xNum - oXNum, yNum - oYNum, zNum - oZNum)
-    geometry.rotateX(d2r(rXNum))
-    geometry.rotateY(d2r(rYNum))
-    geometry.rotateZ(d2r(rZNum))
+    geometry.translate(x - oX, y - oY, z - oZ)
+    geometry.rotateX(d2r(rX))
+    geometry.rotateY(d2r(rY))
+    geometry.rotateZ(d2r(rZ))
     geometry.computeBoundingBox()
     return geometry
 }
 
-const parseCylinderGeometry = (item: string): THREE.BufferGeometry => {
-    const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = item.split(',')
-    const widthNum = floatVal(width)
-    const heightNum = floatVal(height)
-    const depthNum = floatVal(depth)
-    const xNum = floatVal(x)
-    const yNum = floatVal(y)
-    const zNum = floatVal(z)
-    const oXNum = floatVal(oX)
-    const oYNum = floatVal(oY)
-    const oZNum = floatVal(oZ)
-    const rXNum = floatVal(rX)
-    const rYNum = floatVal(rY)
-    const rZNum = floatVal(rZ)
+const parseCylinderGeometry = (item: CubeDef): THREE.BufferGeometry => {
+    const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = expandCubeDef(item)
 
-    const radius = widthNum / 2
-    const geometry = new THREE.CylinderGeometry(radius, radius, heightNum, 32)
-    geometry.translate(xNum - oXNum, yNum - oYNum, zNum - oZNum)
-    geometry.scale(1, 1, depthNum / widthNum)
-    const qX = d2r(rXNum)
-    const qY = d2r(rYNum)
-    const qZ = d2r(rZNum)
+    const radius = width / 2
+    const geometry = new THREE.CylinderGeometry(radius, radius, height, 32)
+    geometry.translate(x - oX, y - oY, z - oZ)
+    geometry.scale(1, 1, depth / width)
+    const qX = d2r(rX)
+    const qY = d2r(rY)
+    const qZ = d2r(rZ)
     const rotEuler = new THREE.Euler(qX, qY, qZ)
     geometry.applyQuaternion(new THREE.Quaternion().setFromEuler(rotEuler))
     geometry.computeBoundingBox()
@@ -138,8 +132,8 @@ const parseCylinderGeometry = (item: string): THREE.BufferGeometry => {
 }
 
 // Helper function to parse geometry from item string
-const parseGeometry = (item: string): THREE.BufferGeometry => {
-    const [shape] = item.split(',')
+const parseGeometry = (item: CubeDef): THREE.BufferGeometry => {
+    const [shape] = item
 
     switch (shape) {
         case 'c':
@@ -179,10 +173,11 @@ export const createModel = (modelArray: Model, opts: CreateModelOpts): THREE.Gro
             console.error('ITEM IS NULL')
             return
         }
-        if (Array.isArray(item)) {
+        const testItem = item[0]
+        if (Array.isArray(testItem)) {
             parent.add(createModel(item, { palette: modelPalette, glow }))
         } else {
-            const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = item.split(',')
+            const [shape, name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color] = expandCubeDef(item)
 
             const geometry = parseGeometry(item)
 
@@ -199,7 +194,7 @@ export const createModel = (modelArray: Model, opts: CreateModelOpts): THREE.Gro
             const mesh = new THREE.Mesh(geometry, material)
 
             mesh.name = name
-            mesh.position.set(oX, oY, oZ)
+            mesh.position.set(floatVal(oX), floatVal(oY), floatVal(oZ))
             parent.add(mesh)
         }
     })

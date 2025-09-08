@@ -43,7 +43,7 @@ export const BB_DEFAULT_PALETTE = {
 }
 
 export const TYPE_COLORS = {
-    color: RED,
-    artist: GREEN,
-    title: BLUE,
+    color: NEON_RED,
+    artist: NEON_GREEN,
+    title: NEON_BLUE,
 }

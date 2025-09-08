@@ -22,6 +22,16 @@ Plugin.register('js13k_export', {
             if (roundedFloat === 0) return ''
             return parseInt(roundedString)
         }
+        const minifyArray = (arr) => {
+            let result = '['
+            arr.forEach((item, index) => {
+                const itemString = item !== '' && Number.isNaN(parseFloat(item)) ? `'${item}'` : item
+                result += itemString
+                if (index < arr.length - 1) result += ','
+            })
+            result += ']'
+            return result
+        }
         const codec = new Codec('js13k_export', {
             name: 'JS13k Mesh',
             remember: true,
@@ -43,7 +53,23 @@ Plugin.register('js13k_export', {
                     const [rX, rY, rZ] = pyramid.rotation
                     const [oX, oY, oZ] = pyramid.origin
                     const color = pyramid.color
-                    return `py,${name},${roundHundredth(width)},${roundHundredth(height)},${roundHundredth(depth)},${roundHundredth(x)},${roundHundredth(y)},${roundHundredth(z)},${roundWhole(rX)},${roundWhole(rY)},${roundWhole(rZ)},${roundHundredth(oX)},${roundHundredth(oY)},${roundHundredth(oZ)},${color}`
+                    return minifyArray([
+                        'py',
+                        name,
+                        roundHundredth(width),
+                        roundHundredth(height),
+                        roundHundredth(depth),
+                        roundHundredth(x),
+                        roundHundredth(y),
+                        roundHundredth(z),
+                        roundWhole(rX),
+                        roundWhole(rY),
+                        roundWhole(rZ),
+                        roundHundredth(oX),
+                        roundHundredth(oY),
+                        roundHundredth(oZ),
+                        color,
+                    ])
                 }
                 const convertCylinder = (cylinder) => {
                     const name = cylinder.name.split('_')[2] || ''
@@ -60,7 +86,23 @@ Plugin.register('js13k_export', {
                     const [rX, rY, rZ] = cylinder.rotation
                     const [oX, oY, oZ] = cylinder.origin
                     const color = cylinder.color
-                    return `cy,${name},${width},${height},${depth},${roundHundredth(x)},${roundHundredth(y)},${roundHundredth(z)},${roundWhole(rX)},${roundWhole(rY)},${roundWhole(rZ)},${roundHundredth(oX)},${roundHundredth(oY)},${roundHundredth(oZ)},${color}`
+                    return minifyArray([
+                        'cy',
+                        name,
+                        width,
+                        height,
+                        depth,
+                        roundHundredth(x),
+                        roundHundredth(y),
+                        roundHundredth(z),
+                        roundWhole(rX),
+                        roundWhole(rY),
+                        roundWhole(rZ),
+                        roundHundredth(oX),
+                        roundHundredth(oY),
+                        roundHundredth(oZ),
+                        color,
+                    ])
                 }
                 const convertPlane = (plane) => {
                     const name = plane.name.split('_')[2] || ''
@@ -72,7 +114,23 @@ Plugin.register('js13k_export', {
                     const [rX, rY, rZ] = plane.rotation
                     const [oX, oY, oZ] = plane.origin
                     const color = plane.color
-                    return `p,${name},${roundHundredth(width)},${roundHundredth(height)},${roundHundredth(depth)},${roundHundredth(x)},${roundHundredth(y)},${roundHundredth(z)},${roundHundredth(rX)},${roundHundredth(rY)},${roundHundredth(rZ)},${roundHundredth(oX)},${roundHundredth(oY)},${roundHundredth(oZ)},${color}`
+                    return minifyArray([
+                        'p',
+                        name,
+                        roundHundredth(width),
+                        roundHundredth(height),
+                        roundHundredth(depth),
+                        roundHundredth(x),
+                        roundHundredth(y),
+                        roundHundredth(z),
+                        roundHundredth(rX),
+                        roundHundredth(rY),
+                        roundHundredth(rZ),
+                        roundHundredth(oX),
+                        roundHundredth(oY),
+                        roundHundredth(oZ),
+                        color,
+                    ])
                 }
 
                 const convertSphere = (sphere) => {
@@ -99,7 +157,23 @@ Plugin.register('js13k_export', {
 
                     const color = sphere.color
 
-                    return `s,${name},${width},${height},${depth},${roundHundredth(x)},${roundHundredth(y)},${roundHundredth(z)},${roundWhole(rX)},${roundWhole(rY)},${roundWhole(rZ)},${roundHundredth(oX)},${roundHundredth(oY)},${roundHundredth(oZ)},${color}`
+                    return minifyArray([
+                        's',
+                        name,
+                        width,
+                        height,
+                        depth,
+                        roundHundredth(x),
+                        roundHundredth(y),
+                        roundHundredth(z),
+                        roundWhole(rX),
+                        roundWhole(rY),
+                        roundWhole(rZ),
+                        roundHundredth(oX),
+                        roundHundredth(oY),
+                        roundHundredth(oZ),
+                        color,
+                    ])
                 }
 
                 const convertCube = (cube) => {
@@ -125,7 +199,7 @@ Plugin.register('js13k_export', {
                     const oZ = roundHundredth(cube.origin[2])
                     const color = cube.color
 
-                    return `c,${name},${width},${height},${depth},${x},${y},${z},${rX},${rY},${rZ},${oX},${oY},${oZ},${color}`
+                    return minifyArray(['c', name, width, height, depth, x, y, z, rX, rY, rZ, oX, oY, oZ, color])
                 }
 
                 const handleObject = (obj) => {
@@ -151,17 +225,18 @@ Plugin.register('js13k_export', {
                             if (!child.visibility) return
                             arr.push(handleObject(child))
                         })
-                        return arr
+                        return `[${arr.join(',\n')}]`
                     }
                 }
 
                 let model = `export const ${Project.name}Model = () => \n`
-                const meshes = []
-                Outliner.root.forEach((obj) => {
+                model += '['
+                Outliner.root.forEach((obj, index) => {
                     if (!obj.visibility) return
-                    meshes.push(handleObject(obj))
+                    model += `${handleObject(obj)}`
+                    if (index < Outliner.root.length - 1) model += ',\n'
                 })
-                model += JSON.stringify(meshes, null, 2)
+                model += ']'
                 return model
             },
             parse(model, path) {
