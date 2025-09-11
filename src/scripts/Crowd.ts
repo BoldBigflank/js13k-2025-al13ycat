@@ -2,43 +2,37 @@ import * as THREE from 'three'
 import { Events } from '../libraries/Events.js'
 import {
     BLACK,
+    BROWN,
     CAT_BLACK,
     CAT_GREY,
-    LIGHT_GREEN,
-    LIGHT_GREY,
+    DARK_GREY,
     MID_GREY,
-    NEON_RED,
-    NEON_YELLOW,
+    NEON_BLUE,
+    NEON_BROWN,
+    NEON_ORANGE,
+    NEON_PURPLE,
     ORANGE,
     TYPE_COLORS,
-    YELLOW,
 } from './Colors.js'
 import { randF, sample, waveHeight } from './Utils.js'
 import { GameProgress } from './DJPuzzle.js'
-import { TickEvent } from '../types.js'
+import { ProgressEvent, TickEvent } from '../types.js'
+import { CrowdHead, CrowdPaw } from '../models/CrowdHead.js'
 
 const CAT_COLORS = [
-    {
-        Purple: CAT_BLACK,
-        Silver: CAT_GREY,
-        Yellow: LIGHT_GREY,
-        Red: NEON_RED, // Paw Beans
-    },
-    {
-        Purple: ORANGE, // Body
-        Silver: YELLOW, // Whiskers
-        Yellow: LIGHT_GREEN, // Eyes/ears
-        Red: NEON_RED, // Paw Beans
-    },
-    {
-        Purple: MID_GREY, // Body
-        Silver: LIGHT_GREY, // Whiskers
-        Yellow: NEON_YELLOW, // Eyes/ears
-        Red: NEON_RED, // Paw Beans
-    },
+    CAT_BLACK,
+    ORANGE,
+    MID_GREY,
+    NEON_BROWN,
+    NEON_PURPLE,
+    DARK_GREY,
+    NEON_BLUE,
+    CAT_GREY,
+    BROWN,
+    NEON_ORANGE,
 ]
 
-const MIN_POS = new THREE.Vector3(-1, 0, -1)
+const MIN_POS = new THREE.Vector3(-1, 1, -1)
 const MAX_POS = new THREE.Vector3(1, 2, 1)
 
 type Pose = {
@@ -54,13 +48,16 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
     // Instanced meshes
     const rows = 8
     const cols = 10
-    const headsGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5)
+
+    // Head
+    const crowdHead = CrowdHead()
+
     const headsMaterial = new THREE.MeshStandardMaterial()
-    const headsMesh = new THREE.InstancedMesh(headsGeometry, headsMaterial, rows * cols)
+    const headsMesh = new THREE.InstancedMesh(crowdHead, headsMaterial, rows * cols)
     headsMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
 
     // const handsGeometry = new THREE.SphereGeometry(0.3, 8, 8)
-    const handsGeometry = new THREE.BoxGeometry(0.2, 0.2, 0.6)
+    const handsGeometry = CrowdPaw()
     const handsMaterial = new THREE.MeshStandardMaterial()
     const handsMesh = new THREE.InstancedMesh(handsGeometry, handsMaterial, rows * cols * 2)
     handsMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
@@ -78,7 +75,7 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
     const instanceData: Array<{
         positionOffset: THREE.Vector3
         poseDelay: number
-        palette: any
+        color: any
     }> = []
 
     const poses: Pose[] = []
@@ -87,7 +84,7 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
     for (let z = 0; z < rows; z++) {
         for (let x = 0; x < cols; x++) {
             const i = x + z * rows
-            const palette = sample(CAT_COLORS)
+            const color = sample(CAT_COLORS)
             const positionOffset = new THREE.Vector3(2 * x - cols + 0.5 + (z % 2) * 1, 0, 2 * z - rows + 0.5)
             if (Math.abs(positionOffset.x) >= 5) {
                 positionOffset.y += 5
@@ -102,7 +99,7 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
             headsMesh.setMatrixAt(i, dummy.matrix)
 
             // Set head color
-            headColor.setStyle(palette.Purple)
+            headColor.setStyle(color)
             headsMesh.setColorAt(i, headColor)
 
             // Set up hand instances
@@ -113,14 +110,14 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
                 handsMesh.setMatrixAt(handIndex, dummy.matrix)
 
                 // Set hand color
-                handColor.setStyle(palette.Purple)
+                handColor.setStyle(color)
                 handsMesh.setColorAt(handIndex, handColor)
             }
 
             instanceData.push({
                 positionOffset,
                 poseDelay: THREE.MathUtils.randInt(0, 15),
-                palette,
+                color,
             })
         }
     }

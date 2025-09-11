@@ -10,7 +10,7 @@ import { Arena } from './models/Arena'
 import { Paw } from './models/Paw'
 import { FishSwirl } from './models/FishSwirl'
 import { Sky } from './models/Sky'
-import { BLACK, CAT_GREY, NEON_BLUE, RED, WHITE } from './scripts/Colors'
+import { BLACK, CAT_GREY, NEON_BLUE, NEON_PURPLE, RED, WHITE } from './scripts/Colors'
 import {
     BeatEvent,
     ComboBrokenEvent,
@@ -50,7 +50,7 @@ const initGame = async () => {
     renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(window.innerWidth, window.innerHeight)
-    renderer.setClearColor(BLACK)
+    renderer.setClearColor(NEON_PURPLE, 1)
     renderer.xr.addEventListener('sessionstart', onXRSessionStart)
     renderer.xr.enabled = true
     renderer.setAnimationLoop(animate)
