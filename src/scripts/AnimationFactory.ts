@@ -38,14 +38,14 @@ export const sinusoidal = (t: number): number => 0.5 * Math.cos(2 * t * Math.PI 
 
 export class AnimationFactory {
     private static _instance: AnimationFactory
-    private animations: Animating[]
-    private scene: THREE.Scene | null
-    private clock: THREE.Clock
+    private _animations: Animating[]
+    private _scene: THREE.Scene | null
+    private _clock: THREE.Clock
 
     private constructor() {
-        this.animations = []
-        this.scene = null
-        this.clock = new THREE.Clock()
+        this._animations = []
+        this._scene = null
+        this._clock = new THREE.Clock()
     }
 
     public static get Instance(): AnimationFactory {
@@ -56,14 +56,14 @@ export class AnimationFactory {
     }
 
     public initScene(scene: THREE.Scene) {
-        if (this.scene) return
-        this.scene = scene
-        this.clock.start()
+        if (this._scene) return
+        this._scene = scene
+        this._clock.start()
     }
 
     public update() {
-        const now = this.clock.getElapsedTime() * 1000 // Convert to milliseconds
-        this.animations = this.animations.filter((animation) => {
+        const now = this._clock.getElapsedTime() * 1000 // Convert to milliseconds
+        this._animations = this._animations.filter((animation) => {
             const { mesh, start, end, easeFunc, loop } = animation
             const msElapsed = now - animation.startTime
             const duration = animation.endTime - animation.startTime
@@ -125,7 +125,7 @@ export class AnimationFactory {
         const duration = opts.duration || 1000
         const delay = opts.delay || 0
         const ease = opts.ease || defaultEase
-        const now = this.clock.getElapsedTime() * 1000
+        const now = this._clock.getElapsedTime() * 1000
 
         // Create a promise that resolves when the animation completes
         let resolve: (() => void) | undefined
@@ -136,7 +136,7 @@ export class AnimationFactory {
             reject = rej
         })
 
-        this.animations.push({
+        this._animations.push({
             mesh,
             start: {
                 position: mesh.position.clone(),
@@ -156,7 +156,7 @@ export class AnimationFactory {
     }
 
     public cancelAnimation(mesh: THREE.Object3D, jumpToEnd: boolean = false) {
-        const animations = this.animations.filter((animation) => animation.mesh === mesh)
+        const animations = this._animations.filter((animation) => animation.mesh === mesh)
         if (!animations.length) return
 
         animations.forEach((animation) => {
@@ -182,6 +182,6 @@ export class AnimationFactory {
             }
         })
 
-        this.animations = this.animations.filter((animation) => animation.mesh !== mesh)
+        this._animations = this._animations.filter((animation) => animation.mesh !== mesh)
     }
 }

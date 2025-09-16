@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 
 const clock = new THREE.Clock()
+export const V3_ZERO = new THREE.Vector3(0, 0, 0).clone()
 
 export const LocalStorageKey = 'AL13YCAT'
 

@@ -3,30 +3,30 @@ import { Events } from '../libraries/Events'
 import { GameProgress } from '../scripts/DJPuzzle'
 import { AnimationFactory, easeInOutCubic } from '../scripts/AnimationFactory'
 import { TYPE_COLORS } from '../scripts/Colors'
-import { waveHeight } from '../scripts/Utils'
-import { TickEvent } from '../types'
+import { V3_ZERO, waveHeight } from '../scripts/Utils'
+import { ProgressEvent, TickEvent } from '../types'
 
 export class Grid {
     parent: THREE.Group
     _mesh: THREE.Object3D
-    geometry: THREE.Geometry
-    material: THREE.Material
-    shouldShow: boolean
+    _geometry: THREE.Geometry
+    _material: THREE.Material
+    _shouldShow: boolean
 
     constructor() {
-        this.shouldShow = false
+        this._shouldShow = false
         this.parent = new THREE.Group()
-        this.geometry = new THREE.PlaneGeometry(20, 29, 20, 29)
-        this.geometry.rotateX(Math.PI / 2)
-        this.material = new THREE.MeshStandardMaterial({
+        this._geometry = new THREE.PlaneGeometry(20, 29, 20, 29)
+        this._geometry.rotateX(Math.PI / 2)
+        this._material = new THREE.MeshStandardMaterial({
             wireframe: true,
         })
-        this.material.emissiveIntensity = 1
-        this._mesh = new THREE.Mesh(this.geometry, this.material)
+        this._material.emissiveIntensity = 1
+        this._mesh = new THREE.Mesh(this._geometry, this._material)
         this.parent.add(this._mesh)
 
         Events.Instance.on(TickEvent, (delta) => {
-            const positions = this.geometry.getAttribute('position')
+            const positions = this._geometry.getAttribute('position')
             for (let i = 0; i < positions.array.length; i += 3) {
                 const x = positions.array[i]
                 const z = positions.array[i + 2]
@@ -35,22 +35,22 @@ export class Grid {
             positions.needsUpdate = true
         })
         Events.Instance.on(ProgressEvent, (progress: GameProgress) => {
-            this.shouldShow = progress.bestComboCount >= 3
+            this._shouldShow = progress.bestComboCount >= 3
             const visible = this._mesh.material.visible
-            if (!visible && this.shouldShow) {
+            if (!visible && this._shouldShow) {
                 this._mesh.position.set(0, -5, 0)
-                this.material.emissive.set(TYPE_COLORS[progress.bestComboType])
+                this._material.emissive.set(TYPE_COLORS[progress.bestComboType])
                 AnimationFactory.Instance.animateTransform({
                     mesh: this._mesh,
                     end: {
-                        position: new THREE.Vector3(0, 0, 0),
+                        position: V3_ZERO,
                     },
                     ease: easeInOutCubic,
                     duration: 2000,
                 })
             }
 
-            this._mesh.material.visible = this.shouldShow
+            this._mesh.material.visible = this._shouldShow
         })
     }
 

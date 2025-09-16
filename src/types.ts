@@ -15,3 +15,4 @@ export const ProgressEvent = 5
 export const RoomGlowEvent = 6
 export const SplashEvent = 7
 export const TickEvent = 8
+export const LaserEvent = 9

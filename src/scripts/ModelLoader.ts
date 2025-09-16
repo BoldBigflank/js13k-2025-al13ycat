@@ -2,6 +2,7 @@ import * as THREE from 'three'
 
 import { floatVal, d2r } from './Utils'
 import { BB_DEFAULT_PALETTE } from './Colors'
+import { floorPowerOfTwo } from 'three/src/math/MathUtils.js'
 
 type CubeDef = [
     string,
@@ -131,29 +132,30 @@ const parseCylinderGeometry = (item: CubeDef): THREE.BufferGeometry => {
     return geometry
 }
 
+// Shape code to geometry parser mapping
+const SHAPE_PARSERS = {
+    c: parseCubeGeometry,
+    s: parseSphereGeometry,
+    p: parsePlaneGeometry,
+    cy: parseCylinderGeometry,
+    py: parsePyramidGeometry,
+} as const
+
 // Helper function to parse geometry from item string
 const parseGeometry = (item: CubeDef): THREE.BufferGeometry => {
     const [shape] = item
+    const parser = SHAPE_PARSERS[shape as keyof typeof SHAPE_PARSERS]
 
-    switch (shape) {
-        case 'c':
-            return parseCubeGeometry(item)
-        case 's':
-            return parseSphereGeometry(item)
-        case 'p':
-            return parsePlaneGeometry(item)
-        case 'cy':
-            return parseCylinderGeometry(item)
-        case 'py':
-            return parsePyramidGeometry(item)
-        default:
-            throw new Error(`Unknown shape: ${shape}`)
+    if (!parser) {
+        throw new Error(`Unknown shape: ${shape}`)
     }
+
+    return parser(item)
 }
 
 type CreateModelOpts = {
     palette?: Partial<typeof BB_DEFAULT_PALETTE>
-    glow?: boolean
+    glow: boolean | number[]
 }
 
 export const createModel = (modelArray: Model, opts: CreateModelOpts): THREE.Group => {
@@ -185,8 +187,7 @@ export const createModel = (modelArray: Model, opts: CreateModelOpts): THREE.Gro
                 color: modelPalette[BB_PALETTE_KEYS[color] as keyof typeof modelPalette],
                 side: THREE.DoubleSide,
             }) // TODO: use color
-
-            if (glow) {
+            if (glow === true || (Array.isArray(glow) && glow.includes(color))) {
                 material.emissive = new THREE.Color(modelPalette[BB_PALETTE_KEYS[color] as keyof typeof modelPalette])
                 material.emissiveIntensity = 1.0
             }

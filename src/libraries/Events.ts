@@ -25,10 +25,10 @@
 
 export class Events {
   private static _instance: Events;
-  private callbacks: { [key: string]: Function[] };
+  private _callbacks: { [key: string]: Function[] };
 
   private constructor() {
-    this.callbacks = {};
+    this._callbacks = {};
   }
 
   public static get Instance(): Events {
@@ -44,8 +44,8 @@ export class Events {
    * @param callback - Function that will be called when the event is emitted.
    */
   public on(event: number, callback: Function): void {
-    this.callbacks[event] = this.callbacks[event] || [];
-    this.callbacks[event].push(callback);
+    this._callbacks[event] = this._callbacks[event] || [];
+    this._callbacks[event].push(callback);
   }
 
   /**
@@ -54,7 +54,7 @@ export class Events {
    * @param callback - The function that was passed during registration.
    */
   public off(event: number, callback: Function): void {
-    this.callbacks[event] = (this.callbacks[event] || []).filter(
+    this._callbacks[event] = (this._callbacks[event] || []).filter(
       (fn) => fn !== callback,
     );
   }
@@ -65,15 +65,15 @@ export class Events {
    * @param args - Comma separated list of arguments passed to all callbacks.
    */
   public emit(event: number, ...args: any[]): void {
-    (this.callbacks[event] || []).forEach((fn) => fn(...args));
+    (this._callbacks[event] || []).forEach((fn) => fn(...args));
   }
 
   /**
    * Reset all callbacks (expose for testing)
    */
   public _reset(): void {
-    Object.keys(this.callbacks).forEach((key) => {
-      delete this.callbacks[key];
+    Object.keys(this._callbacks).forEach((key) => {
+      delete this._callbacks[key];
     });
   }
 
@@ -81,6 +81,6 @@ export class Events {
    * Get all callbacks (expose for testing)
    */
   public getCallbacks(): { [key: string]: Function[] } {
-    return this.callbacks;
+    return this._callbacks;
   }
 }

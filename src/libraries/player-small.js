@@ -36,19 +36,19 @@
 class CPlayer {
     constructor() {
         // Array of oscillator functions - bind them to this instance
-        this.mOscillators = [
-            this.osc_sin.bind(this),
-            this.osc_square.bind(this),
-            this.osc_saw.bind(this),
-            this.osc_tri.bind(this)
+        this._mOscillators = [
+            this._osc_sin.bind(this),
+            this._osc_square.bind(this),
+            this._osc_saw.bind(this),
+            this._osc_tri.bind(this)
         ];
         
         // Private variables set up by init()
-        this.mSong = null;
-        this.mLastRow = 0;
-        this.mCurrentCol = 0;
-        this.mNumWords = 0;
-        this.mMixBuf = null;
+        this._mSong = null;
+        this._mLastRow = 0;
+        this._mCurrentCol = 0;
+        this._mNumWords = 0;
+        this._mMixBuf = null;
     }
     
     //--------------------------------------------------------------------------
@@ -56,34 +56,34 @@ class CPlayer {
     //--------------------------------------------------------------------------
     
     // Oscillators
-    osc_sin(value) {
+    _osc_sin(value) {
         return Math.sin(value * 6.283184);
     }
     
-    osc_saw(value) {
+    _osc_saw(value) {
         return 2 * (value % 1) - 1;
     }
     
-    osc_square(value) {
+    _osc_square(value) {
         return (value % 1) < 0.5 ? 1 : -1;
     }
     
-    osc_tri(value) {
+    _osc_tri(value) {
         var v2 = (value % 1) * 4;
         if(v2 < 2) return v2 - 1;
         return 3 - v2;
     }
     
-    getnotefreq(n) {
+    _getnotefreq(n) {
         // 174.61.. / 44100 = 0.003959503758 (F3)
         return 0.003959503758 * (2 ** ((n - 128) / 12));
     }
     
-    createNote(instr, n, rowLen) {
-        var osc1 = this.mOscillators[instr.i[0]],
+    _createNote(instr, n, rowLen) {
+        var osc1 = this._mOscillators[instr.i[0]],
         o1vol = instr.i[1],
         o1xenv = instr.i[3]/32,
-        osc2 = this.mOscillators[instr.i[4]],
+        osc2 = this._mOscillators[instr.i[4]],
         o2vol = instr.i[5],
         o2xenv = instr.i[8]/32,
         noiseVol = instr.i[9],
@@ -111,8 +111,8 @@ class CPlayer {
                 j2 -= arpInterval;
                 
                 // Calculate note frequencies for the oscillators
-                o1t = this.getnotefreq(n + (arp & 15) + instr.i[2] - 128);
-                o2t = this.getnotefreq(n + (arp & 15) + instr.i[6] - 128) * (1 + 0.0008 * instr.i[7]);
+                o1t = this._getnotefreq(n + (arp & 15) + instr.i[2] - 128);
+                o2t = this._getnotefreq(n + (arp & 15) + instr.i[6] - 128) * (1 + 0.0008 * instr.i[7]);
             }
             
             // Envelope
@@ -151,17 +151,17 @@ class CPlayer {
     async init(song) {
         return new Promise((resolve) => {
             // Define the song
-            this.mSong = song;
+            this._mSong = song;
             
             // Init iteration state variables
-            this.mLastRow = song.endPattern;
-            this.mCurrentCol = 0;
+            this._mLastRow = song.endPattern;
+            this._mCurrentCol = 0;
             
             // Prepare song info
-            this.mNumWords = song.rowLen * song.patternLen * (this.mLastRow + 1) * 2;
+            this._mNumWords = song.rowLen * song.patternLen * (this._mLastRow + 1) * 2;
             
             // Create work buffer (initially cleared)
-            this.mMixBuf = new Int32Array(this.mNumWords);
+            this._mMixBuf = new Int32Array(this._mNumWords);
             
             resolve();
         });
@@ -179,10 +179,10 @@ class CPlayer {
             k, t, lfor, e, x, rsample, rowStartSample, f, da;
             
             // Put performance critical items in local variables
-            var chnBuf = new Int32Array(this.mNumWords),
-            instr = this.mSong.songData[channelIndex],
-            rowLen = this.mSong.rowLen,
-            patternLen = this.mSong.patternLen;
+            var chnBuf = new Int32Array(this._mNumWords),
+            instr = this._mSong.songData[channelIndex],
+            rowLen = this._mSong.rowLen,
+            patternLen = this._mSong.patternLen;
             
             // Clear effect state
             var low = 0, band = 0, high;
@@ -192,7 +192,7 @@ class CPlayer {
             var noteCache = [];
             
             // Patterns
-            for (p = 0; p <= this.mLastRow; ++p) {
+            for (p = 0; p <= this._mLastRow; ++p) {
                 cp = instr.p[p];
                 
                 // Pattern rows
@@ -209,7 +209,7 @@ class CPlayer {
                     }
                     
                     // Put performance critical instrument properties in local variables
-                    var oscLFO = this.mOscillators[instr.i[16]],
+                    var oscLFO = this._mOscillators[instr.i[16]],
                     lfoAmt = instr.i[17] / 512,
                     lfoFreq = (2 ** (instr.i[18] - 9)) / rowLen,
                     fxLFO = instr.i[19],
@@ -231,7 +231,7 @@ class CPlayer {
                         n = cp ? instr.c[cp - 1].n[row + col * patternLen] : 0;
                         if (n) {
                             if (!noteCache[n]) {
-                                noteCache[n] = this.createNote(instr, n, rowLen);
+                                noteCache[n] = this._createNote(instr, n, rowLen);
                             }
                             
                             // Copy note from the note cache
@@ -264,7 +264,7 @@ class CPlayer {
                             // Distortion
                             if (dist) {
                                 rsample *= dist;
-                                rsample = rsample < 1 ? rsample > -1 ? this.osc_sin(rsample*.25) : -1 : 1;
+                                rsample = rsample < 1 ? rsample > -1 ? this._osc_sin(rsample*.25) : -1 : 1;
                                 rsample /= dist;
                             }
                             
@@ -296,8 +296,8 @@ class CPlayer {
                         chnBuf[k+1] = rsample | 0;
                         
                         // ...and add to stereo mix buffer
-                        this.mMixBuf[k] += lsample | 0;
-                        this.mMixBuf[k+1] += rsample | 0;
+                        this._mMixBuf[k] += lsample | 0;
+                        this._mMixBuf[k+1] += rsample | 0;
                     }
                 }
             }
@@ -309,14 +309,14 @@ class CPlayer {
     // Generate audio data for all channels asynchronously
     async generate() {
         // Clear the mix buffer
-        this.mMixBuf.fill(0);
+        this._mMixBuf.fill(0);
         
         // Reset current column
-        this.mCurrentCol = 0;
+        this._mCurrentCol = 0;
         
         // Generate all channels in parallel
         const channelPromises = [];
-        for (let i = 0; i < this.mSong.numChannels; i++) {
+        for (let i = 0; i < this._mSong.numChannels; i++) {
             channelPromises.push(this.generateChannel(i));
         }
         
@@ -324,7 +324,7 @@ class CPlayer {
         await Promise.all(channelPromises);
         
         // Mark as complete
-        this.mCurrentCol = this.mSong.numChannels;
+        this._mCurrentCol = this._mSong.numChannels;
         
         return 1.0; // All done
     }
@@ -333,11 +333,11 @@ class CPlayer {
     
     // Create a AudioBuffer from the generated audio data
     createAudioBuffer(context) {
-        var buffer = context.createBuffer(2, this.mNumWords / 2, 44100);
+        var buffer = context.createBuffer(2, this._mNumWords / 2, 44100);
         for (var i = 0; i < 2; i ++) {
             var data = buffer.getChannelData(i);
-            for (var j = i; j < this.mNumWords; j += 2) {
-                data[j >> 1] = this.mMixBuf[j] / 65536;
+            for (var j = i; j < this._mNumWords; j += 2) {
+                data[j >> 1] = this._mMixBuf[j] / 65536;
             }
         }
         return buffer;
@@ -346,8 +346,8 @@ class CPlayer {
     // Create a AudioBuffer from a specific range of the generated audio data
     createAudioBufferRange(context, startIndex = 0, endIndex = null) {
         // Validate and set default end index
-        if (endIndex === null || endIndex > this.mNumWords / 2) {
-            endIndex = this.mNumWords / 2;
+        if (endIndex === null || endIndex > this._mNumWords / 2) {
+            endIndex = this._mNumWords / 2;
         }
         
         // Ensure start index is valid
@@ -365,7 +365,7 @@ class CPlayer {
             for (var j = 0; j < bufferLength; j++) {
                 // Map j to the actual sample index in the mix buffer
                 var sampleIndex = (startIndex + j) * 2 + i;
-                data[j] = this.mMixBuf[sampleIndex] / 65536;
+                data[j] = this._mMixBuf[sampleIndex] / 65536;
             }
         }
         
@@ -376,9 +376,9 @@ class CPlayer {
     createWave() {
         // Create WAVE header
         var headerLen = 44;
-        var l1 = headerLen + this.mNumWords * 2 - 8;
+        var l1 = headerLen + this._mNumWords * 2 - 8;
         var l2 = l1 - 36;
-        var wave = new Uint8Array(headerLen + this.mNumWords * 2);
+        var wave = new Uint8Array(headerLen + this._mNumWords * 2);
         wave.set(
             [82,73,70,70,
                 l1 & 255,(l1 >> 8) & 255,(l1 >> 16) & 255,(l1 >> 24) & 255,
@@ -388,9 +388,9 @@ class CPlayer {
             );
             
             // Append actual wave data
-            for (var i = 0, idx = headerLen; i < this.mNumWords; ++i) {
+            for (var i = 0, idx = headerLen; i < this._mNumWords; ++i) {
                 // Note: We clamp here
-                var y = this.mMixBuf[i];
+                var y = this._mMixBuf[i];
                 y = y < -32767 ? -32767 : (y > 32767 ? 32767 : y);
                 wave[idx++] = y & 255;
                 wave[idx++] = (y >> 8) & 255;
@@ -403,8 +403,8 @@ class CPlayer {
         // Create a WAVE formatted Uint8Array from a specific range of the generated audio data
         createWaveRange(startIndex = 0, endIndex = null) {
             // Validate and set default end index
-            if (endIndex === null || endIndex > this.mNumWords / 2) {
-                endIndex = this.mNumWords / 2;
+            if (endIndex === null || endIndex > this._mNumWords / 2) {
+                endIndex = this._mNumWords / 2;
             }
             
             // Ensure start index is valid
@@ -430,7 +430,7 @@ class CPlayer {
                 // Append actual wave data for the specified range
                 for (var i = 0, idx = headerLen; i < bufferLength; ++i) {
                     // Note: We clamp here
-                    var y = this.mMixBuf[(startIndex + i) * 2];
+                    var y = this._mMixBuf[(startIndex + i) * 2];
                     y = y < -32767 ? -32767 : (y > 32767 ? 32767 : y);
                     wave[idx++] = y & 255;
                     wave[idx++] = (y >> 8) & 255;
@@ -446,7 +446,7 @@ class CPlayer {
             var d = new Array(n);
             for (var j = 0; j < 2*n; j += 1) {
                 var k = i + j;
-                d[j] = t > 0 && k < this.mMixBuf.length ? this.mMixBuf[k] / 32768 : 0;
+                d[j] = t > 0 && k < this._mMixBuf.length ? this._mMixBuf[k] / 32768 : 0;
             }
             return d;
         }

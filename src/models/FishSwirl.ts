@@ -14,8 +14,9 @@ import {
     NEON_PURPLE,
     NEON_YELLOW,
 } from '../scripts/Colors'
-import { FishJuggledEvent, InteractiveObject3D, SplashEvent, TickEvent } from '../types'
+import { FishJuggledEvent, InteractiveObject3D, ProgressEvent, SplashEvent, TickEvent } from '../types'
 import { PickupSFX, SolvedSFX } from '../audio/music'
+import { V3_ZERO } from '../scripts/Utils'
 
 const FISH_PALETTES = [
     {
@@ -49,12 +50,12 @@ export const FishSwirl = (): THREE.Group => {
         clone.userData.velocity = new THREE.Vector3(0, 5 + 3 * Math.random(), -5)
         clone.userData.isPickable = true
         clone.userData.shot = 0
-        clone.onPointerPick = (controller) => {
+        clone.onPointerPick = () => {
             PickupSFX()
-            Events.Instance.emit(SplashEvent, clone.getWorldPosition(new THREE.Vector3()))
-            Events.Instance.emit(FishJuggledEvent, 1)
             clone.userData.shot += 1
             clone.userData.velocity.set(0, 10, 0)
+            Events.Instance.emit(SplashEvent, clone.getWorldPosition(new THREE.Vector3()))
+            Events.Instance.emit(FishJuggledEvent, clone.userData.shot)
         }
         clone.position.set(Math.random() * 10 - 5, 0, 0)
         fishPond.push(clone)
@@ -71,7 +72,7 @@ export const FishSwirl = (): THREE.Group => {
                 // Reset, go again
                 if (fish.userData.shot > 0) {
                     SolvedSFX()
-                    Events.Instance.emit(FishJuggledEvent, -1)
+                    Events.Instance.emit(FishJuggledEvent, 0)
                 }
                 fish.userData.shot = 0
 
@@ -109,7 +110,7 @@ export const FishSwirl = (): THREE.Group => {
                 AnimationFactory.Instance.animateTransform({
                     mesh: fish,
                     end: {
-                        scaling: showFish ? FISH_SCALE : new THREE.Vector3(0, 0, 0),
+                        scaling: showFish ? FISH_SCALE : V3_ZERO,
                     },
                     duration: showFish ? 2000 : 1000,
                 })

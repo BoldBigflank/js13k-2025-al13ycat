@@ -25,7 +25,7 @@ export const Cassette = (): THREE.Object3D => {
             Purple: NEON_BROWN, // Tape
             Green: BLUE, // Base
         },
-        glow: true,
+        glow: [0, 1, 2, 3, 4, 5, 7, 8, 9],
     }) as THREE.Object3D
     const label = mesh.getObjectByName('label')
     label!.material = TextMaterial(['AL13YCAT'], { color: BLACK, fontSize: 224, ratio: 4, bgColor: NEON_PURPLE })

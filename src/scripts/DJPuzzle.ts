@@ -1,5 +1,5 @@
 import { Events } from '../libraries/Events'
-import { ComboBrokenEvent, DebugEvent } from '../types'
+import { ComboBrokenEvent, DebugEvent, LaserEvent, ProgressEvent } from '../types'
 import { BLUE, GREEN, ORANGE, RED, VIOLET, YELLOW } from './Colors'
 
 export const SOLUTION_COLOR_HEX = [RED, ORANGE, YELLOW, GREEN, BLUE, VIOLET]
@@ -71,22 +71,22 @@ export type Progress = {
 }
 
 export class DJPuzzle {
-    queue: number[]
+    _queue: number[]
     selected: Record<string, number>
     vinyls: Vinyl[]
     progress: GameProgress
 
     constructor() {
-        this.queue = []
+        this._queue = []
         this.selected = {}
         this.vinyls = []
         this.reset()
     }
 
     addVinylByIndex(index: number) {
-        if (this.queue[0] === index) return
+        if (this._queue[0] === index) return
         // Add the vinyl to the front of the queue
-        this.queue.unshift(index)
+        this._queue.unshift(index)
 
         // Update progress state
         const { color, artist, title } = this.vinyls[index]
@@ -97,6 +97,7 @@ export class DJPuzzle {
         if (!this.progress.color.solved && colorIndex === this.progress.color.currentIndex + 1) {
             this.progress.color.correctCount++
             if (this.progress.color.correctCount === SOLUTION_COLOR.length) this.progress.color.solved = true
+            Events.Instance.emit(LaserEvent)
             this.progress.color.currentIndex = colorIndex
         } else {
             this.progress.color.correctCount = 0
@@ -110,6 +111,7 @@ export class DJPuzzle {
         ) {
             this.progress.artist.correctCount++
             if (this.progress.artist.correctCount === SOLUTION_ARTIST.length) this.progress.artist.solved = true
+            Events.Instance.emit(LaserEvent)
         } else {
             this.progress.artist.correctCount = 1
         }
@@ -122,6 +124,7 @@ export class DJPuzzle {
         ) {
             this.progress.title.correctCount++
             if (this.progress.title.correctCount === SOLUTION_TITLE.length) this.progress.title.solved = true
+            Events.Instance.emit(LaserEvent)
         } else {
             this.progress.title.correctCount = 1
         }
@@ -146,7 +149,7 @@ export class DJPuzzle {
                   ? 'artist'
                   : 'title'
 
-        this.progress.bestComboUsedVinyls = this.queue.slice(0, this.progress.bestComboCount)
+        this.progress.bestComboUsedVinyls = this._queue.slice(0, this.progress.bestComboCount)
 
         this.progress.displayText = this.getDisplayText()
         Events.Instance.emit(ProgressEvent, this.progress)
@@ -163,7 +166,7 @@ export class DJPuzzle {
     getDisplayText() {
         const { currentIndex, correctCount, solved } = this.progress[this.progress.bestComboType]
         const solution = TYPE_SOLUTIONS[this.progress.bestComboType]
-        let sequence = this.queue
+        let sequence = this._queue
             .slice(0, correctCount)
             .reverse()
             .map((index) => this.vinyls[index][this.progress.bestComboType])
@@ -186,13 +189,13 @@ export class DJPuzzle {
             return '🎉 Sequence Complete 🎉'
         }
         if (sequence.length === 1) {
-            return `What follows ${this.vinyls[this.queue[0]][this.progress.bestComboType]} best? → → → → →`
+            return `What follows ${this.vinyls[this._queue[0]][this.progress.bestComboType]} best? → → → → →`
         }
         return sequence.join('→')
     }
 
     reset() {
-        this.queue = []
+        this._queue = []
         this.selected = {}
         const [COLOR_SOLUTION, ARTIST_SOLUTION, TITLE_SOLUTION] = SOLUTION_INDEXES
         this.progress = {

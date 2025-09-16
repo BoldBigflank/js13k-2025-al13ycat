@@ -2,7 +2,8 @@ import * as THREE from 'three'
 import { vectorFromRadians } from '../scripts/Utils'
 import { Events } from '../libraries/Events'
 import { BLUE, NEON_BLUE, RED, WHITE } from '../scripts/Colors'
-import { TickEvent } from '../types'
+import { ProgressEvent, TickEvent } from '../types'
+import { GameProgress } from '../scripts/DJPuzzle'
 
 // https://dustinpfister.github.io/2021/06/18/threejs-vector3-apply-euler/
 // https://threejs.org/examples/#webgl_instancing_dynamic
@@ -83,7 +84,7 @@ export const Sky = (): THREE.Group => {
         mesh.instanceMatrix.needsUpdate = true
         mesh.instanceColor.needsUpdate = true
     })
-    Events.Instance.on(ProgressEvent, (progress) => {
+    Events.Instance.on(ProgressEvent, (progress: GameProgress) => {
         zAmp = progress.bestComboCount >= 6 ? 1 : 0
         pulses.push(0)
     })

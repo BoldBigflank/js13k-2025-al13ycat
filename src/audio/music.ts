@@ -3,7 +3,7 @@ import CPlayer from '../libraries/player-small'
 
 import { zzfx } from '../libraries/zzfx'
 import { GameProgress } from '../scripts/DJPuzzle'
-import { DownbeatEvent } from '../types'
+import { DownbeatEvent, ProgressEvent } from '../types'
 import song from './song(4)'
 
 const audioContext = new AudioContext()
@@ -18,6 +18,7 @@ Events.Instance.on(ProgressEvent, (progress: GameProgress) => {
 
 export const RecordSFX = () => zzfx(...[, , 143, 0.03, 0.17, 0.09, 2, 1.5, 10, -17, , , , , 4, , , 0.73, 0.09]) // Shoot 95
 export const CorrectSFX = () => zzfx(...[, 0, , , 0.07, 0.12, , 3.4, , , 109, 0.07, , , , , , 0.6, 0.05, , -1428]) // Pickup 116
+export const LaserSFX = () => zzfx(...[0.6, 0, 110, 0.2, 0.6, 0.36, 1, 1.8, , , , , , 0.3, , , , 0.33, 0.4, , -1500]) // Music 121
 
 export const BlipSFX = () => zzfx(...[, , 76, 0.02, 0.02, 0.01, 1, 0.44, , , , , , 0.5, , , , , 0.01, 0.57]) // Blip 60
 export const SolvedSFX = () =>

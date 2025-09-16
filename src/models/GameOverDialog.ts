@@ -3,7 +3,8 @@ import { Events } from '../libraries/Events'
 import { GameProgress } from '../scripts/DJPuzzle'
 import { TextMaterial } from '../scripts/TextureUtils'
 import { AnimationFactory } from '../scripts/AnimationFactory'
-import { DEBUG, Intro } from '../scripts/Utils'
+import { DEBUG, Intro, V3_ZERO } from '../scripts/Utils'
+import { ProgressEvent } from '../types'
 
 export const GameOverDialog = (): THREE.Object3D => {
     const result = new THREE.Group()
@@ -31,7 +32,7 @@ export const GameOverDialog = (): THREE.Object3D => {
             AnimationFactory.Instance.animateTransform({
                 mesh,
                 end: {
-                    position: new THREE.Vector3(0, 0, 0),
+                    position: V3_ZERO,
                     scaling: new THREE.Vector3(1, 1, 1),
                     rotation: new THREE.Euler(0, 0, 0),
                 },

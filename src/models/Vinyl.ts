@@ -4,6 +4,7 @@ import { BLACK, BLUE, GREEN, MAGENTA, TYPE_COLORS, WHITE } from '../scripts/Colo
 import { ColorMaterial } from '../scripts/TextureUtils'
 import { Events } from '../libraries/Events'
 import { GameProgress } from '../scripts/DJPuzzle'
+import { ProgressEvent } from '../types'
 
 type VinylProps = {
     color: string
