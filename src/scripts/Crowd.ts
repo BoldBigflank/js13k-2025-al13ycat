@@ -58,6 +58,8 @@ export const Crowd = (renderer: THREE.WebGLRenderer) => {
 
     // const handsGeometry = new THREE.SphereGeometry(0.3, 8, 8)
     const handsGeometry = CrowdPaw()
+        .rotateX(Math.PI / 2)
+        .translate(0, 2, 0)
     const handsMaterial = new THREE.MeshStandardMaterial()
     const handsMesh = new THREE.InstancedMesh(handsGeometry, handsMaterial, rows * cols * 2)
     handsMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage)

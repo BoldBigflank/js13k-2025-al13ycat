@@ -18,6 +18,7 @@ import {
     DownbeatEvent,
     FishJuggledEvent,
     InteractiveObject3D,
+    LaserEvent,
     ProgressEvent,
     RoomGlowEvent,
     SplashEvent,
@@ -55,7 +56,7 @@ const initGame = async () => {
     renderer.xr.addEventListener('sessionstart', onXRSessionStart)
     renderer.xr.enabled = true
     renderer.setAnimationLoop(animate)
-    document.body.appendChild(VRButton.createButton(renderer))
+    // document.body.appendChild(VRButton.createButton(renderer))
     document.body.appendChild(renderer.domElement)
 
     // Init Puzzle
@@ -211,7 +212,7 @@ const initGame = async () => {
     window.addEventListener('resize', onWindowResize, false)
 
     Events.Instance.on(ComboBrokenEvent, (isComboBroken: boolean) => {
-        isComboBroken ? RecordSFX() : CorrectSFX()
+        // isComboBroken ? RecordSFX() : CorrectSFX()
         if (!isComboBroken) {
             Events.Instance.emit(SplashEvent, pad?.getWorldPosition(new THREE.Vector3()))
         }
@@ -263,18 +264,54 @@ const initGame = async () => {
         // camera.lookAt(new THREE.Vector3(0, 0, -1))
         // document.getElementById('VRButton')!.style.display = 'none'
 
-        const debugScreen = DebugScreen()
-        debugScreen.position.set(0, 1, 5)
-        debugScreen.rotation.set(0, Math.PI, 0)
-        if (DEBUG) Events.Instance.emit(DebugEvent, 'Hello🔒, world!')
-        scene.add(debugScreen)
+        // const debugScreen = DebugScreen()
+        // debugScreen.position.set(0, 1, 5)
+        // debugScreen.rotation.set(0, Math.PI, 0)
+        // if (DEBUG) Events.Instance.emit(DebugEvent, 'Hello🔒, world!')
+        // scene.add(debugScreen)
+
+        // flyby
+        // Start in the middle for lasers
+        document.getElementById('#')
+        const dummy = new THREE.Mesh()
+        camera.position.set(-2, 1, -10)
+        camera.rotation.set(0, -Math.PI, 0)
+        // Move to behind the table
+        dummy.position.set(0, 5.5, 6)
+        dummy.rotation.set(-Math.PI / 6, 0, 0)
+        AnimationFactory.Instance.animateTransform({
+            mesh: camera,
+            end: {
+                position: dummy.position.clone(),
+                rotation: dummy.rotation.clone(),
+            },
+            duration: 8000,
+        }).then(() => {
+            // Move to cassette
+            dummy.position.set(0, 8, -20)
+            dummy.rotation.set(0, 0, 0)
+            AnimationFactory.Instance.animateTransform({
+                mesh: camera,
+                end: {
+                    position: dummy.position.clone(),
+                    rotation: dummy.rotation.clone(),
+                },
+                duration: 8000,
+            })
+        })
+
         // Color
-        // djPuzzle.addVinylByIndex(0)
-        // djPuzzle.addVinylByIndex(1)
-        // djPuzzle.addVinylByIndex(2)
-        // djPuzzle.addVinylByIndex(3)
-        // djPuzzle.addVinylByIndex(4)
-        // djPuzzle.addVinylByIndex(5)
+        djPuzzle.addVinylByIndex(0)
+        djPuzzle.addVinylByIndex(1)
+        djPuzzle.addVinylByIndex(2)
+        djPuzzle.addVinylByIndex(3)
+        djPuzzle.addVinylByIndex(4)
+        djPuzzle.addVinylByIndex(5)
+
+        sleep(4000).then(() => Events.Instance.emit(LaserEvent))
+        sleep(8000).then(() => Events.Instance.emit(LaserEvent))
+        sleep(12000).then(() => Events.Instance.emit(LaserEvent))
+
         // Artist
         // djPuzzle.addVinylByIndex(0)
         // djPuzzle.addVinylByIndex(2)

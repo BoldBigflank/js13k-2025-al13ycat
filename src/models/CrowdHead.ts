@@ -42,6 +42,7 @@ export const CrowdHead = (): THREE.BufferGeometry => {
     const shape = makeShape(head)
     const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
     geometry.scale(0.05, 0.05, 0.05)
+    geometry.translate(0, 1.5, 0)
     return geometry
 }
 
