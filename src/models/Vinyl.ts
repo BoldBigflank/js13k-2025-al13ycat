@@ -78,6 +78,7 @@ const LabelMaterial = (artist: string, title: string) => {
         map: texture,
         transparent: true,
     })
+    material.userData.type = 'LabelMaterial'
     return material
 }
 

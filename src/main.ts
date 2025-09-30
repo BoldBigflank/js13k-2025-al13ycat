@@ -26,13 +26,14 @@ import {
 import { Splash } from './models/Splash'
 import { sleep, DEBUG, Intro, LocalStorageKey, V3_ZERO } from './scripts/Utils'
 import { TextMaterial } from './scripts/TextureUtils'
+import { Mouse } from './scripts/Mouse'
 
 const CLOCK = new THREE.Clock()
 let beat = 0
 let fishCount = 0
 let maxFishCount = 0
 
-let camera: THREE.Camera | undefined,
+let camera: THREE.PerspectiveCamera | undefined,
     scene: THREE.Scene | undefined,
     raycaster: THREE.Raycaster | undefined,
     renderer: THREE.WebGLRenderer | undefined
@@ -53,6 +54,7 @@ const initGame = async () => {
     renderer.setSize(window.innerWidth, window.innerHeight)
     renderer.setClearColor(NEON_PURPLE, 1)
     renderer.xr.addEventListener('sessionstart', onXRSessionStart)
+    renderer.xr.addEventListener('sessionend', onXRSessionEnd)
     renderer.xr.enabled = true
     renderer.setAnimationLoop(animate)
     document.body.appendChild(VRButton.createButton(renderer))
@@ -64,9 +66,8 @@ const initGame = async () => {
     // Create a scene and populate it
     scene = new THREE.Scene()
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-    camera.position.set(0, 2, 1)
-    camera.rotation.set((-1 * Math.PI) / 12, 0, 0)
-    scene.add(camera)
+    resetCameraToInitialPosition()
+    // scene.add(camera)
     AnimationFactory.Instance.initScene(scene)
 
     const ambientLightBaseColor = new THREE.Color().setStyle(CAT_GREY)
@@ -99,8 +100,9 @@ const initGame = async () => {
     scene.attach(fishSwirl)
 
     djPuzzle.vinyls.forEach((record, i) => {
-        const mesh = Vinyl(record)
-        const originalPosition = new THREE.Vector3(0.7, 1.15, -0.2 - 0.125 * i)
+        const mesh = Vinyl(record) as InteractiveObject3D
+        const originalPosition = new THREE.Vector3(0.56 + ((0.24 * (i + 1)) % 0.48), 1.15, -0.18 - 0.135 * i)
+
         mesh.position.copy(originalPosition)
         mesh.userData.originalPosition = originalPosition
         mesh.userData.isPickable = true
@@ -187,6 +189,10 @@ const initGame = async () => {
         scene.add(mesh)
     })
 
+    // Mouse
+    const mouse = new Mouse(renderer.domElement, scene, camera)
+    scene.add(mouse.controller)
+
     // Controllers
 
     controller1 = renderer.xr.getController(0)
@@ -209,6 +215,7 @@ const initGame = async () => {
 
     // Event listeners
     window.addEventListener('resize', onWindowResize, false)
+    window.addEventListener('keydown', onKeyDown, false)
 
     Events.Instance.on(ComboBrokenEvent, (isComboBroken: boolean) => {
         isComboBroken ? RecordSFX() : CorrectSFX()
@@ -296,18 +303,37 @@ function onXRSessionStart() {
     xrMoveToLocation(START_POSITION)
 }
 
+function onXRSessionEnd() {
+    // Reset camera to initial position when VR session ends
+    resetCameraToInitialPosition()
+}
+
 function xrMoveToLocation(position: THREE.Vector3) {
-    baseReferenceSpace = renderer.xr.getReferenceSpace()
-    const offsetPosition = {
-        x: -1 * position.x,
-        y: -1 * position.y,
-        z: -1 * position.z,
-        w: 1,
+    // Check if XR session is active
+    if (renderer.xr.isPresenting) {
+        // XR mode: use reference space transformation
+        baseReferenceSpace = renderer.xr.getReferenceSpace()
+        if (!baseReferenceSpace) {
+            console.warn('XR reference space is null, cannot move to location')
+            return
+        }
+
+        const offsetPosition = {
+            x: -1 * position.x,
+            y: -1 * position.y,
+            z: -1 * position.z,
+            w: 1,
+        }
+        const offsetRotation = new THREE.Quaternion()
+        const transform = new XRRigidTransform(offsetPosition, offsetRotation)
+        baseReferenceSpace = baseReferenceSpace.getOffsetReferenceSpace(transform)
+        renderer.xr.setReferenceSpace(baseReferenceSpace)
+    } else {
+        // Non-XR mode: move camera directly
+        if (camera) {
+            camera.position.copy(position)
+        }
     }
-    const offsetRotation = new THREE.Quaternion()
-    const transform = new XRRigidTransform(offsetPosition, offsetRotation)
-    baseReferenceSpace = baseReferenceSpace.getOffsetReferenceSpace(transform)
-    renderer.xr.setReferenceSpace(baseReferenceSpace)
 }
 
 function onControllerConnected(event) {
@@ -444,9 +470,30 @@ function animate() {
 }
 
 const onWindowResize = () => {
-    camera.aspect = window.innerWidth / window.innerHeight
-    camera.updateProjectionMatrix()
-    renderer.setSize(window.innerWidth, window.innerHeight)
+    if (camera) {
+        camera.aspect = window.innerWidth / window.innerHeight
+        camera.updateProjectionMatrix()
+    }
+    if (renderer) {
+        renderer.setSize(window.innerWidth, window.innerHeight)
+    }
+}
+
+const resetCameraToInitialPosition = () => {
+    if (camera) {
+        camera.position.set(0, 2, 1)
+        camera.rotation.set((-1 * Math.PI) / 12, 0, 0)
+        camera.fov = 75
+        camera.updateProjectionMatrix()
+        scene.add(camera)
+    }
+}
+
+const onKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape' && renderer?.xr?.isPresenting) {
+        // Exit VR mode when Escape key is pressed
+        renderer.xr.getSession()?.end()
+    }
 }
 
 const setLoading = async (isLoading: boolean) => {
